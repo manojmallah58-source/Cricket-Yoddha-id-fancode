@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cricket Pro Live | IST Final</title>
+    <title>Cricket Live Pro | IST Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4f46e5;
-            --secondary: #9333ea;
+            --primary: #6366f1;
+            --secondary: #a855f7;
             --accent: #10b981;
-            --dark: #0f172a;
+            --bg: #0f172a;
             --glass: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
         }
@@ -24,47 +24,55 @@
             padding: 20px;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 800px; margin: 0 auto; }
 
-        header { text-align: center; padding: 20px 0 40px; }
-        header h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header { text-align: center; padding: 20px 0; }
+        header h1 { font-size: 2.8rem; font-weight: 800; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
         
-        #current-time { color: var(--accent); font-weight: 600; margin-top: 10px; }
+        #current-time { color: var(--accent); font-weight: 600; font-size: 1.1rem; margin-bottom: 20px; }
 
         .refresh-btn {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border: none; padding: 12px 28px; border-radius: 12px; color: white;
-            font-weight: 600; cursor: pointer; transition: 0.3s;
-            display: flex; align-items: center; gap: 10px; margin: 20px auto;
+            border: none; padding: 14px 30px; border-radius: 15px; color: white;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; gap: 10px; margin: 0 auto 30px;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
         }
 
-        .refresh-btn:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3); }
+        .refresh-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 25px rgba(168, 85, 247, 0.4); }
 
-        .loader { width: 40px; height: 40px; border: 4px solid var(--glass); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; display: none; margin: 20px auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        #match-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        /* Match Cards */
+        #match-grid { display: flex; flex-direction: column; gap: 20px; }
 
         .match-card {
             background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 20px; cursor: pointer; transition: 0.3s;
+            border-radius: 24px; padding: 22px; cursor: pointer; transition: 0.3s;
+            animation: fadeIn 0.5s ease-out forwards;
         }
-        .match-card:hover { border-color: var(--primary); background: rgba(255,255,255,0.1); }
+        .match-card:hover { border-color: var(--primary); transform: scale(1.01); background: rgba(255,255,255,0.08); }
 
-        .team-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
-        .team-meta { display: flex; align-items: center; gap: 10px; }
-        .logo { width: 40px; height: 40px; background: #334155; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; }
+        .series-label { font-size: 0.75rem; color: var(--secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: block; }
+
+        .team-box { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; }
+        .team-info { display: flex; align-items: center; gap: 12px; }
+        .team-logo { width: 42px; height: 42px; background: #334155; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; border: 1px solid var(--glass-border); }
         
-        .score { font-weight: 800; font-size: 1.1rem; }
-        .status { font-size: 0.85rem; color: var(--accent); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--glass-border); display: flex; align-items: center; gap: 5px; }
-        .ist-time-tag { color: #facc15; font-weight: 600; }
+        .score-val { font-weight: 800; font-size: 1.25rem; color: #fff; }
+        .match-status { font-size: 0.9rem; color: var(--accent); margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--glass-border); display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        .ist-highlight { color: #facc15; font-weight: 700; }
 
-        /* Modal */
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:1000; padding:15px; }
-        .modal-content { background: #1e293b; width:100%; max-width:600px; border-radius:25px; padding:30px; position:relative; }
-        .close { position:absolute; top:20px; right:20px; font-size:2rem; cursor:pointer; color: #94a3b8; }
+        /* Scoreboard Modal */
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); display:none; justify-content:center; align-items:center; z-index:1000; padding:15px; backdrop-filter: blur(5px); }
+        .modal-content { background: #1e293b; width:100%; max-width:550px; border-radius:30px; padding:30px; position:relative; border: 1px solid var(--glass-border); }
+        .close-btn { position:absolute; top:20px; right:20px; font-size:2.2rem; cursor:pointer; color: #94a3b8; line-height: 1; }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .player-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .player-name { font-weight: 500; color: #cbd5e1; }
+        .player-score { font-weight: 700; color: var(--accent); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader { width: 45px; height: 45px; border: 4px solid var(--glass); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 40px auto; display: none; }
     </style>
 </head>
 <body>
@@ -72,7 +80,7 @@
 <div class="container">
     <header>
         <h1>Cricket Live Pro</h1>
-        <div id="current-time">Loading IST Time...</div>
+        <div id="current-time">🇮🇳 IST: --:--:--</div>
     </header>
 
     <button class="refresh-btn" onclick="fetchScores()">
@@ -85,9 +93,18 @@
 
 <div id="scoreModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2 id="modalMatch">Match Details</h2>
-        <div id="playerStats" style="margin-top:20px;"></div>
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle" style="margin-bottom: 5px; color: #fff;">Match Summary</h2>
+        <p id="modalStatus" style="color: var(--accent); font-size: 0.9rem; margin-bottom: 25px;"></p>
+        
+        <div style="background: rgba(0,0,0,0.2); border-radius: 20px; padding: 20px;">
+            <h4 style="color: var(--secondary); margin-bottom: 15px; font-size: 1.1rem;">Top Performer / Current Batter</h4>
+            <div id="playerList">
+                </div>
+            <p style="text-align: center; font-size: 0.8rem; color: #64748b; margin-top: 20px;">
+                Full ball-by-ball scorecard updates live with feed.
+            </p>
+        </div>
     </div>
 </div>
 
@@ -95,40 +112,43 @@
     const API_KEY = "71a4d725-d2d8-4411-9d5b-fc7c55ccf9e5";
     const API_URL = `https://api.cricapi.com/v1/cricScore?apikey=${API_KEY}`;
 
-    function updateISTHeader() {
-        const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-        const istTime = new Intl.DateTimeFormat('en-IN', options).format(new Date());
-        document.getElementById('current-time').innerHTML = `🇮🇳 IST: ${istTime}`;
+    // Clock Logic
+    function updateClock() {
+        const now = new Date();
+        const ist = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true });
+        document.getElementById('current-time').innerHTML = `🇮🇳 Indian Standard Time: ${ist}`;
     }
-    setInterval(updateISTHeader, 1000);
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    // Naya function: GMT ko IST mein badalne ke liye
-    function formatToIST(statusText) {
-        if (!statusText.includes("GMT")) return statusText;
-
+    // GMT to IST Converter Logic
+    function convertStatus(status) {
+        if (!status || !status.includes("GMT")) return status;
+        
         try {
-            // Extracting date and time from string like "Dec 29, 15:30 GMT"
-            const date Part = statusText.match(/[A-Z][a-z]{2}\s\d{1,2},\s\d{2}:\d{2}\sGMT/);
-            if (!datePart) return statusText;
-
-            const gmtDate = new Date(datePart[0]);
-            const istOptions = { 
-                timeZone: 'Asia/Kolkata', 
-                month: 'short', day: 'numeric', 
-                hour: '2-digit', minute: '2-digit', 
-                hour12: true 
-            };
-            const istString = new Intl.DateTimeFormat('en-IN', istOptions).format(gmtDate);
+            // Regex to find "Dec 29, 15:30 GMT" pattern
+            const gmtRegex = /[A-Z][a-z]{2}\s\d{1,2},\s\d{2}:\d{2}\sGMT/;
+            const match = status.match(gmtRegex);
             
-            return statusText.replace(datePart[0], `<span class="ist-time-tag">${istString} IST</span>`);
+            if (match) {
+                const gmtDate = new Date(match[0]);
+                const istTime = gmtDate.toLocaleString('en-IN', { 
+                    timeZone: 'Asia/Kolkata',
+                    month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: true 
+                });
+                return status.replace(match[0], `<span class="ist-highlight">${istTime} IST</span>`);
+            }
+            return status;
         } catch (e) {
-            return statusText;
+            return status;
         }
     }
 
     async function fetchScores() {
         const grid = document.getElementById('match-grid');
         const loader = document.getElementById('loader');
+        
         grid.innerHTML = '';
         loader.style.display = 'block';
 
@@ -136,63 +156,89 @@
             const response = await fetch(API_URL);
             const result = await response.json();
             loader.style.display = 'none';
-            if (result.status === "success") renderMatches(result.data);
+
+            if (result.status !== "success") throw new Error(result.reason || "API Limit");
+            
+            if (result.data.length === 0) {
+                grid.innerHTML = `<p style="text-align:center;">No live matches found.</p>`;
+                return;
+            }
+
+            result.data.forEach((match, idx) => {
+                const card = document.createElement('div');
+                card.className = 'match-card';
+                card.style.animationDelay = `${idx * 0.1}s`;
+                card.onclick = () => openModal(match);
+
+                const istStatus = convertStatus(match.status);
+
+                card.innerHTML = `
+                    <span class="series-label">${match.series}</span>
+                    <div class="team-box">
+                        <div class="team-info">
+                            <div class="team-logo">${match.t1.charAt(0)}</div>
+                            <span style="font-weight:600;">${match.t1}</span>
+                        </div>
+                        <span class="score-val">${match.t1s || 'Yet to Bat'}</span>
+                    </div>
+                    <div class="team-box">
+                        <div class="team-info">
+                            <div class="team-logo" style="background:var(--primary);">${match.t2.charAt(0)}</div>
+                            <span style="font-weight:600;">${match.t2}</span>
+                        </div>
+                        <span class="score-val">${match.t2s || 'Yet to Bat'}</span>
+                    </div>
+                    <div class="match-status">
+                        <div style="width:8px; height:8px; background:var(--accent); border-radius:50%;"></div>
+                        ${istStatus}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
         } catch (error) {
             loader.style.display = 'none';
+            grid.innerHTML = `<div style="text-align:center; color:#ef4444; background:rgba(239,68,68,0.1); padding:20px; border-radius:15px;">
+                <strong>Error:</strong> ${error.message}
+            </div>`;
         }
     }
 
-    function renderMatches(matches) {
-        const grid = document.getElementById('match-grid');
-        matches.forEach(match => {
-            const card = document.createElement('div');
-            card.className = 'match-card';
-            card.onclick = () => showPlayerStats(match);
-            
-            // Yahan status ko IST mein convert kiya gaya hai
-            const istStatus = formatToIST(match.status);
-
-            card.innerHTML = `
-                <div style="font-size: 0.7rem; font-weight:700; color:var(--secondary); margin-bottom:10px;">${match.series}</div>
-                <div class="team-row">
-                    <div class="team-meta"><div class="logo">${match.t1.charAt(0)}</div><span>${match.t1}</span></div>
-                    <span class="score">${match.t1s || '0/0'}</span>
-                </div>
-                <div class="team-row">
-                    <div class="team-meta"><div class="logo" style="background:var(--primary)">${match.t2.charAt(0)}</div><span>${match.t2}</span></div>
-                    <span class="score">${match.t2s || '0/0'}</span>
-                </div>
-                <div class="status">
-                    <div style="width:8px; height:8px; background:var(--accent); border-radius:50%;"></div>
-                    ${istStatus}
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    function showPlayerStats(match) {
+    function openModal(match) {
         const modal = document.getElementById('scoreModal');
-        const statsDiv = document.getElementById('playerStats');
-        document.getElementById('modalMatch').innerText = `${match.t1} vs ${match.t2}`;
-        
-        statsDiv.innerHTML = `
-            <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:15px;">
-                <p><strong>Status:</strong> ${formatToIST(match.status)}</p>
-                <hr style="margin:15px 0; border:0; border-top:1px solid #334155;">
-                <p>Batting/Bowling detailed stats will update here live...</p>
+        const list = document.getElementById('playerList');
+        document.getElementById('modalTitle').innerText = `${match.t1} vs ${match.t2}`;
+        document.getElementById('modalStatus').innerHTML = convertStatus(match.status);
+
+        // Generating a professional summary scorecard
+        list.innerHTML = `
+            <div class="player-row">
+                <span class="player-name">${match.t1}</span>
+                <span class="player-score">${match.t1s || 'N/A'}</span>
+            </div>
+            <div class="player-row">
+                <span class="player-name">${match.t2}</span>
+                <span class="player-score">${match.t2s || 'N/A'}</span>
+            </div>
+            <div style="margin-top:20px; padding:10px; border-radius:10px; background:rgba(255,255,255,0.03); font-size:0.85rem;">
+                Match Type: ${match.matchType.toUpperCase()} | Format: ${match.matchType === 't20' ? 'T20i' : 'International'}
             </div>
         `;
+
         modal.style.display = 'flex';
     }
 
-    function closeModal() { document.getElementById('scoreModal').style.display = 'none'; }
+    function closeModal() {
+        document.getElementById('scoreModal').style.display = 'none';
+    }
+
     window.onclick = (e) => { if(e.target.className === 'modal') closeModal(); }
 
+    // First load
     fetchScores();
 </script>
+
 </body>
 </html>
-
 
 
