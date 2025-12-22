@@ -3,99 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Color Sort Ultra Pro</title>
+    <title>Color Sort Puzzle - Pro</title>
     <style>
         :root {
-            --bg: #0a0a12;
-            --tube-border: rgba(255, 255, 255, 0.2);
-            --glass-shine: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+            --bg: #120d26;
+            --tube-glass: rgba(255, 255, 255, 0.2);
+            --tube-border: #ffffff;
+            --accent: #ffcc00;
         }
 
         body {
             margin: 0;
             background: var(--bg);
             color: white;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Arial Rounded MT Bold', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            touch-action: manipulation;
+            background-image: radial-gradient(circle, #241a4a 0%, #120d26 100%);
         }
 
-        .header {
-            padding: 20px;
+        /* Header UI */
+        #ui-top {
             width: 100%;
+            padding: 15px 25px;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
+            max-width: 500px;
         }
 
-        #game-container {
-            flex: 1;
+        #level-text { font-size: 24px; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+        .btn-group { display: flex; gap: 10px; }
+        .control-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--tube-border);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
-            align-content: center;
-            gap: 25px;
+            align-items: center;
+            transition: 0.2s;
+        }
+        .control-btn:active { transform: scale(0.9); background: var(--accent); }
+
+        /* Game Board */
+        #board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px 10px;
             padding: 20px;
-            max-width: 600px;
+            max-width: 500px;
+            margin-top: 50px;
+        }
+
+        .tube-container {
+            position: relative;
+            width: 55px;
+            height: 160px;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .tube {
-            width: 55px;
-            height: 170px;
-            border: 2px solid var(--tube-border);
-            border-top: 5px solid transparent;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--tube-border);
+            border-top: none;
             border-radius: 0 0 30px 30px;
             position: relative;
-            background: rgba(255, 255, 255, 0.03);
-            cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
             display: flex;
             flex-direction: column-reverse;
-            overflow: visible;
-        }
-
-        .tube.selected {
-            transform: translateY(-25px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 15px rgba(255,255,255,0.2);
-            border-color: #fff;
-        }
-
-        .liquid {
-            width: 100%;
-            transition: height 0.3s ease-out;
-            position: relative;
-            border-radius: 2px;
-        }
-
-        /* Glass Reflection Effect */
-        .tube::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 5px; width: 8px; height: 90%;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            pointer-events: none;
-        }
-
-        .btn {
-            background: #2a2a40;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: bold;
+            background: var(--tube-glass);
             cursor: pointer;
-            box-shadow: 0 4px 0 #1a1a2e;
         }
 
-        .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #1a1a2e; }
+        /* Tilt Animation */
+        .tube-container.selected { transform: translateY(-30px); }
+        .tube-container.tilting { transform: translate(30px, -50px) rotate(80deg); z-index: 10; }
 
+        .layer {
+            width: 100%;
+            height: 25%;
+            transition: height 0.3s ease;
+        }
+
+        /* Overlay */
         #win-screen {
             position: fixed;
             inset: 0;
@@ -107,212 +105,192 @@
             z-index: 100;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            60% { transform: translateX(8px); }
+        .next-btn {
+            background: #4CAF50;
+            padding: 15px 50px;
+            border-radius: 30px;
+            color: white;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        .shake { animation: shake 0.3s; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2 id="lvl-display">Level 1</h2>
-        <button class="btn" onclick="undo()">UNDO</button>
-        <button class="btn" onclick="initLevel()">RESET</button>
+    <div id="ui-top">
+        <div id="level-text">LEVEL 1</div>
+        <div class="btn-group">
+            <div class="control-btn" onclick="undoMove()">↩️</div>
+            <div class="control-btn" onclick="initGame()">🔄</div>
+        </div>
     </div>
 
-    <div id="game-container"></div>
+    <div id="board"></div>
 
     <div id="win-screen">
-        <h1 style="color: #00ff88; font-size: 3rem;">EXCELLENT!</h1>
-        <button class="btn" style="padding: 20px 40px; font-size: 1.2rem;" onclick="nextLevel()">NEXT LEVEL</button>
+        <h1 style="color:var(--accent); font-size: 40px;">EXCELLENT!</h1>
+        <button class="next-btn" onclick="nextLevel()">NEXT LEVEL</button>
     </div>
 
-    <script>
-        const COLORS = ['#ff4757', '#2ed573', '#1e90ff', '#eccc68', '#ffa502', '#ff6b81', '#70a1ff', '#7bed9f'];
-        let state = { level: 1, tubes: [], selectedIdx: null, history: [], busy: false };
+<script>
+    // Audio Context for Procedural Pouring Sound
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playPourSound() {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+    }
 
-        // --- Audio Controller ---
-        const AudioFX = (() => {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const COLORS = {
+        C1: '#FF5252', C2: '#448AFF', C3: '#4CAF50', C4: '#FFEB3B', 
+        C5: '#E040FB', C6: '#FF9800', C7: '#00BCD4', C8: '#8D6E63'
+    };
+
+    let level = 1;
+    let tubesData = [];
+    let selected = null;
+    let history = [];
+
+    function initGame() {
+        document.getElementById('win-screen').style.display = 'none';
+        document.getElementById('level-text').innerText = `LEVEL ${level}`;
+        selected = null;
+        history = [];
+        
+        // Dynamic level difficulty
+        let colorCount = Math.min(level + 2, 8);
+        let tubeCount = colorCount + 2;
+        
+        tubesData = generatePuzzle(colorCount, tubeCount);
+        render();
+    }
+
+    function generatePuzzle(colors, totalTubes) {
+        let pool = [];
+        for(let i=1; i<=colors; i++) {
+            for(let j=0; j<4; j++) pool.push(`C${i}`);
+        }
+        pool.sort(() => Math.random() - 0.5);
+
+        let tubes = [];
+        for(let i=0; i<colors; i++) {
+            tubes.push(pool.slice(i*4, (i+1)*4));
+        }
+        for(let i=0; i<totalTubes-colors; i++) tubes.push([]);
+        return tubes;
+    }
+
+    function render() {
+        const board = document.getElementById('board');
+        board.innerHTML = '';
+        tubesData.forEach((layers, idx) => {
+            const container = document.createElement('div');
+            container.className = `tube-container ${selected === idx ? 'selected' : ''}`;
             
-            const playPop = () => {
-                const osc = ctx.createOscillator();
-                const g = ctx.createGain();
-                osc.connect(g); g.connect(ctx.destination);
-                osc.frequency.setValueAtTime(600, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.1);
-                g.gain.setValueAtTime(0.2, ctx.currentTime);
-                g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
-                osc.start(); osc.stop(ctx.currentTime + 0.1);
-            };
+            const tube = document.createElement('div');
+            tube.className = 'tube';
+            tube.onclick = () => handleTap(idx);
 
-            const startPour = () => {
-                const osc = ctx.createOscillator();
-                const lfo = ctx.createOscillator();
-                const g = ctx.createGain();
-                const lfoGain = ctx.createGain();
-
-                osc.type = 'triangle';
-                lfo.frequency.value = 15; // Gurgle speed
-                lfoGain.gain.value = 30; // Gurgle intensity
-
-                lfo.connect(lfoGain);
-                lfoGain.connect(osc.frequency);
-                osc.connect(g);
-                g.connect(ctx.destination);
-
-                osc.frequency.setValueAtTime(150, ctx.currentTime);
-                g.gain.setValueAtTime(0, ctx.currentTime);
-                g.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.1);
-
-                osc.start(); lfo.start();
-                return { stop: () => {
-                    g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
-                    setTimeout(() => { osc.stop(); lfo.stop(); }, 100);
-                }};
-            };
-
-            return { playPop, startPour, resume: () => ctx.resume() };
-        })();
-
-        // --- Game Logic ---
-        function initLevel() {
-            state.history = [];
-            state.selectedIdx = null;
-            state.busy = false;
-            document.getElementById('win-screen').style.display = 'none';
-            document.getElementById('lvl-display').innerText = `Level ${state.level}`;
-
-            const colorCount = Math.min(state.level + 2, 8);
-            const tubeCount = colorCount + 2;
-            let pool = [];
-            for(let i=0; i<colorCount; i++) {
-                for(let j=0; j<4; j++) pool.push(COLORS[i]);
-            }
-            pool.sort(() => Math.random() - 0.5);
-
-            state.tubes = [];
-            for(let i=0; i<tubeCount; i++) {
-                state.tubes.push(i < colorCount ? pool.splice(0, 4) : []);
-            }
-            render();
-        }
-
-        function render() {
-            const container = document.getElementById('game-container');
-            container.innerHTML = '';
-            state.tubes.forEach((content, i) => {
-                const tube = document.createElement('div');
-                tube.className = `tube ${state.selectedIdx === i ? 'selected' : ''}`;
-                tube.onclick = () => handleTubeClick(i);
-                
-                content.forEach(color => {
-                    const liq = document.createElement('div');
-                    liq.className = 'liquid';
-                    liq.style.backgroundColor = color;
-                    liq.style.height = '40px';
-                    tube.appendChild(liq);
-                });
-                container.appendChild(tube);
+            layers.forEach(c => {
+                const l = document.createElement('div');
+                l.className = 'layer';
+                l.style.backgroundColor = COLORS[c];
+                tube.appendChild(l);
             });
-        }
 
-        async function handleTubeClick(idx) {
-            if (state.busy) return;
-            AudioFX.resume();
+            container.appendChild(tube);
+            board.appendChild(container);
+        });
+    }
 
-            if (state.selectedIdx === null) {
-                if (state.tubes[idx].length > 0) {
-                    state.selectedIdx = idx;
-                    AudioFX.playPop();
-                    render();
-                }
-            } else if (state.selectedIdx === idx) {
-                state.selectedIdx = null;
+    function handleTap(idx) {
+        if (selected === null) {
+            if (tubesData[idx].length > 0) {
+                selected = idx;
+                render();
+            }
+        } else {
+            if (selected === idx) {
+                selected = null;
                 render();
             } else {
-                const from = state.selectedIdx;
-                const to = idx;
-                
-                if (isValidMove(from, to)) {
-                    await performMove(from, to);
-                } else {
-                    const el = document.querySelectorAll('.tube')[to];
-                    el.classList.add('shake');
-                    setTimeout(() => el.classList.remove('shake'), 300);
-                }
-                state.selectedIdx = null;
-                render();
-                checkWin();
+                tryPour(selected, idx);
             }
         }
+    }
 
-        function isValidMove(f, t) {
-            const src = state.tubes[f];
-            const dst = state.tubes[t];
-            if (dst.length >= 4) return false;
-            if (dst.length > 0 && src[src.length-1] !== dst[dst.length-1]) return false;
-            return true;
+    async function tryPour(from, to) {
+        let f = tubesData[from];
+        let t = tubesData[to];
+
+        if (f.length === 0 || t.length === 4) {
+            selected = null;
+            render();
+            return;
         }
 
-        async function performMove(f, t) {
-            state.busy = true;
-            state.history.push(JSON.stringify(state.tubes));
-            
-            const src = state.tubes[f];
-            const dst = state.tubes[t];
-            const color = src[src.length - 1];
-            
-            // Pouring logic
-            const sound = AudioFX.startPour();
-            
-            // Animation: Move source tube to target
-            const tubes = document.querySelectorAll('.tube');
-            const rectF = tubes[f].getBoundingClientRect();
-            const rectT = tubes[t].getBoundingClientRect();
-            const angle = rectT.left < rectF.left ? -70 : 70;
-
-            tubes[f].style.zIndex = "10";
-            tubes[f].style.transform = `translate(${rectT.left - rectF.left}px, -80px) rotate(${angle}deg)`;
-
-            while (src.length > 0 && src[src.length-1] === color && dst.length < 4) {
-                dst.push(src.pop());
-                render(); 
-                // Restore selection and transform during mid-render
-                document.querySelectorAll('.tube')[f].style.transform = `translate(${rectT.left - rectF.left}px, -80px) rotate(${angle}deg)`;
-                document.querySelectorAll('.tube')[f].classList.add('selected');
-                await new Promise(r => setTimeout(r, 250));
-            }
-
-            sound.stop();
-            tubes[f].style.transform = '';
-            await new Promise(r => setTimeout(r, 300));
-            state.busy = false;
+        let color = f[f.length - 1];
+        if (t.length > 0 && t[t.length - 1] !== color) {
+            selected = null;
+            render();
+            return;
         }
 
-        function checkWin() {
-            const win = state.tubes.every(t => t.length === 0 || (t.length === 4 && t.every(c => c === t[0])));
-            if (win) document.getElementById('win-screen').style.display = 'flex';
+        // Pouring Animation Logic
+        const containers = document.querySelectorAll('.tube-container');
+        containers[from].classList.add('tilting');
+        playPourSound();
+
+        await new Promise(r => setTimeout(r, 400));
+
+        history.push(JSON.parse(JSON.stringify(tubesData)));
+
+        while (f.length > 0 && f[f.length-1] === color && t.length < 4) {
+            t.push(f.pop());
         }
 
-        function undo() {
-            if (state.history.length > 0) {
-                state.tubes = JSON.parse(state.history.pop());
-                render();
-            }
-        }
+        selected = null;
+        render();
+        checkWin();
+    }
 
-        function nextLevel() {
-            state.level++;
-            initLevel();
+    function undoMove() {
+        if (history.length > 0) {
+            tubesData = history.pop();
+            render();
         }
+    }
 
-        initLevel();
-    </script>
+    function checkWin() {
+        let win = tubesData.every(t => t.length === 0 || (t.length === 4 && t.every(c => c === t[0])));
+        if (win) {
+            setTimeout(() => {
+                document.getElementById('win-screen').style.display = 'flex';
+            }, 500);
+        }
+    }
+
+    function nextLevel() {
+        level++;
+        initGame();
+    }
+
+    initGame();
+</script>
 </body>
 </html>
+
 
 
