@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CricPro Live | Sorted Upcoming</title>
+    <title>CricPro Live | Ultimate Sorted Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00a82d; --bg: #f4f7f6; --white: #ffffff; --text-dark: #222; --text-light: #666; --border: #e0e0e0; --blue: #1976d2; }
@@ -23,13 +23,13 @@
         .team-logo { width: 28px; height: 28px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; color: var(--primary); }
         .team-name { font-weight: 600; font-size: 0.95rem; }
         .team-score { font-weight: 700; font-size: 1.1rem; }
-        .time-ist { font-size: 0.85rem; color: #d32f2f; font-weight: 700; margin-top: 8px; background: #fff5f5; padding: 5px; border-radius: 5px; display: inline-block; }
+        .time-ist { font-size: 0.85rem; color: #d32f2f; font-weight: 700; margin-top: 8px; background: #fff5f5; padding: 6px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; }
         .match-status { font-size: 0.85rem; color: #d32f2f; margin-top: 10px; font-weight: 500; }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; }
         .back-btn { font-size: 1.5rem; cursor: pointer; padding: 0 10px; }
         .scorecard-container { background: white; margin: 10px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .inning-title { background: #f8f9fa; padding: 12px; font-weight: 700; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.9rem; }
+        .inning-title { background: #f8f9fa; padding: 12px; font-weight: 700; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.9rem; text-transform: capitalize; }
         .stat-table { width: 100%; border-collapse: collapse; }
         .stat-table th { text-align: left; font-size: 0.65rem; color: var(--text-light); padding: 10px 8px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
         .stat-table td { padding: 10px 8px; font-size: 0.8rem; border-bottom: 1px solid #f1f1f1; }
@@ -43,7 +43,7 @@
 
 <header>
     <div class="header-top">
-        <h2 style="font-weight: 800; letter-spacing: -0.5px;">CricPro Live</h2>
+        <h2 style="font-weight: 800;">CricPro Live</h2>
         <div class="ist-clock" id="ist-clock">IST: --:--</div>
     </div>
     <div class="tabs">
@@ -62,8 +62,8 @@
     <div class="modal-header">
         <span class="back-btn" onclick="closeModal()">←</span>
         <div>
-            <div id="m-teams" style="font-weight: 700; font-size: 1rem;">Loading...</div>
-            <div id="m-status" style="font-size: 0.75rem; opacity: 0.9;">Please wait...</div>
+            <div id="m-teams" style="font-weight: 700;">Loading...</div>
+            <div id="m-status" style="font-size: 0.75rem;">Please wait...</div>
         </div>
     </div>
     <div id="scorecard-area"></div>
@@ -79,11 +79,18 @@
     }
     setInterval(updateClock, 1000);
 
-    // GMT string ko IST mein convert karne ka function
+    // Date/Time fix for proper sorting and IST conversion
+    function getParsedTime(dateStr) {
+        if (!dateStr) return 0;
+        // Clean up GMT strings for Safari/Mobile compatibility
+        let cleanStr = dateStr.replace(" GMT", "Z").replace(" ", "T");
+        return new Date(cleanStr).getTime();
+    }
+
     function formatToIST(dateStr) {
         if (!dateStr) return "";
         try {
-            const date = new Date(dateStr.replace(" GMT", "Z").replace(" ", "T")); 
+            const date = new Date(getParsedTime(dateStr)); 
             return date.toLocaleString('en-IN', { 
                 timeZone: 'Asia/Kolkata',
                 day: '2-digit', month: 'short',
@@ -102,17 +109,12 @@
             const res = await fetch(`https://api.cricapi.com/v1/cricScore?apikey=${API_KEY}`);
             const json = await res.json();
             loader.style.display = 'none';
-
-            if (json.status !== "success") {
-                list.innerHTML = `<p style="text-align:center; padding:20px;">API Limit Reached.</p>`;
-                return;
-            }
-
+            if (json.status !== "success") return;
             allMatches = json.data || [];
             switchTab('live', document.querySelector('.tab.active'));
         } catch (e) {
             loader.style.display = 'none';
-            list.innerHTML = "<p style='text-align:center; padding:20px;'>Connection Error.</p>";
+            list.innerHTML = "<p style='text-align:center;'>API Limit or Connection Error</p>";
         }
     }
 
@@ -122,18 +124,17 @@
         const list = document.getElementById('match-list');
         list.innerHTML = '';
 
-        // Filter and Sort Logic
         let filtered = allMatches.filter(m => {
             if (type === 'live') return m.ms === 'live';
             if (type === 'upcoming') return m.ms === 'fixture';
             return m.ms === 'result';
         });
 
-        // Date ke hisab se sorting (Jo match pehle aane wala hai wo upar)
+        // Sorting Logic: Nearest match first for upcoming, latest match first for recent
         if (type === 'upcoming') {
-            filtered.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+            filtered.sort((a, b) => getParsedTime(a.dateTime || a.status) - getParsedTime(b.dateTime || b.status));
         } else if (type === 'recent') {
-            filtered.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+            filtered.sort((a, b) => getParsedTime(b.dateTime || b.status) - getParsedTime(a.dateTime || a.status));
         }
 
         if (filtered.length === 0) {
@@ -146,12 +147,9 @@
             card.className = 'match-card';
             card.onclick = () => openModal(m);
             
-            let timeDisplay = "";
-            if (type === 'upcoming') {
-                timeDisplay = `<div class="time-ist">📅 ${formatToIST(m.dateTime || m.status)}</div>`;
-            } else {
-                timeDisplay = `<div class="match-status">${m.status}</div>`;
-            }
+            let timeDisplay = (type === 'upcoming') ? 
+                `<div class="time-ist">📅 ${formatToIST(m.dateTime || m.status)}</div>` : 
+                `<div class="match-status">${m.status}</div>`;
 
             card.innerHTML = `
                 <div class="series-info">${m.series || 'Cricket Match'}</div>
@@ -182,7 +180,7 @@
             const json = await res.json();
             
             if (json.status !== "success" || !json.data || !json.data.scorecard) {
-                area.innerHTML = "<p style='padding:40px; text-align:center;'>Detailed Scorecard Not Available.</p>";
+                area.innerHTML = "<p style='padding:40px; text-align:center;'>Full Scorecard Not Available.</p>";
                 return;
             }
 
@@ -208,12 +206,12 @@
                 section.innerHTML = `
                     <div class="inning-title"><span>${inning.inning}</span><span>${totals.R}/${totals.W} (${totals.OV} ov)</span></div>
                     <table class="stat-table"><thead><tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody>${battingHtml}</tbody></table>
-                    <div style="padding:10px; font-size:0.8rem; border-top:1px solid #eee;"><strong>Extras:</strong> ${extras} | <strong>Total:</strong> ${totals.R}/${totals.W} (${totals.OV} ov)</div>
+                    <div style="padding:10px; font-size:0.8rem; border-top:1px solid #eee; background:#fffdfd;"><strong>Extras:</strong> ${extras} | <strong>Total:</strong> ${totals.R}/${totals.W} (${totals.OV} ov)</div>
                     <div class="bowling-section"><table class="stat-table"><thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Eco</th></tr></thead><tbody>${bowlingHtml}</tbody></table></div>
                 `;
                 area.appendChild(section);
             });
-        } catch (e) { area.innerHTML = "<p style='padding:40px; text-align:center;'>Error loading details.</p>"; }
+        } catch (e) { area.innerHTML = "<p style='text-align:center;'>Error loading details.</p>"; }
     }
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
@@ -221,6 +219,7 @@
 </script>
 </body>
 </html>
+
 
 
 
