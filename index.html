@@ -3,59 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Color Sort Puzzle</title>
+    <title>SortPuz - Pro Edition</title>
     <style>
         :root {
-            --bg-color: #1a1a1a;
-            --tube-border: #ffffff80;
-            --btn-bg: #4a4a4a;
-            --accent: #ffd700;
-            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            --bg: #0b0e1a;
+            --tube-border: #ffffff;
+            --accent: #ffcc00;
         }
 
         body {
             margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
+            background: var(--bg);
+            background-image: radial-gradient(circle, #1a1f35 0%, #0b0e1a 100%);
             color: white;
-            font-family: var(--font-main);
+            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100vh;
             overflow: hidden;
         }
 
-        /* UI Elements */
+        /* --- Home Page --- */
+        #home-page {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(255,204,0,0.5);
+            margin-bottom: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        .play-btn {
+            background: #4caf50;
+            border: none;
+            padding: 20px 60px;
+            font-size: 1.5rem;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        /* --- Game UI --- */
         #header {
             width: 100%;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             max-width: 500px;
         }
 
-        #level-display {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
+        .level-tag { font-size: 1.4rem; font-weight: bold; }
 
-        .controls {
-            display: flex;
-            gap: 10px;
-        }
+        .btn-group { display: flex; gap: 10px; }
 
         .icon-btn {
-            background: var(--btn-bg);
-            border: 2px solid var(--tube-border);
+            background: rgba(255,255,255,0.1);
+            border: 1.5px solid white;
             border-radius: 12px;
             width: 45px;
             height: 45px;
@@ -63,308 +81,237 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: transform 0.1s;
         }
 
-        .icon-btn:active {
-            transform: scale(0.9);
-            background: #666;
-        }
-
-        /* Game Board */
-        #game-container {
-            flex-grow: 1;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-content: center;
-            gap: 30px 15px;
+        /* --- Tubes & Animation --- */
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+            gap: 25px 15px;
+            width: 90%;
+            max-width: 450px;
             padding: 20px;
-            max-width: 600px;
+            margin-top: 20px;
         }
 
         .tube {
-            width: 60px;
-            height: 180px;
-            border: 3px solid var(--tube-border);
+            height: 140px;
+            width: 50px;
+            border: 2.5px solid var(--tube-border);
             border-top: none;
-            border-bottom-left-radius: 30px;
-            border-bottom-right-radius: 30px;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
             position: relative;
             display: flex;
             flex-direction: column-reverse;
             cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            padding-bottom: 5px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: visible; /* Stream ke liye zaroori hai */
         }
 
         .tube.selected {
-            transform: translateY(-20px);
-            border-color: var(--accent);
+            transform: translateY(-25px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
         .liquid {
             width: 100%;
-            height: 0%; /* Dynamic */
-            transition: height 0.5s ease;
-            border-radius: 2px;
+            height: 25%;
+            transition: height 0.4s ease;
+            position: relative;
+            z-index: 2;
         }
 
+        /* Video ki tarah rounded bottom */
         .liquid:first-child {
             border-bottom-left-radius: 20px;
             border-bottom-right-radius: 20px;
         }
 
-        /* Overlay & Modals */
-        #overlay {
-            position: fixed;
+        /* Pouring Stream Effect */
+        .stream {
+            position: absolute;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
+            left: 50%;
+            width: 6px;
+            height: 0;
+            transform: translateX(-50%);
+            z-index: 1;
+            transition: height 0.3s ease;
+        }
+
+        /* --- Modals --- */
+        #win-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 300;
         }
 
-        .win-card {
-            background: #2c2c2c;
-            padding: 40px;
-            border-radius: 25px;
-            text-align: center;
-            border: 3px solid var(--accent);
-            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes pop {
-            0% { transform: scale(0.5); }
-            100% { transform: scale(1); }
-        }
-
-        .btn-next {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 20px;
-            border-radius: 50px;
-            margin-top: 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        /* SVG Icons Styling */
-        svg { fill: white; width: 24px; height: 24px; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
     </style>
 </head>
 <body>
 
+    <div id="home-page">
+        <div class="logo">SortPuz</div>
+        <button class="play-btn" onclick="startGame()">PLAY NOW</button>
+    </div>
+
     <div id="header">
-        <div id="level-display">LEVEL 1</div>
-        <div class="controls">
-            <div class="icon-btn" onclick="undoMove()" title="Undo">
-                <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L3.2 8V18h10l-3.62-3.62c1.39-.81 3.02-1.28 4.77-1.28 4.14 0 7.5 3.36 7.5 7.5h2c0-5.24-4.26-9.5-9.5-9.5z"/></svg>
-            </div>
-            <div class="icon-btn" onclick="initLevel()" title="Restart">
-                <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-            </div>
+        <div class="level-tag" id="lvl-txt">LEVEL 1</div>
+        <div class="btn-group">
+            <div class="icon-btn" onclick="undo()">↩️</div>
+            <div class="icon-btn" onclick="reset()">🔄</div>
         </div>
     </div>
 
-    <div id="game-container"></div>
+    <div id="game-board"></div>
 
-    <div id="overlay">
-        <div class="win-card">
-            <h1 style="color: var(--accent); margin: 0;">AWESOME!</h1>
-            <p>Level Completed</p>
-            <button class="btn-next" onclick="nextLevel()">NEXT LEVEL</button>
-        </div>
+    <div id="win-modal">
+        <h1 style="color:var(--accent); font-size: 3rem;">FANTASTIC!</h1>
+        <button class="play-btn" onclick="nextLevel()">NEXT</button>
     </div>
 
 <script>
-    // Game Config
+    // Audio Context for sound effects
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(freq, type, dur) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+    }
+
     const COLORS = {
-        RED: '#e74c3c',
-        BLUE: '#3498db',
-        GREEN: '#2ecc71',
-        YELLOW: '#f1c40f',
-        PURPLE: '#9b59b6',
-        ORANGE: '#e67e22',
-        TEAL: '#1abc9c',
-        PINK: '#fd79a8',
-        BROWN: '#8d6e63',
-        LIME: '#badc58'
+        C1: '#FF3D00', C2: '#2979FF', C3: '#00E676', 
+        C4: '#FFEA00', C5: '#D500F9', C6: '#FF9100',
+        C7: '#00B8D4', C8: '#FF4081', C9: '#795548', C10: '#FFFFFF'
     };
 
-    let currentLevel = 0;
-    let selectedTubeIndex = null;
-    let moveHistory = [];
+    let currentLevel = 1;
     let tubesData = [];
-    const MAX_LAYERS = 4;
+    let history = [];
+    let selectedIdx = null;
 
-    // 20 Sample Levels (Color codes)
-    const LEVELS = [
-        { tubes: 3, colors: ['RED', 'BLUE'] },
-        { tubes: 3, colors: ['GREEN', 'YELLOW'] },
-        { tubes: 4, colors: ['RED', 'BLUE', 'GREEN'] },
-        { tubes: 4, colors: ['PURPLE', 'ORANGE', 'TEAL'] },
-        { tubes: 5, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW'] },
-        { tubes: 5, colors: ['PINK', 'BROWN', 'LIME', 'PURPLE'] },
-        { tubes: 6, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE'] },
-        { tubes: 6, colors: ['TEAL', 'PINK', 'BROWN', 'LIME', 'RED'] },
-        { tubes: 7, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE'] },
-        { tubes: 7, colors: ['TEAL', 'PINK', 'BROWN', 'LIME', 'BLUE', 'YELLOW'] },
-        { tubes: 8, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'TEAL'] },
-        { tubes: 9, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'TEAL', 'PINK'] },
-        { tubes: 10, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'TEAL', 'PINK', 'BROWN'] },
-        { tubes: 11, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'TEAL', 'PINK', 'BROWN', 'LIME'] },
-        // Levels 15-20 increase complexity by mixing more
-        { tubes: 11, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'TEAL', 'PINK', 'BROWN', 'LIME'] },
-        { tubes: 12, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'TEAL', 'PINK', 'BROWN', 'LIME', 'RED', 'BLUE'] },
-        { tubes: 12, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'TEAL', 'PINK', 'BROWN', 'LIME', 'TEAL', 'PINK'] },
-        { tubes: 13, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'TEAL', 'PINK', 'BROWN', 'LIME', 'RED', 'BLUE', 'GREEN'] },
-        { tubes: 14, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'TEAL', 'PINK', 'BROWN', 'LIME', 'RED', 'BLUE', 'GREEN', 'YELLOW'] },
-        { tubes: 14, colors: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'TEAL', 'PINK', 'BROWN', 'LIME', 'ORANGE', 'PURPLE', 'TEAL', 'PINK'] }
-    ];
+    function startGame() {
+        document.getElementById('home-page').style.display = 'none';
+        initLevel();
+    }
 
     function initLevel() {
-        moveHistory = [];
-        selectedTubeIndex = null;
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('level-display').innerText = `LEVEL ${currentLevel + 1}`;
+        selectedIdx = null;
+        history = [];
+        document.getElementById('win-modal').style.display = 'none';
+        document.getElementById('lvl-txt').innerText = `LEVEL ${currentLevel}`;
         
-        const level = LEVELS[currentLevel % LEVELS.length];
-        tubesData = generateLevel(level);
+        // Dynamic Difficulty
+        const colorCount = Math.min(3 + Math.floor(currentLevel/2), 10);
+        const tubeCount = colorCount + 2;
+        
+        tubesData = generatePuzzle(colorCount, tubeCount);
         render();
     }
 
-    function generateLevel(config) {
+    function generatePuzzle(colors, tubes) {
         let pool = [];
-        config.colors.forEach(color => {
-            for(let i=0; i<MAX_LAYERS; i++) pool.push(color);
-        });
+        for(let i=1; i<=colors; i++) {
+            for(let j=0; j<4; j++) pool.push(`C${i}`);
+        }
+        pool.sort(() => Math.random() - 0.5);
 
-        // Shuffle colors
-        for (let i = pool.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [pool[i], pool[j]] = [pool[j], pool[i]];
+        let data = [];
+        for(let i=0; i<colors; i++) {
+            data.push(pool.slice(i*4, (i+1)*4));
         }
-
-        let tubes = [];
-        // Fill full tubes
-        for (let i = 0; i < config.colors.length; i++) {
-            tubes.push(pool.slice(i * 4, (i + 1) * 4));
-        }
-        // Add empty tubes (usually 2)
-        const emptyTubesCount = config.tubes - config.colors.length;
-        for (let i = 0; i < emptyTubesCount; i++) {
-            tubes.push([]);
-        }
-        return tubes;
+        for(let i=0; i<(tubes-colors); i++) data.push([]);
+        return data;
     }
 
     function render() {
-        const container = document.getElementById('game-container');
-        container.innerHTML = '';
+        const board = document.getElementById('game-board');
+        board.innerHTML = '';
+        tubesData.forEach((tube, i) => {
+            const tDiv = document.createElement('div');
+            tDiv.className = `tube ${selectedIdx === i ? 'selected' : ''}`;
+            tDiv.onclick = () => handleTubeClick(i);
 
-        tubesData.forEach((tube, index) => {
-            const tubeDiv = document.createElement('div');
-            tubeDiv.className = `tube ${selectedTubeIndex === index ? 'selected' : ''}`;
-            tubeDiv.onclick = () => handleTubeClick(index);
-
-            tube.forEach(color => {
-                const liquid = document.createElement('div');
-                liquid.className = 'liquid';
-                liquid.style.height = '25%';
-                liquid.style.backgroundColor = COLORS[color];
-                tubeDiv.appendChild(liquid);
+            tube.forEach(c => {
+                const liq = document.createElement('div');
+                liq.className = 'liquid';
+                liq.style.backgroundColor = COLORS[c];
+                tDiv.appendChild(liq);
             });
-
-            container.appendChild(tubeDiv);
+            board.appendChild(tDiv);
         });
     }
 
-    function handleTubeClick(index) {
-        if (selectedTubeIndex === null) {
-            if (tubesData[index].length > 0) {
-                selectedTubeIndex = index;
+    function handleTubeClick(idx) {
+        if(selectedIdx === null) {
+            if(tubesData[idx].length > 0) {
+                selectedIdx = idx;
+                playSound(440, 'sine', 0.1); // Tap sound
             }
         } else {
-            if (selectedTubeIndex === index) {
-                selectedTubeIndex = null;
+            if(selectedIdx === idx) {
+                selectedIdx = null;
             } else {
-                pourLiquid(selectedTubeIndex, index);
-                selectedTubeIndex = null;
+                attemptPour(selectedIdx, idx);
+                selectedIdx = null;
             }
         }
         render();
     }
 
-    function pourLiquid(fromIdx, toIdx) {
-        const fromTube = tubesData[fromIdx];
-        const toTube = tubesData[toIdx];
-
-        if (fromTube.length === 0 || toTube.length === MAX_LAYERS) return;
-
-        const colorToPour = fromTube[fromTube.length - 1];
+    function attemptPour(from, to) {
+        const fTube = tubesData[from];
+        const tTube = tubesData[to];
         
-        // Check if color matches or target is empty
-        if (toTube.length > 0 && toTube[toTube.length - 1] !== colorToPour) return;
+        if(tTube.length >= 4) return;
+        const color = fTube[fTube.length - 1];
+        if(tTube.length > 0 && tTube[tTube.length - 1] !== color) return;
 
-        // Valid Move: Store history for undo
-        moveHistory.push(JSON.parse(JSON.stringify(tubesData)));
+        // Valid Move
+        history.push(JSON.parse(JSON.stringify(tubesData)));
+        
+        // Animation & Sound
+        playSound(660, 'triangle', 0.3); // Pour sound
 
-        // Pour logic: Move all matching top layers
-        while (
-            fromTube.length > 0 && 
-            fromTube[fromTube.length - 1] === colorToPour && 
-            toTube.length < MAX_LAYERS
-        ) {
-            toTube.push(fromTube.pop());
+        while(fTube.length > 0 && fTube[fTube.length - 1] === color && tTube.length < 4) {
+            tTube.push(fTube.pop());
         }
 
-        checkWin();
-    }
-
-    function undoMove() {
-        if (moveHistory.length > 0) {
-            tubesData = moveHistory.pop();
-            selectedTubeIndex = null;
-            render();
+        if(checkWin()) {
+            setTimeout(() => {
+                document.getElementById('win-modal').style.display = 'flex';
+                playSound(880, 'sine', 0.5);
+            }, 600);
         }
     }
 
     function checkWin() {
-        const isWin = tubesData.every(tube => {
-            if (tube.length === 0) return true;
-            if (tube.length === MAX_LAYERS) {
-                return tube.every(color => color === tube[0]);
-            }
-            return false;
-        });
-
-        if (isWin) {
-            setTimeout(() => {
-                document.getElementById('overlay').style.display = 'flex';
-            }, 500);
-        }
+        return tubesData.every(t => t.length === 0 || (t.length === 4 && t.every(c => c === t[0])));
     }
 
-    function nextLevel() {
-        currentLevel++;
-        initLevel();
-    }
-
-    // Start Game
-    initLevel();
+    function undo() { if(history.length) { tubesData = history.pop(); render(); } }
+    function reset() { initLevel(); }
+    function nextLevel() { currentLevel++; initLevel(); }
 
 </script>
 </body>
 </html>
+
 
 
 
