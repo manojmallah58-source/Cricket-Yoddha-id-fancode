@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CricPro Live | 100% Fixed</title>
+    <title>CricPro Live | IST Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00a82d; --bg: #f4f7f6; --white: #ffffff; --text-dark: #222; --text-light: #666; --border: #e0e0e0; --blue: #1976d2; }
@@ -24,6 +24,7 @@
         .team-name { font-weight: 600; font-size: 0.95rem; }
         .team-score { font-weight: 700; font-size: 1.1rem; }
         .match-status { font-size: 0.85rem; color: #d32f2f; margin-top: 10px; font-weight: 500; }
+        .time-ist { font-size: 0.8rem; color: #d32f2f; font-weight: 600; margin-top: 5px; }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; }
         .back-btn { font-size: 1.5rem; cursor: pointer; padding: 0 10px; }
@@ -35,6 +36,7 @@
         .bat-name { color: var(--blue); font-weight: 600; }
         .dismissal { font-size: 0.7rem; color: #777; margin-top: 2px; line-height: 1.2; }
         .extras-total { background: #fdfdfd; padding: 12px; border-top: 1px solid #eee; font-size: 0.85rem; line-height: 1.5; }
+        .bowling-section { margin-top: 10px; border-top: 5px solid #f4f7f6; }
         .loader { width: 35px; height: 35px; border: 4px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite linear; margin: 50px auto; display: block; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -70,7 +72,6 @@
 </div>
 
 <script>
-    // Aapki Nayi API Key yaha add kar di gayi hai
     const API_KEY = "168a13f4-ce19-4e4b-9cde-067b4268bb9c"; 
     let allMatches = [];
 
@@ -79,6 +80,25 @@
         document.getElementById('ist-clock').innerText = `IST: ${ist}`;
     }
     setInterval(updateClock, 1000);
+
+    // GMT ko IST mein badalne ka function
+    function formatToIST(dateStr) {
+        if (!dateStr) return "";
+        try {
+            // "Dec 29, 15:30 GMT" jaise strings ko handle karne ke liye
+            const date = new Date(dateStr.replace("GMT", "Z")); 
+            return date.toLocaleString('en-IN', { 
+                timeZone: 'Asia/Kolkata',
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+        } catch (e) {
+            return dateStr;
+        }
+    }
 
     async function fetchMatches() {
         const loader = document.getElementById('loader');
@@ -92,10 +112,7 @@
             loader.style.display = 'none';
 
             if (json.status !== "success") {
-                list.innerHTML = `<div style="text-align:center; padding:20px;">
-                    <p style="color:red; font-weight:bold;">API Key Limit or Error!</p>
-                    <button onclick="fetchMatches()" style="margin-top:15px; padding:8px 15px; background:var(--primary); color:white; border:none; border-radius:5px; cursor:pointer;">Retry</button>
-                </div>`;
+                list.innerHTML = `<div style="text-align:center; padding:20px;"><p>API Limit or Error</p></div>`;
                 return;
             }
 
@@ -120,7 +137,7 @@
         });
 
         if (filtered.length === 0) {
-            list.innerHTML = `<p style='text-align:center; padding:40px; color:#999;'>No ${type} matches available right now.</p>`;
+            list.innerHTML = `<p style='text-align:center; padding:40px; color:#999;'>No ${type} matches available.</p>`;
             return;
         }
 
@@ -128,6 +145,15 @@
             const card = document.createElement('div');
             card.className = 'match-card';
             card.onclick = () => openModal(m);
+            
+            // Match Status ya IST Time dikhana
+            let statusDisplay = m.status;
+            if (type === 'upcoming' && m.status.includes("GMT")) {
+                statusDisplay = `<div class="time-ist">Starts: ${formatToIST(m.status)}</div>`;
+            } else {
+                statusDisplay = `<div class="match-status">${m.status}</div>`;
+            }
+
             card.innerHTML = `
                 <div class="series-info">${m.series || 'Cricket Match'}</div>
                 <div class="team-row">
@@ -138,7 +164,7 @@
                     <div class="team-meta"><div class="team-logo">${(m.t2 || 'T').charAt(0)}</div><span class="team-name">${m.t2}</span></div>
                     <div class="team-score">${m.t2s || '-'}</div>
                 </div>
-                <div class="match-status">${m.status}</div>
+                ${statusDisplay}
             `;
             list.appendChild(card);
         });
@@ -157,7 +183,7 @@
             const json = await res.json();
             
             if (json.status !== "success" || !json.data || !json.data.scorecard) {
-                area.innerHTML = "<p style='padding:40px; text-align:center;'>Scorecard not available yet.</p>";
+                area.innerHTML = "<p style='padding:40px; text-align:center;'>Scorecard not available.</p>";
                 return;
             }
 
@@ -166,7 +192,7 @@
                 const section = document.createElement('div');
                 section.className = 'scorecard-container';
                 
-                // FIXED: Using correct path for batsman name
+                // Batsman mapping
                 let battingHtml = (inning.batting || []).map(p => `
                     <tr>
                         <td>
@@ -181,16 +207,27 @@
                     </tr>
                 `).join('');
 
-                // FIXED: Correct totals paths
+                // Bowler mapping
+                let bowlingHtml = (inning.bowling || []).map(b => `
+                    <tr>
+                        <td class="bat-name">${b.bowler?.name || 'Bowler'}</td>
+                        <td>${b.o || 0}</td>
+                        <td>${b.m || 0}</td>
+                        <td>${b.r || 0}</td>
+                        <td style="font-weight:700;">${b.w || 0}</td>
+                        <td>${b.er || 0}</td>
+                    </tr>
+                `).join('');
+
+                const extras = (typeof inning.extras === 'object') ? (inning.extras.r || 0) : (inning.extras || 0);
                 const totalRuns = inning.totals?.R || 0;
                 const totalWkts = inning.totals?.W || 0;
                 const totalOvers = inning.totals?.OV || 0;
-                const extras = (typeof inning.extras === 'object') ? (inning.extras.r || 0) : (inning.extras || 0);
 
                 section.innerHTML = `
                     <div class="inning-title">
                         <span>${inning.inning}</span>
-                        <span>${totalRuns}/${totalWkts} (${totalOvers})</span>
+                        <span>${totalRuns}/${totalWkts} (${totalOvers} ov)</span>
                     </div>
                     <table class="stat-table">
                         <thead><tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead>
@@ -199,6 +236,12 @@
                     <div class="extras-total">
                         <strong>Extras:</strong> ${extras}<br>
                         <strong>Total:</strong> ${totalRuns}/${totalWkts} (${totalOvers} ov)
+                    </div>
+                    <div class="bowling-section">
+                        <table class="stat-table">
+                            <thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Eco</th></tr></thead>
+                            <tbody>${bowlingHtml}</tbody>
+                        </table>
                     </div>
                 `;
                 area.appendChild(section);
@@ -213,6 +256,7 @@
 </script>
 </body>
 </html>
+
 
 
 
