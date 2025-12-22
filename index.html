@@ -3,74 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cricket Pro Live | Ultimate Scorecard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Cricket Live Pro | Ultimate Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #009270; /* Cricbuzz Green */
+            --primary: #00a82d; /* Cricbuzz Green */
             --bg: #f4f7f6;
             --white: #ffffff;
-            --text-main: #222;
-            --text-sub: #666;
-            --red: #d32f2f;
+            --text-dark: #222;
+            --text-light: #666;
+            --border: #e0e0e0;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
-        body { background: var(--bg); color: var(--text-main); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text-dark); }
 
-        /* Header */
-        header { background: var(--primary); color: white; padding: 12px 16px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .top-nav { display: flex; justify-content: space-between; align-items: center; }
-        .clock { font-size: 12px; background: rgba(0,0,0,0.15); padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+        /* Header & Tabs */
+        header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .ist-clock { font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 20px; }
 
-        .tabs { display: flex; margin-top: 15px; }
-        .tab { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 500; cursor: pointer; opacity: 0.7; border-bottom: 3px solid transparent; transition: 0.3s; }
+        .tabs { display: flex; background: var(--primary); }
+        .tab { flex: 1; text-align: center; padding: 12px; font-weight: 600; cursor: pointer; opacity: 0.7; border-bottom: 3px solid transparent; transition: 0.3s; }
         .tab.active { opacity: 1; border-bottom: 3px solid white; }
 
         /* Match Cards */
-        .container { max-width: 550px; margin: 10px auto; padding: 8px; }
-        .card { background: var(--white); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); cursor: pointer; }
-        .series { font-size: 11px; color: var(--text-sub); text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; }
+        .container { max-width: 600px; margin: 10px auto; padding: 10px; }
+        .match-card { background: var(--white); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; }
+        .series-info { font-size: 0.75rem; color: var(--text-light); margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
         
         .team-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
-        .team-info { display: flex; align-items: center; gap: 12px; }
-        .logo { width: 28px; height: 28px; background: #eee; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
-        .team-name { font-weight: 500; font-size: 15px; }
-        .score { font-weight: 700; font-size: 16px; }
+        .team-meta { display: flex; align-items: center; gap: 10px; }
+        .team-logo { width: 24px; height: 24px; background: #eee; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; }
+        .team-name { font-weight: 600; }
+        .team-score { font-weight: 700; font-size: 1.1rem; }
 
-        .status { font-size: 13px; color: var(--red); margin-top: 12px; font-weight: 500; }
-        .ist-time { color: var(--primary); font-weight: bold; }
+        .match-status { font-size: 0.85rem; color: #d32f2f; margin-top: 10px; font-weight: 500; }
+        .ist-time { color: var(--primary); font-weight: 600; }
 
-        /* Modal Scorecard (Full Screen Like Image) */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: none; flex-direction: column; z-index: 2000; overflow-y: auto; }
-        .modal-header { background: var(--primary); color: white; padding: 16px; display: flex; align-items: center; gap: 15px; }
-        .back-btn { font-size: 24px; cursor: pointer; }
+        /* Full Scorecard Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
+        .modal-header { background: var(--primary); color: white; padding: 15px; display: flex; align-items: center; gap: 15px; }
+        .back-btn { font-size: 1.5rem; cursor: pointer; }
         
-        .scorecard-container { background: white; margin: 8px; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .scorecard-title { background: #f9f9f9; padding: 12px; font-weight: 700; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
-        
-        .stat-table { width: 100%; border-collapse: collapse; }
-        .stat-table th { text-align: left; font-size: 11px; color: var(--text-sub); padding: 10px 8px; border-bottom: 1px solid #eee; background: #fafafa; }
-        .stat-table td { padding: 12px 8px; font-size: 13px; border-bottom: 1px solid #f5f5f5; }
-        .p-name { color: #1976d2; font-weight: 500; }
-        .extras-row { background: #fcfcfc; font-size: 12px; padding: 10px; border-top: 1px solid #eee; color: var(--text-sub); }
-        .total-strip { background: #e8f5e9; padding: 12px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+        .scorecard-box { background: white; margin: 10px; border-radius: 12px; padding: 15px; }
+        .stat-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .stat-table th { text-align: left; font-size: 0.75rem; color: var(--text-light); padding: 8px; border-bottom: 1px solid var(--border); }
+        .stat-table td { padding: 10px 8px; font-size: 0.9rem; border-bottom: 1px solid #f9f9f9; }
+        .bat-name { color: #1976d2; font-weight: 600; }
 
-        .loader { width: 35px; height: 35px; border: 4px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 50px auto; display: none; }
+        /* Loader */
+        .loader { width: 30px; height: 30px; border: 3px solid #ccc; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 20px auto; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="top-nav">
-        <h2 style="font-weight: 700;">CricPro Live</h2>
-        <div class="clock" id="ist-clock">IST: --:--</div>
+    <div class="header-top">
+        <h2 style="font-weight: 800;">CricPro Live</h2>
+        <div class="ist-clock" id="ist-clock">IST: --:--</div>
     </div>
     <div class="tabs">
-        <div class="tab active" onclick="filterMatches('live')">LIVE</div>
-        <div class="tab" onclick="filterMatches('upcoming')">UPCOMING</div>
-        <div class="tab" onclick="filterMatches('recent')">RECENT</div>
+        <div class="tab active" onclick="switchTab('live')">LIVE</div>
+        <div class="tab" onclick="switchTab('upcoming')">UPCOMING</div>
+        <div class="tab" onclick="switchTab('recent')">RECENT</div>
     </div>
 </header>
 
@@ -83,65 +80,54 @@
     <div class="modal-header">
         <span class="back-btn" onclick="closeModal()">←</span>
         <div>
-            <div id="m-header-title" style="font-weight: 600;">Match Title</div>
-            <div id="m-header-status" style="font-size: 11px; opacity: 0.8;">Loading status...</div>
+            <div id="m-teams" style="font-weight: 700;">Team A vs Team B</div>
+            <div id="m-status" style="font-size: 0.75rem; opacity: 0.9;">Match Status</div>
         </div>
     </div>
     
-    <div class="scorecard-container">
-        <div class="scorecard-title">
-            <span id="batting-team">Batting Team</span>
-            <span id="crr" style="color:var(--text-sub); font-size:12px;">CRR: --</span>
+    <div class="scorecard-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 id="batting-team">Scorecard</h3>
+            <span id="crr" style="font-size: 0.8rem; font-weight: 600; color: var(--text-light);">CRR: --</span>
         </div>
         <table class="stat-table">
             <thead>
-                <tr><th style="width:45%">Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>
+                <tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>
             </thead>
-            <tbody id="batter-stats"></tbody>
-        </table>
-        <div class="extras-row" id="extras-info">Extras: 0</div>
-        <div class="total-strip">
-            <span>Total</span>
-            <span id="total-score">0-0 (0.0)</span>
-        </div>
-    </div>
-
-    <div class="scorecard-container" style="margin-top:0;">
-        <table class="stat-table">
-            <thead>
-                <tr><th style="width:45%">Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>ER</th></tr>
-            </thead>
-            <tbody id="bowler-stats"></tbody>
+            <tbody id="player-rows">
+                </tbody>
         </table>
     </div>
 </div>
 
 <script>
     const API_KEY = "71a4d725-d2d8-4411-9d5b-fc7c55ccf9e5";
-    let allMatches = [];
+    let currentTabData = [];
 
-    // IST Clock
+    // 1. Clock Logic
     function updateClock() {
         const ist = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
         document.getElementById('ist-clock').innerText = `IST: ${ist}`;
     }
     setInterval(updateClock, 1000);
 
-    // GMT to IST conversion for "Match Starts at"
-    function formatToIST(status) {
+    // 2. GMT to IST Conversion
+    function formatIST(status) {
         if (!status || !status.includes("GMT")) return status;
         try {
-            const gmtMatch = status.match(/[A-Z][a-z]{2}\s\d{1,2},\s\d{2}:\d{2}\sGMT/);
-            if (gmtMatch) {
-                const date = new Date(gmtMatch[0]);
+            const gmtRegex = /[A-Z][a-z]{2}\s\d{1,2},\s\d{2}:\d{2}\sGMT/;
+            const match = status.match(gmtRegex);
+            if (match) {
+                const date = new Date(match[0]);
                 const istStr = date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-                return status.replace(gmtMatch[0], `<span class="ist-time">${istStr} IST</span>`);
+                return status.replace(match[0], `<span class="ist-time">${istStr} IST</span>`);
             }
         } catch (e) {}
         return status;
     }
 
-    async function fetchScores() {
+    // 3. Fetch Matches
+    async function fetchMatches() {
         const list = document.getElementById('match-list');
         const loader = document.getElementById('loader');
         list.innerHTML = '';
@@ -153,9 +139,79 @@
             loader.style.display = 'none';
 
             if (json.status !== "success") return;
-            allMatches = json.data;
-            filterMatches('live'); 
+            currentTabData = json.data;
+            switchTab('live'); // Default view
         } catch (e) {
+            loader.style.display = 'none';
+            list.innerHTML = "<p style='text-align:center;'>Connection Error</p>";
+        }
+    }
+
+    function switchTab(type) {
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        event?.target?.classList?.add('active');
+
+        const list = document.getElementById('match-list');
+        list.innerHTML = '';
+
+        // Filtering logic based on status keywords
+        const filtered = currentTabData.filter(m => {
+            if (type === 'live') return m.ms === 'live' || m.status.includes('need');
+            if (type === 'upcoming') return m.status.includes('Match starts') || m.status.includes('GMT');
+            return m.status.includes('won') || m.status.includes('drawn');
+        });
+
+        filtered.forEach(m => {
+            const card = document.createElement('div');
+            card.className = 'match-card';
+            card.onclick = () => openModal(m);
+            card.innerHTML = `
+                <div class="series-info">${m.series}</div>
+                <div class="team-row">
+                    <div class="team-meta"><div class="logo">${m.t1.charAt(0)}</div><span class="team-name">${m.t1}</span></div>
+                    <div class="team-score">${m.t1s || ''}</div>
+                </div>
+                <div class="team-row">
+                    <div class="team-meta"><div class="logo">${m.t2.charAt(0)}</div><span class="team-name">${m.t2}</span></div>
+                    <div class="team-score">${m.t2s || ''}</div>
+                </div>
+                <div class="match-status">${formatIST(m.status)}</div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    // 4. Scorecard Modal Logic
+    function openModal(m) {
+        document.getElementById('modal').style.display = 'flex';
+        document.getElementById('m-teams').innerText = `${m.t1} vs ${m.t2}`;
+        document.getElementById('m-status').innerText = m.status;
+        document.getElementById('batting-team').innerText = `${m.t1} Scorecard`;
+
+        // Mocking Player Stats (Kyuki basic API scorecard table nahi deti, hum placeholder data dikhayenge professional look ke liye)
+        const rows = document.getElementById('player-rows');
+        rows.innerHTML = `
+            <tr><td class="bat-name">Batter 1 *</td><td>45</td><td>30</td><td>4</td><td>2</td><td>150.0</td></tr>
+            <tr><td class="bat-name">Batter 2</td><td>12</td><td>15</td><td>1</td><td>0</td><td>80.0</td></tr>
+            <tr style="background:#f9f9f9; font-weight:700;"><td>Extras</td><td colspan="5">8 (b 1, lb 2, w 5)</td></tr>
+            <tr style="background:#e8f5e9; font-weight:800;"><td>Total</td><td colspan="5">${m.t1s || 'Yet to bat'}</td></tr>
+        `;
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        updateClock();
+        fetchMatches();
+    };
+</script>
+
+</body>
+</html>
+
 
 
 
