@@ -1,127 +1,415 @@
-<!DOCTYPE html>  
-<html>  
-<head>  
-  <meta charset="UTF-8">  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  <title>Prime By Cricket Yoddha</title>     
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
-  <style>  
-   * { margin: 0; padding: 0; box-sizing: border-box; }  
-    html, body {  
-      background: #000;  
-      height: 100vh;  
-      width: 100vw;  
-      overflow: hidden;  
-      font-family: system-ui, -apple-system, sans-serif;  
-    }  
-    .shaka-video-container {  
-      position: absolute;  
-      inset: 0;  
-      width: 100%;  
-      height: 100%;  
-    }  
-    video {  
-      width: 100%;  
-      height: 100%;  
-      background: #000;  
-      object-fit: contain;  
-    }  
-    /* Shaka Spinner को छिपाने के लिए */
-    .shaka-spinner-container,  
-    .shaka-spinner,  
-    .shaka-spinner-svg {  
-      display: none !important;  
-      visibility: hidden !important;  
-      opacity: 0 !important;  
-    }  
-  </style>  
-</head>  
-<body>  
-  <div class="shaka-video-container" data-shaka-player>  
-    <video autoplay playsinline preload="metadata" poster="https://assets.tntsports.io/web/img/og/tntsports.jpg"></video>  
-  </div>  
-  
-  <script>  
-    document.addEventListener('DOMContentLoaded', async () => {  
-      shaka.polyfill.installAll();  
-  
-      if (!shaka.Player.isBrowserSupported()) {  
-        console.error('Browser not supported');  
-        return;  
-      }  
-  
-      const video = document.querySelector('video');  
-      const player = new shaka.Player();  
-      await player.attach(video);  
-  
-      const container = document.querySelector('.shaka-video-container');  
-      const ui = new shaka.ui.Overlay(player, container, video);  
-  
-      ui.configure({  
-        controlPanelElements: [  
-          'play_pause', 'time_and_duration', 'mute', 'volume',  
-          'spacer', 'language', 'captions', 'picture_in_picture',  
-          'quality', 'fullscreen'  
-        ],  
-        volumeBarColors: {  
-          base: 'rgba(255, 192, 203, 0.3)',  
-          level: 'rgb(255, 105, 180)'  
-        },  
-        seekBarColors: {  
-          base: 'rgba(255, 255, 0, 0.3)',  
-          buffered: 'rgba(255, 255, 0, 0.6)',  
-          played: 'rgb(255, 255, 0)'  
-        }  
-      });  
-  
-      // ✅ नया DRM कॉन्फ़िगरेशन (ClearKey)
-      let drmConfig = {  
-        clearKeys: {  
-          "784dc98758c0fce50fcf660de8c475af": "c0e5b71a25eccde6f53c55a4276571ba"  
-        }  
-      };  
-  
-      // ✅ नया MPD URL
-      let streamUrl = "https://otte.live.fly.ww.aiv-cdn.net/iad-nitro/live/clients/dash/enc/urmjyg8wnu/out/v1/13407966252a4e449d2d4a6032b5d6e1/cenc-sd.mpd";  
-  
-      player.configure({  
-        drm: drmConfig,  
-        streaming: {  
-          lowLatencyMode: true,  
-          bufferingGoal: 15,  
-          rebufferingGoal: 2,  
-          bufferBehind: 15,  
-          retryParameters: {  
-            timeout: 10000,  
-            maxAttempts: 5,  
-            baseDelay: 300,  
-            backoffFactor: 1.2  
-          },  
-          segmentRequestTimeout: 8000,  
-          segmentPrefetchLimit: 2,  
-          useNativeHlsOnSafari: true  
-        },  
-        manifest: {  
-          retryParameters: {  
-            timeout: 8000,  
-            maxAttempts: 3  
-          }  
-        }  
-      });  
-  
-      player.addEventListener('error', (event) => {  
-        console.error('Shaka Player Error:', event.detail);  
-      });  
-  
-      try {  
-        await player.load(streamUrl);  
-        console.log("Stream loaded successfully");  
-      } catch (error) {  
-        console.error('Load error:', error);  
-      }  
-    });  
-  </script>  
-</body>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SortPuz Pro Clone</title>
+    <style>
+        :root {
+            --bg-deep: #0a0b1e;
+            --tube-border: rgba(255, 255, 255, 0.3);
+            --glass-reflection: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.05) 100%);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-deep);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Twinkling Stars Background */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        header {
+            margin-top: 20px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        #level-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #4facfe;
+        }
+
+        /* Game Container */
+        #game-container {
+            flex-grow: 1;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            gap: 20px;
+            padding: 20px;
+            max-width: 500px;
+            z-index: 5;
+        }
+
+        /* Tube Styling */
+        .tube {
+            width: 45px;
+            height: 140px;
+            border: 3px solid var(--tube-border);
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            position: relative;
+            display: flex;
+            flex-direction: column-reverse;
+            overflow: hidden;
+            background: var(--glass-reflection);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .tube.selected {
+            transform: translateY(-15px) scale(1.05);
+            border-color: #fff;
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+
+        .tube.tilting {
+            z-index: 100;
+        }
+
+        .liquid-layer {
+            width: 100%;
+            height: 0;
+            transition: height 0.4s ease-out;
+            position: relative;
+        }
+
+        /* Stream Effect */
+        #stream {
+            position: absolute;
+            width: 6px;
+            z-index: 50;
+            pointer-events: none;
+            border-radius: 3px;
+        }
+
+        /* UI Buttons */
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Success Shimmer */
+        @keyframes shimmer {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(2) contrast(1.2); }
+            100% { filter: brightness(1); }
+        }
+        .complete-glow {
+            animation: shimmer 0.6s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="starfield"></canvas>
+    <div id="stream"></div>
+
+    <header>
+        <div id="level-display">LEVEL 1</div>
+    </header>
+
+    <div id="game-container"></div>
+
+    <div class="controls">
+        <div class="btn" onclick="resetLevel()">⟳</div>
+        <div class="btn" onclick="undoMove()">↺</div>
+        <div class="btn" onclick="addExtraTube()">+🧪</div>
+    </div>
+
+<script>
+    /** 1. CONFIGURATION & STATE **/
+    const COLORS = {
+        blue: '#00d2ff',
+        purple: '#9d50bb',
+        pink: '#ff0080',
+        green: '#00f260',
+        yellow: '#f7ff00',
+        red: '#ff4b2b',
+        orange: '#f09819',
+        teal: '#38ef7d'
+    };
+    const COLOR_KEYS = Object.keys(COLORS);
+    let currentLevel = 1;
+    let tubesData = [];
+    let selectedTubeIndex = null;
+    let moveHistory = [];
+    let isAnimating = false;
+
+    /** 2. AUDIO SYNTHESIS (Web Audio API) **/
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playPop() {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function playPour(duration) {
+        const noise = audioCtx.createBufferSource();
+        const bufferSize = audioCtx.sampleRate * duration;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+        
+        noise.buffer = buffer;
+        const bandpass = audioCtx.createBiquadFilter();
+        bandpass.type = 'bandpass';
+        bandpass.frequency.value = 800;
+        
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.1);
+        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
+
+        noise.connect(bandpass);
+        bandpass.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start();
+    }
+
+    /** 3. GAME LOGIC **/
+    function initLevel(lvl) {
+        tubesData = [];
+        selectedTubeIndex = null;
+        moveHistory = [];
+        const container = document.getElementById('game-container');
+        container.innerHTML = '';
+        document.getElementById('level-display').innerText = `LEVEL ${lvl}`;
+
+        // Level Difficulty Scaling
+        let colorCount = Math.min(3 + Math.floor(lvl / 3), 8);
+        let emptyTubes = 2;
+        
+        // Generate randomized balanced colors
+        let pool = [];
+        for(let i=0; i<colorCount; i++) {
+            for(let j=0; j<4; j++) pool.push(COLOR_KEYS[i]);
+        }
+        pool.sort(() => Math.random() - 0.5);
+
+        for(let i=0; i<colorCount; i++) {
+            tubesData.push(pool.splice(0, 4));
+        }
+        for(let i=0; i<emptyTubes; i++) {
+            tubesData.push([]);
+        }
+
+        renderTubes();
+    }
+
+    function renderTubes() {
+        const container = document.getElementById('game-container');
+        container.innerHTML = '';
+        tubesData.forEach((colors, idx) => {
+            const tube = document.createElement('div');
+            tube.className = 'tube';
+            tube.dataset.index = idx;
+            tube.onclick = () => handleTubeClick(idx);
+            
+            colors.forEach(color => {
+                const layer = document.createElement('div');
+                layer.className = 'liquid-layer';
+                layer.style.backgroundColor = COLORS[color];
+                layer.style.height = '25%';
+                tube.appendChild(layer);
+            });
+            
+            container.appendChild(tube);
+        });
+    }
+
+    async function handleTubeClick(index) {
+        if (isAnimating) return;
+        
+        if (selectedTubeIndex === null) {
+            if (tubesData[index].length > 0) {
+                selectedTubeIndex = index;
+                playPop();
+                updateSelectionUI();
+            }
+        } else {
+            if (selectedTubeIndex === index) {
+                selectedTubeIndex = null;
+                updateSelectionUI();
+            } else {
+                if (canPour(selectedTubeIndex, index)) {
+                    await pourLiquid(selectedTubeIndex, index);
+                } else {
+                    selectedTubeIndex = index;
+                    playPop();
+                    updateSelectionUI();
+                }
+            }
+        }
+    }
+
+    function canPour(fromIdx, toIdx) {
+        const fromStack = tubesData[fromIdx];
+        const toStack = tubesData[toIdx];
+        if (fromStack.length === 0) return false;
+        if (toStack.length === 4) return false;
+        if (toStack.length === 0) return true;
+        return fromStack[fromStack.length - 1] === toStack[toStack.length - 1];
+    }
+
+    async function pourLiquid(fromIdx, toIdx) {
+        isAnimating = true;
+        const color = tubesData[fromIdx][tubesData[fromIdx].length - 1];
+        let amount = 0;
+
+        // Count how many of the same color can be poured
+        while (tubesData[fromIdx].length > 0 && 
+               tubesData[fromIdx][tubesData[fromIdx].length - 1] === color && 
+               tubesData[toIdx].length < 4) {
+            tubesData[toIdx].push(tubesData[fromIdx].pop());
+            amount++;
+        }
+
+        moveHistory.push(JSON.parse(JSON.stringify(tubesData)));
+
+        // Animation Logic
+        const tubeEls = document.querySelectorAll('.tube');
+        const sourceEl = tubeEls[fromIdx];
+        const targetEl = tubeEls[toIdx];
+
+        // 1. Tilt
+        const rectSource = sourceEl.getBoundingClientRect();
+        const rectTarget = targetEl.getBoundingClientRect();
+        const angle = rectSource.left < rectTarget.left ? 45 : -45;
+        
+        sourceEl.classList.add('tilting');
+        sourceEl.style.transform = `translateY(-30px) rotate(${angle}deg)`;
+        
+        playPour(0.6);
+        await new Promise(r => setTimeout(r, 600));
+
+        // Reset and Re-render
+        sourceEl.style.transform = '';
+        sourceEl.classList.remove('tilting');
+        selectedTubeIndex = null;
+        renderTubes();
+        
+        checkWin();
+        isAnimating = false;
+    }
+
+    function updateSelectionUI() {
+        document.querySelectorAll('.tube').forEach((t, i) => {
+            t.classList.toggle('selected', i === selectedTubeIndex);
+        });
+    }
+
+    function checkWin() {
+        const win = tubesData.every(tube => 
+            tube.length === 0 || (tube.length === 4 && tube.every(c => c === tube[0]))
+        );
+        if (win) {
+            setTimeout(() => {
+                alert("AWESOME! Level Cleared.");
+                currentLevel++;
+                initLevel(currentLevel);
+            }, 500);
+        }
+    }
+
+    /** 4. BACKGROUND PARTICLES **/
+    function initStars() {
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const stars = Array.from({length: 100}, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2,
+            opacity: Math.random()
+        }));
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(s => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+                s.opacity += (Math.random() - 0.5) * 0.05;
+                if(s.opacity < 0) s.opacity = 0;
+                if(s.opacity > 1) s.opacity = 1;
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+    }
+
+    /** 5. UTILS **/
+    window.resetLevel = () => initLevel(currentLevel);
+    window.undoMove = () => {
+        if (moveHistory.length > 1) {
+            moveHistory.pop();
+            tubesData = JSON.parse(JSON.stringify(moveHistory[moveHistory.length - 1]));
+            renderTubes();
+        }
+    };
+    window.addExtraTube = () => {
+        tubesData.push([]);
+        renderTubes();
+    };
+
+    // Initialize
+    initStars();
+    initLevel(1);
+
+</script>
+</body>
 </html>
 
