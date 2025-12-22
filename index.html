@@ -1,339 +1,411 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cricket Champion</title>
-    <link rel="icon" href="https://fancode.com/favicon.ico" type="image/x-icon">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --background: #02040a;
-            --primary-glow: #0ea5e9;
-            --secondary-glow: #f59e0b;
-            --card-bg: rgba(15, 23, 42, 0.5);
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kohli xpress</title>
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    font-family: 'Poppins', sans-serif; background: #000; overflow-x: hidden;
+  }
+  header {
+    position: fixed; top: 0; left: 0; width: 100%;
+    background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 10px 16px; z-index: 1001; border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .menu-icon {
+    position: absolute; left: 16px; color: #fff; font-size: 28px; cursor: pointer;
+  }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+}
 
-        body {
-            background-color: var(--background);
-            font-family: 'Inter', sans-serif;
-            background-image: radial-gradient(circle at 25% 25%, rgba(14, 165, 233, 0.15), transparent 30%),
-                              radial-gradient(circle at 75% 75%, rgba(245, 158, 11, 0.1), transparent 30%);
-            background-attachment: fixed;
-        }
+.tabs {
+  display: flex;
+  background: #111;
+  border-bottom: 1px solid #333;
+}
+ body {
+    margin: 0; padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #000; color: #fff;
+  }
 
-        /* --- Match Card 3D Tilt Effect --- */
-        .match-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(12px);
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
-            position: relative;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeIn 0.6s ease-out forwards;
-        }
+  .popup-overlay {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+  }
+.counter-box {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 12px;
+  border-radius: 16px;
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+  margin-top: 1rem;
+}
+.counter-box img {
+  height: 48px;
+}
+  .popup-box {
+    width: 320px;
+    background: rgba(20, 20, 30, 0.6);
+    border: 1px solid rgba(173, 216, 230, 0.25);
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.4), 0 0 80px rgba(173, 216, 230, 0.15);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    animation: fadeIn 0.5s ease forwards;
+    position: relative;
+  }
 
-        .match-card:hover {
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--primary-glow);
-            border-color: var(--primary-glow);
-        }
-          .match-card img{
-    object-position:top;
-          }
-        
-        .card-glow {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), var(--primary-glow), transparent 40%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-            border-radius: inherit;
-        }
+  @keyframes fadeIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
 
-        .match-card:hover .card-glow {
-            opacity: 0.1;
-        }
+  .popup-header {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #00eaff, #bd00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.4rem;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+  }
 
-        .watch-btn {
-            background: var(--primary-glow);
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px -5px var(--primary-glow);
-        }
+  .popup-subtitle {
+    font-size: 1rem;
+    color: #aaa;
+    margin-bottom: 1.2rem;
+  }
 
-        .watch-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px -2px var(--primary-glow);
-        }
+  .popup-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
 
-        /* --- Spotlight Card --- */
-        .spotlight-card {
-            border: 1px solid var(--border-color);
-            background: linear-gradient(45deg, rgba(15, 23, 42, 0.5), rgba(30, 41, 59, 0.3));
-            backdrop-filter: blur(20px);
-            animation: fadeIn 1s ease-out;
-        }
+  .popup-btn {
+    padding: 0.8rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.35s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
 
-        .spotlight-live-badge {
-            background: linear-gradient(90deg, #dc2626, #ef4444);
-            animation: pulse-live 2s infinite ease-in-out;
-        }
+  .popup-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(0,255,255,0.3), rgba(255,0,255,0.2));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .popup-btn:hover::after {
+    opacity: 1;
+  }
 
-        @keyframes pulse-live {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 15px #ef4444; }
-            50% { transform: scale(1.05); box-shadow: 0 0 25px #ef4444; }
-        }
+  .join-btn {
+    background: linear-gradient(135deg, #00eaff, #9c00ff);
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+  }
+  .join-btn:hover {
+    background: linear-gradient(135deg, #00ffff, #c000ff);
+    box-shadow: 0 0 16px rgba(0, 255, 255, 0.6);
+  }
 
-        /* --- General Animations --- */
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+  .already-btn {
+    background: rgba(255,255,255,0.05);
+  }
+  .already-btn:hover {
+    background: rgba(255,255,255,0.15);
+  }
 
-        /* --- Telegram Popup --- */
-        .popup-overlay {
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-        }
-        .popup-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        .popup-card {
-            transform: scale(0.8) translateY(20px);
-            opacity: 0;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
-        }
-        .popup-overlay.show .popup-card {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-    </style>
+  .close-btn {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 1.3rem;
+    color: #00eaff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .close-btn:hover {
+    color: #ff00cc;
+  }
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 12px 0;
+  cursor: pointer;
+  color: #aaa;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background 0.3s, color 0.3s, border-bottom 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 3px solid transparent;
+}
+
+.tab:hover {
+  background: #181818;
+  color: #ccc;
+}
+
+.tab.active {
+  background: #101d10;
+  color: #00ff80;
+  border-bottom: 3px solid #00ff80;
+}
+
+.tab-content {
+  display: none;
+  width: 100%;
+  height: 65vh;
+  background: #000;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.tab-content iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.material-icons {
+  font-size: 18px;
+}
+  header img {
+    max-height: 45px;
+  }
+  #player {
+    margin-top: 60px; width: 100vw; height: calc(100vw * 9 / 16);
+    background: #000;
+  }
+
+  /* Sidebar Styles - Premium Glassmorphic */
+  .sidebar {
+    position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255,255,255,0.2);
+    color: #fff; z-index: 1100; transition: left 0.5s ease;
+    padding-top: 80px; box-shadow: 4px 0 15px rgba(0,0,0,0.4);
+    border-top-right-radius: 12px; border-bottom-right-radius: 12px;
+  }
+  .sidebar.open { left: 0; }
+  .sidebar a {
+    display: block; padding: 15px 24px; color: #fff; text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-weight: 500; font-size: 16px;
+    transition: background 0.3s, padding-left 0.3s;
+  }
+  .sidebar a:hover {
+    background: rgba(255,255,255,0.15);
+    padding-left: 32px;
+  }
+.menu-header {
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+.popup-buttons a {
+  text-decoration: none;
+}
+  .overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4); z-index: 1099; display: none;
+    transition: background 0.4s ease;
+  }
+  .overlay.show { display: block; }
+
+</style>
 </head>
-<body class="text-slate-200">
-
-    <header class="text-center py-12 px-4">
-        <h1 class="text-4xl md:text-5xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-amber-400">
-           CRICKET CHAMPION
-        </h1>
-        <p class="text-slate-400 mt-2 max-w-xl mx-auto">
-           Watch all fancode matches for free 🔥
-        </p>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 pb-12">
-        <div id="spotlight-container"></div>
-
-        <div class="mt-16 mb-8 px-2">
-            <h2 class="text-2xl font-bold tracking-tight text-slate-100">Live & Upcoming</h2>
-            <div class="w-20 h-1 mt-2 bg-gradient-to-r from-sky-500 to-amber-500 rounded-full"></div>
-        </div>
-
-        <div id="matches-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="h-64 bg-slate-800/50 rounded-xl animate-pulse"></div>
-            <div class="h-64 bg-slate-800/50 rounded-xl animate-pulse hidden md:block"></div>
-            <div class="h-64 bg-slate-800/50 rounded-xl animate-pulse hidden lg:block"></div>
-        </div>
-    </main>
-    
-    <div id="telegram-popup" class="popup-overlay fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="popup-card w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900/80 shadow-2xl shadow-sky-500/10">
-            <div class="p-8 text-center">
-                <div class="text-5xl mb-4 text-sky-400"><i class="fab fa-telegram-plane"></i></div>
-                <h3 class="text-2xl font-bold text-white mb-2">Join Our Community</h3>
-                <p class="text-slate-400 mb-6">
-                    Get instant match links, updates, and clips directly on Telegram.
-                </p>
-                <div class="flex flex-col gap-3">
-                    <a href="https://t.me/+ITRwLanLPc1mZGEx" target="_blank" id="join-btn" class="w-full text-center px-6 py-3 rounded-lg font-semibold text-black bg-sky-400 hover:bg-sky-300 transition-all duration-300 transform hover:scale-105">
-                        <i class="fas fa-rocket mr-2"></i>Join Now
-                    </a>
-                    <button id="close-popup-btn" class="w-full text-center px-6 py-3 rounded-lg font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors duration-300">
-                        Already Joined
-                    </button>
-                </div>
-            </div>
-        </div>
+<body>
+  <!-- Visitor Counter Popup -->
+<div class="popup-overlay" id="visitorPopup" style="display:none;">
+  <div class="popup-box">
+    <button class="close-btn" onclick="closeVisitorPopup()">×</button>
+    <div class="popup-header">Total Visitors</div>
+    <div class="popup-subtitle">Users Live On Web</div>
+    <div class="counter-box">
+      <img src="https://visit-counter.vercel.app/counter.png?page=allrounder.com&s=40&c=00ff00&bg=00000000&no=10&ff=digi&tb=&ta=" alt="Visitor Count" />
     </div>
+  </div>
+</div>
+<div class="popup-overlay" id="popup">
+  <div class="popup-box">
+    <button class="close-btn" onclick="closePopup()">×</button>
+    <div class="popup-header">Support Us!</div>
+    <div class="popup-subtitle">Join our Telegram for latest updates.</div>
+    <div class="popup-buttons">
+      <a href="https://t.me/+6O_L9MKIn5QyN2Vl" target="_blank" class="popup-btn join-btn">Join Now</a>
+      <button class="popup-btn already-btn" onclick="closePopup()">Already Joined</button>
+    </div>
+  </div>
+</div>
+<header>
+  <span class="material-icons menu-icon" onclick="toggleSidebar()">menu</span>
+  <img src="https://i.ibb.co/kgVYyQLv/Picsart-25-06-12-10-21-22-198.png" alt="Logo" />
+</header>
 
+<div class="sidebar" id="sidebar">
+  <div class="menu-header">MENU</div>
+  <a href="https://t.me/+6O_L9MKIn5QyN2Vl" target="_blank"> Join Our Telegram</a>
+  <a href="https://t.me/+6O_L9MKIn5QyN2Vl" target="_blank"> Contact Us</a>
+  <a href="https://t.me/+6O_L9MKIn5QyN2Vl" target="_blank">Copyright</a>
+  <a href="#" onclick="showVisitorPopup()">Total Visitor</a>
+</div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-    <script>
-        const spotlightContainer = document.getElementById('spotlight-container');
-        const gridContainer = document.getElementById('matches-grid');
-        const DATA_URL = 'https://raw.githubusercontent.com/Jitendra-unatti/fancode/refs/heads/main/data/fancode.json';
-        const PLAY_BASE = 'fc/player.html';
+<div style="margin-top: 60px; width: 100vw; height: calc(100vw * 9 / 16); background: #000; position: relative; overflow: hidden;">
+  <iframe
+    src="https://cricketstan.github.io/Sony-Liv/"
+    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
+    allowfullscreen
+    allow="autoplay; encrypted-media"
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+  </iframe>
+</div>
 
-        async function fetchAndRender() {
-            try {
-                const res = await fetch(DATA_URL);
-                const data = await res.json();
-                let matches = Array.isArray(data.matches) ? data.matches : [];
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+<!-- Google Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-                matches.sort((a, b) => {
-                    const aIsLive = a.status?.toUpperCase() === 'LIVE';
-                    const bIsLive = b.status?.toUpperCase() === 'LIVE';
-                    return bIsLive - aIsLive;
-                });
+<div class="tabs">
+  <div class="tab" id="livechat-tab" onclick="openTab('livechat')">
+    <span class="material-icons">chat</span> Live Chat
+  </div>
+  <div class="tab" id="scoreboard-tab" onclick="openTab('scoreboard')">
+    <span class="material-icons">leaderboard</span> Scoreboard
+  </div>
+  <div class="tab" id="moments-tab" onclick="openTab('moments')">
+    <span class="material-icons">movie</span> Top Moments
+  </div>
+</div>
 
-                gridContainer.innerHTML = '';
+<div class="tab-content" id="livechat-content">
+  <iframe src="https://cricketstan.github.io/Live-Chat/" allowfullscreen></iframe>
+</div>
 
-                const firstLiveMatch = matches.find(m => m.status?.toUpperCase() === 'LIVE');
-                if (firstLiveMatch) {
-                    renderSpotlight(firstLiveMatch);
-                    matches = matches.filter(m => m.match_id !== firstLiveMatch.match_id);
-                }
+<div class="tab-content" id="scoreboard-content">
+  <iframe src="https://allrounder745.github.io/Scoreboard-/" allowfullscreen></iframe>
+</div>
 
-                if (matches.length > 0) {
-                    matches.forEach((match, index) => {
-                        const card = createMatchCard(match);
-                        card.style.animationDelay = `${index * 100}ms`;
-                        gridContainer.appendChild(card);
-                    });
-                } else if (!firstLiveMatch) {
-                    gridContainer.innerHTML = `<p class="col-span-full text-center text-slate-400">No matches available right now.</p>`;
-                }
-                
-                initInteractiveEffects();
+<div class="tab-content" id="moments-content">
+  <iframe src="https://cricketstan.github.io/Top-moments-/" allowfullscreen></iframe>
+</div>
+<script>
+  const jsonUrl = 'https://raw.githubusercontent.com/StmpupCricket/Star-Sports-Hindi-json/refs/heads/main/data.json';
+  fetch(jsonUrl)
+    .then(res => res.json())
+    .then(data => {
+      const m3u8Url = data.stream_url;
+      const video = document.getElementById('player');
 
-            } catch (error) {
-                console.error("Failed to load match data:", error);
-                gridContainer.innerHTML = `<p class="col-span-full text-center text-red-400">Could not load matches. Please check your connection and try again.</p>`;
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(m3u8Url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          const qualities = hls.levels.map(l => l.height).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>b-a);
+          new Plyr(video, {
+            controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+            settings: ['quality', 'speed'],
+            quality: {
+              default: qualities[0],
+              options: qualities,
+              forced: true,
+              onChange: q => {
+                const level = hls.levels.findIndex(l => l.height === q);
+                hls.currentLevel = level;
+              }
             }
-        }
-
-        function renderSpotlight(match) {
-            const imgSrc = match.image || 'https://fancode.com/skillup-uploads/cms-media/Cricket_Fallback_Old_match-card.jpg';
-            const buttonsHTML = generateButtons(match, 'text-sm px-5 py-2.5 rounded-lg');
-
-            spotlightContainer.innerHTML = `
-                <div class="spotlight-card rounded-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 items-center gap-8 p-6 md:p-8">
-                    <div class="relative rounded-lg overflow-hidden aspect-video">
-                        <img src="${imgSrc}" alt="${match.title}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                        <div class="spotlight-live-badge absolute top-4 left-4 text-xs font-bold px-3 py-1.5 rounded-full text-white shadow-lg">
-                            <i class="fas fa-circle text-xs mr-1.5 animate-ping absolute opacity-75"></i>
-                            <i class="fas fa-circle text-xs mr-1.5"></i>
-                            LIVE NOW
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-center">
-                        <p class="text-amber-400 font-semibold text-sm mb-1">${match.tournament || ''}</p>
-                        <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">${match.title || 'Live Match'}</h2>
-                        <p class="text-slate-400 text-sm mb-6">${match.language || ''}</p>
-                        <div class="flex flex-wrap gap-3">${buttonsHTML}</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function createMatchCard(match) {
-            const card = document.createElement('div');
-            card.className = 'match-card rounded-xl overflow-hidden flex flex-col';
-            
-            const isLive = match.status?.toUpperCase() === 'LIVE';
-            const imgSrc = match.image || 'https://fancode.com/skillup-uploads/cms-media/Cricket_Fallback_Old_match-card.jpg';
-            const buttonsHTML = generateButtons(match, 'text-xs px-3 py-2 rounded-md');
-
-            card.innerHTML = `
-                <div class="relative">
-                    <div class="card-glow"></div>
-                    <img src="${imgSrc}" alt="${match.title}" class="w-full h-48 object-cover">
-                    ${isLive ? `<span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">LIVE</span>` : ''}
-                </div>
-                <div class="p-5 flex flex-col flex-grow">
-                    <p class="text-amber-500 text-xs font-semibold mb-1">${match.tournament || ''}</p>
-                    <h3 class="text-lg font-bold text-slate-100 flex-grow mb-4">${match.title || 'Match Title'}</h3>
-                    <div class="flex flex-wrap gap-2">${buttonsHTML || '<p class="text-xs text-slate-500">Links coming soon...</p>'}</div>
-                </div>
-            `;
-            return card;
-        }
-
-        function generateButtons(match, classes) {
-            const streams = {
-                ...match.STREAMING_CDN,
-                adfree_stream: match.adfree_stream,
-                dai_stream: match.dai_stream
-            };
-            
-            let buttons = '';
-            const id = encodeURIComponent(String(match.match_id ?? ''));
-
-            for (const [key, value] of Object.entries(streams)) {
-                // MODIFICATION: Added a check to skip 'Primary_Playback_URL'
-                if (value && value !== "Unavailable" && key.toLowerCase() !== 'language' && key !== 'Primary_Playback_URL') {
-                    const label = key.replace(/_/g, ' ').replace(/(cdn|stream)/i, '').trim().toUpperCase() || 'STREAM';
-                    const href = `${PLAY_BASE}?id=${id}&cdn=${encodeURIComponent(key)}`;
-                    buttons += `<a href="${href}" class="watch-btn text-center text-black font-semibold ${classes}">${label}</a>`;
-                }
-            }
-            return buttons;
-        }
-
-        function initInteractiveEffects() {
-            const cards = document.querySelectorAll('.match-card');
-            cards.forEach(card => {
-                const glow = card.querySelector('.card-glow');
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    
-                    const rotateX = (y - rect.height / 2) / -15;
-                    const rotateY = (x - rect.width / 2) / 15;
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-                    
-                    glow.style.setProperty('--x', `${x}px`);
-                    glow.style.setProperty('--y', `${y}px`);
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-                });
-            });
-        }
-        
-        function handlePopup() {
-            const popup = document.getElementById('telegram-popup');
-            const closeBtn = document.getElementById('close-popup-btn');
-            const joinBtn = document.getElementById('join-btn');
-            const POPUP_KEY = 'telegramPopupDismissed';
-
-            if (localStorage.getItem(POPUP_KEY)) {
-                return;
-            }
-
-            setTimeout(() => {
-                popup.classList.add('show');
-            }, 3000);
-
-            function dismissPopup() {
-                popup.classList.remove('show');
-                localStorage.setItem(POPUP_KEY, 'true');
-            }
-
-            closeBtn.addEventListener('click', dismissPopup);
-            joinBtn.addEventListener('click', () => {
-                setTimeout(dismissPopup, 500); 
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchAndRender();
-            handlePopup();
+          });
+          video.play();
         });
-  
-    </script>
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = m3u8Url;
+        video.addEventListener('loadedmetadata', () => {
+          new Plyr(video, {
+            controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+            settings: ['quality', 'speed']
+          });
+          video.play();
+        });
+      } else {
+        alert("Your browser does not support HLS.");
+      }
+    })
+    .catch(err => {
+      console.error('Failed to load stream:', err);
+      alert('Failed to load stream.');
+    });
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+  }
+function openTab(tabName) {
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+  document.getElementById(tabName + '-tab').classList.add('active');
+  document.getElementById(tabName + '-content').classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  openTab('livechat'); // default tab
+});
+function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+  }
+  function showVisitorPopup() {
+  const popup = document.getElementById("visitorPopup");
+  popup.style.display = "flex";
+  setTimeout(() => {
+    popup.querySelector('.popup-box').style.opacity = '1';
+  }, 10);
+}
+function closeVisitorPopup() {
+  const popup = document.getElementById("visitorPopup");
+  popup.querySelector('.popup-box').style.opacity = '0';
+  setTimeout(() => {
+    popup.style.display = "none";
+  }, 300);
+}
+</script>
+
 </body>
-  </html>
+</html>
