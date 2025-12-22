@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Cricket Scores Pro</title>
+    <title>Live Cricket Score Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -36,19 +36,19 @@
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             animation: fadeInDown 0.8s ease-out;
         }
 
         header h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             background: linear-gradient(to right, #818cf8, #c084fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 700;
         }
 
-        /* Animated Button */
+        /* Refresh Button with Animation */
         .refresh-btn {
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: white;
@@ -63,7 +63,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin: 20px auto;
+            margin: 10px auto 30px;
         }
 
         .refresh-btn:hover {
@@ -92,85 +92,86 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Match Grid */
+        /* Match Cards Container */
         #match-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 20px;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1100px;
         }
 
         .match-card {
             background: var(--card-bg);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 25px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 20px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
             animation: fadeInUp 0.5s ease forwards;
         }
 
         .match-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-8px);
             border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
         }
 
-        .match-type {
+        .series-name {
             font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
             color: var(--secondary);
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        .match-name {
-            font-size: 1.1rem;
+        .match-title {
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             line-height: 1.4;
         }
 
-        .score-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 10px 0;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
+        .score-box {
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
         }
 
-        .status {
+        .team-score {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+
+        .match-status {
             font-size: 0.85rem;
             color: var(--accent);
             font-weight: 500;
-            margin-top: 15px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
-        .status::before {
+        .match-status::before {
             content: "";
             width: 8px;
             height: 8px;
             background: var(--accent);
             border-radius: 50%;
-            display: inline-block;
             animation: pulse 1.5s infinite;
         }
 
-        .error-msg {
+        .error-card {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid #ef4444;
             color: #fca5a5;
             padding: 20px;
             border-radius: 15px;
             text-align: center;
-            max-width: 500px;
+            width: 100%;
         }
 
         /* Animations */
@@ -185,13 +186,13 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.5; }
-            100% { transform: scale(0.95); opacity: 1; }
+            0% { transform: scale(0.9); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.4; }
+            100% { transform: scale(0.9); opacity: 1; }
         }
 
         @media (max-width: 480px) {
-            header h1 { font-size: 1.8rem; }
+            header h1 { font-size: 1.6rem; }
             #match-container { grid-template-columns: 1fr; }
         }
     </style>
@@ -199,63 +200,60 @@
 <body>
 
     <header>
-        <h1>Live Cricket Pro</h1>
-        <p style="color: var(--text-dim)">Real-time match updates and scores</p>
+        <h1>Cricket Live Scores</h1>
+        <p style="color: var(--text-dim)">Latest match updates and real-time data</p>
     </header>
 
     <button class="refresh-btn" onclick="fetchScores()">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-        Refresh Scores
+        <span id="btn-icon">🔄</span> Refresh Score
     </button>
 
     <div id="loader" class="loader"></div>
     <div id="match-container"></div>
 
     <script>
-        // Replace with your actual API key
-        const API_KEY = "YOUR_API_KEY_HERE";
-        const API_URL = `https://api.cricapi.com/v1/currentMatches?apikey=${API_KEY}&offset=0`;
+        // Aapki API Key yahan integrated hai
+        const API_KEY = "71a4d725-d2d8-4411-9d5b-fc7c55ccf9e5";
+        const API_URL = `https://api.cricapi.com/v1/cricScore?apikey=${API_KEY}`;
 
         async function fetchScores() {
             const container = document.getElementById('match-container');
             const loader = document.getElementById('loader');
             
-            // UI States
             container.innerHTML = '';
             loader.style.display = 'block';
 
             try {
                 const response = await fetch(API_URL);
-                const data = await response.json();
+                const result = await response.json();
 
                 loader.style.display = 'none';
 
-                if (data.status !== "success") {
-                    throw new Error(data.reason || "Failed to fetch data");
+                if (result.status !== "success") {
+                    throw new Error(result.reason || "API Error occurred");
                 }
 
-                const matches = data.data;
+                const matches = result.data;
                 
                 if (!matches || matches.length === 0) {
-                    container.innerHTML = `<div class="error-msg">No live matches found at the moment.</div>`;
+                    container.innerHTML = `<div class="error-card">Abhi koi live match nahi mila.</div>`;
                     return;
                 }
 
-                displayMatches(matches);
+                renderMatches(matches);
 
             } catch (error) {
                 loader.style.display = 'none';
                 container.innerHTML = `
-                    <div class="error-msg">
-                        <h3>Oops! Something went wrong</h3>
-                        <p>${error.message}</p>
-                        <p style="font-size: 0.8rem; margin-top:10px">Make sure your API key is correct.</p>
+                    <div class="error-card">
+                        <strong>Error:</strong> ${error.message}<br>
+                        <small style="display:block; margin-top:10px;">Kripya check karein ki aapka internet ya API key sahi hai.</small>
                     </div>
                 `;
             }
         }
 
-        function displayMatches(matches) {
+        function renderMatches(matches) {
             const container = document.getElementById('match-container');
             
             matches.forEach((match, index) => {
@@ -263,29 +261,35 @@
                 card.className = 'match-card';
                 card.style.animationDelay = `${index * 0.1}s`;
 
-                // Handle scores gracefully if they are missing
-                const scoreInfo = match.score && match.score.length > 0 
-                    ? match.score.map(s => `
-                        <div class="score-row">
-                            <span><strong>${s.inning}</strong></span>
-                            <span>${s.r}/${s.w} (${s.o})</span>
-                        </div>
-                    `).join('')
-                    : '<div class="score-row">Score not available yet</div>';
+                // Team Scores Parsing
+                const t1 = match.t1 || "Team 1";
+                const t2 = match.t2 || "Team 2";
+                const t1Score = match.t1s || "N/A";
+                const t2Score = match.t2s || "N/A";
 
                 card.innerHTML = `
-                    <div class="match-type">${match.matchType || 'Match'}</div>
-                    <div class="match-name">${match.name}</div>
-                    <div class="scores">${scoreInfo}</div>
-                    <div class="status">${match.status}</div>
+                    <div class="series-name">${match.series || 'International'}</div>
+                    <div class="match-title">${match.matchType.toUpperCase()}: ${t1} vs ${t2}</div>
+                    <div class="score-box">
+                        <div class="team-score">
+                            <span>${t1}</span>
+                            <span><strong>${t1Score}</strong></span>
+                        </div>
+                        <div class="team-score">
+                            <span>${t2}</span>
+                            <span><strong>${t2Score}</strong></span>
+                        </div>
+                    </div>
+                    <div class="match-status">${match.status || 'Match in progress'}</div>
                 `;
 
                 container.appendChild(card);
             });
         }
 
-        // Initial Load
+        // Page load hone par scores fetch karein
         window.onload = fetchScores;
     </script>
 </body>
 </html>
+
