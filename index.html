@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cricket Live Pro | Ultimate Edition</title>
+    <title>Cricket Live Pro | Working Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -19,6 +19,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text-dark); }
 
+        /* Header */
         header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .ist-clock { font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 20px; }
@@ -27,6 +28,7 @@
         .tab { flex: 1; text-align: center; padding: 12px; font-weight: 600; cursor: pointer; opacity: 0.7; border-bottom: 3px solid transparent; transition: 0.3s; }
         .tab.active { opacity: 1; border-bottom: 3px solid white; }
 
+        /* Match Cards */
         .container { max-width: 600px; margin: 10px auto; padding: 10px; }
         .match-card { background: var(--white); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; }
         .series-info { font-size: 0.75rem; color: var(--text-light); margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
@@ -38,6 +40,7 @@
         .team-score { font-weight: 700; font-size: 1.1rem; }
         .match-status { font-size: 0.85rem; color: #d32f2f; margin-top: 10px; font-weight: 500; }
 
+        /* Modal / Scorecard */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; }
         .back-btn { font-size: 1.5rem; cursor: pointer; }
@@ -55,6 +58,7 @@
         .extras-total { background: #fdfdfd; padding: 12px; border-top: 2px solid #eee; font-size: 0.9rem; }
         .yet-to-bat { padding: 12px; border-top: 1px solid #eee; font-size: 0.8rem; color: #555; background: #fff; }
 
+        /* Loader */
         .loader { width: 30px; height: 30px; border: 3px solid #ccc; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 20px auto; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -109,18 +113,22 @@
             const json = await res.json();
             loader.style.display = 'none';
 
-            if (json.status !== "success") return;
+            if (json.status !== "success") {
+                list.innerHTML = "<p style='text-align:center;'>API Limit Reached</p>";
+                return;
+            }
             currentTabData = json.data;
             switchTab('live', document.querySelector('.tab.active'));
         } catch (e) {
             loader.style.display = 'none';
-            list.innerHTML = "<p style='text-align:center;'>API Limit Reached or Connection Error</p>";
+            list.innerHTML = "<p style='text-align:center;'>Connection Error</p>";
         }
     }
 
     function switchTab(type, el) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         el.classList.add('active');
+
         const list = document.getElementById('match-list');
         list.innerHTML = '';
 
@@ -130,18 +138,23 @@
             return m.ms === 'result';
         });
 
+        if(filtered.length === 0) {
+            list.innerHTML = "<p style='text-align:center; padding:20px; color:#999;'>No matches found</p>";
+            return;
+        }
+
         filtered.forEach(m => {
             const card = document.createElement('div');
             card.className = 'match-card';
             card.onclick = () => openModal(m);
             card.innerHTML = `
-                <div class="series-info">${m.series}</div>
+                <div class="series-info">${m.series || 'Series Info'}</div>
                 <div class="team-row">
-                    <div class="team-meta"><div class="team-logo">${m.t1.charAt(0)}</div><span class="team-name">${m.t1}</span></div>
+                    <div class="team-meta"><div class="team-logo">${(m.t1 || 'T').charAt(0)}</div><span class="team-name">${m.t1}</span></div>
                     <div class="team-score">${m.t1s || ''}</div>
                 </div>
                 <div class="team-row">
-                    <div class="team-meta"><div class="team-logo">${m.t2.charAt(0)}</div><span class="team-name">${m.t2}</span></div>
+                    <div class="team-meta"><div class="team-logo">${(m.t2 || 'T').charAt(0)}</div><span class="team-name">${m.t2}</span></div>
                     <div class="team-score">${m.t2s || ''}</div>
                 </div>
                 <div class="match-status">${m.status}</div>
@@ -156,6 +169,7 @@
         modal.style.display = 'flex';
         document.getElementById('m-teams').innerText = `${m.t1} vs ${m.t2}`;
         document.getElementById('m-status').innerText = m.status;
+        
         area.innerHTML = '<div class="loader" style="display:block;"></div>';
 
         try {
@@ -163,7 +177,7 @@
             const json = await res.json();
             
             if (json.status !== "success" || !json.data || !json.data.scorecard) {
-                area.innerHTML = "<p style='padding:20px; text-align:center;'>Detailed scorecard not available for this match yet.</p>";
+                area.innerHTML = "<p style='padding:20px; text-align:center;'>Scorecard not available.</p>";
                 return;
             }
 
@@ -172,29 +186,32 @@
                 const section = document.createElement('div');
                 section.className = 'scorecard-container';
                 
-                // FIXED: Mapping correctly to API properties
+                // FIXED: Mapping batting data with correct field names
                 let playersHtml = inning.batting.map(p => `
                     <tr>
                         <td>
-                            <div class="bat-name">${p.batsman.name}</div>
+                            <div class="bat-name">${p.batsman?.name || 'Unknown'}</div>
                             <div class="dismissal">${p['dismissal-text'] || 'not out'}</div>
                         </td>
-                        <td style="font-weight:700;">${p.r}</td>
-                        <td>${p.b}</td>
-                        <td>${p['4s']}</td>
-                        <td>${p['6s']}</td>
-                        <td>${p.sr}</td>
+                        <td style="font-weight:700;">${p.r || 0}</td>
+                        <td>${p.b || 0}</td>
+                        <td>${p['4s'] || 0}</td>
+                        <td>${p['6s'] || 0}</td>
+                        <td>${p.sr || 0}</td>
                     </tr>
                 `).join('');
 
-                // FIXED: Handling Extras and Totals properly
-                const extras = inning.extrasData ? `B: ${inning.extrasData.b}, LB: ${inning.extrasData.lb}, W: ${inning.extrasData.w}, NB: ${inning.extrasData.nb}, P: ${inning.extrasData.p}` : inning.extras;
-                const yetToBat = inning.yetToBat ? inning.yetToBat.map(p => p.name).join(", ") : "None";
+                const yetToBat = inning.yetToBat ? inning.yetToBat.map(p => p.name).join(", ") : "N/A";
+
+                // FIXED: Handling Extras if it's an object
+                const extrasText = typeof inning.extras === 'object' ? 
+                                   `${inning.extras.r || 0} (w ${inning.extras.w || 0}, nb ${inning.extras.nb || 0}, lb ${inning.extras.lb || 0}, b ${inning.extras.b || 0})` : 
+                                   inning.extras;
 
                 section.innerHTML = `
                     <div class="inning-title">
                         <span>${inning.inning}</span>
-                        <span>${inning.totals.R}/${inning.totals.W} (${inning.totals.OV})</span>
+                        <span>${inning.totals?.R || 0}/${inning.totals?.W || 0} (${inning.totals?.OV || 0})</span>
                     </div>
                     <table class="stat-table">
                         <thead>
@@ -203,8 +220,8 @@
                         <tbody>${playersHtml}</tbody>
                     </table>
                     <div class="extras-total">
-                        <strong>Extras:</strong> ${extras} <br>
-                        <strong>Total:</strong> ${inning.totals.R} (${inning.totals.W} wkts, ${inning.totals.OV} ov)
+                        <strong>Extras:</strong> ${extrasText} <br>
+                        <strong>Total:</strong> ${inning.totals?.R || 0} (${inning.totals?.W || 0} wkts, ${inning.totals?.OV || 0} ov)
                     </div>
                     <div class="yet-to-bat">
                         <strong>Yet to bat:</strong> ${yetToBat}
@@ -212,6 +229,7 @@
                 `;
                 area.appendChild(section);
             });
+
         } catch (e) {
             area.innerHTML = "<p style='padding:20px; text-align:center;'>Error loading scorecard.</p>";
         }
@@ -229,6 +247,7 @@
 
 </body>
 </html>
+
 
 
 
