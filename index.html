@@ -1,295 +1,239 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Cricket Score Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Cricket Live Pro | Premium Scoreboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --secondary: #a855f7;
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --accent: #22c55e;
+            --primary: #4f46e5;
+            --secondary: #9333ea;
+            --accent: #10b981;
+            --dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
 
         body {
-            background: var(--bg-gradient);
-            background-attachment: fixed;
-            color: var(--text-main);
+            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+            color: #f8fafc;
             min-height: 100vh;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            animation: fadeInDown 0.8s ease-out;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
 
-        header h1 {
-            font-size: 2.2rem;
-            background: linear-gradient(to right, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-        }
+        header { text-align: center; padding: 40px 0; }
+        header h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* Refresh Button with Animation */
+        /* Stylish Button */
         .refresh-btn {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px auto 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none; padding: 14px 32px; border-radius: 12px; color: white;
+            font-weight: 600; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; gap: 10px; margin: 0 auto 40px;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
         }
-
-        .refresh-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
-        }
-
-        .refresh-btn:active {
-            transform: scale(0.95);
-        }
+        .refresh-btn:hover { transform: translateY(-3px); box-shadow: 0 20px 30px -10px rgba(147, 51, 234, 0.5); }
+        .refresh-btn:active { transform: scale(0.95); }
 
         /* Loader */
-        .loader {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 255, 255, 0.1);
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: none;
-            margin: 50px auto;
-        }
+        .loader { width: 40px; height: 40px; border: 4px solid var(--glass); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; display: none; margin: 20px auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Match Cards Container */
-        #match-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 1100px;
-        }
+        /* Match Grid */
+        #match-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
 
         .match-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            background: var(--glass); backdrop-filter: blur(16px); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 25px; cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+        }
+        .match-card:hover { transform: scale(1.02); background: rgba(255,255,255,0.08); border-color: var(--primary); }
+
+        .series-tag { font-size: 0.7rem; font-weight: 700; color: var(--secondary); text-transform: uppercase; margin-bottom: 15px; display: block; }
+
+        .team-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .team-info { display: flex; align-items: center; gap: 12px; }
+        
+        /* Logo System */
+        .team-logo {
+            width: 45px; height: 45px; border-radius: 12px;
+            background: linear-gradient(135deg, #334155, #1e293b);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.2rem; color: #fff;
+            border: 1px solid var(--glass-border);
+        }
+
+        .team-name { font-weight: 600; font-size: 1.1rem; }
+        .score { font-weight: 800; font-size: 1.2rem; color: #fff; }
+
+        .status-bar { 
+            margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--glass-border);
+            color: var(--accent); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 8px;
+        }
+        .live-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 1.5s infinite; }
+
+        /* Modal Scorecard */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
             padding: 20px;
-            transition: transform 0.3s ease, border-color 0.3s ease;
-            animation: fadeInUp 0.5s ease forwards;
         }
+        .modal-content {
+            background: #1e293b; width: 100%; max-width: 600px; border-radius: 30px;
+            padding: 40px; position: relative; border: 1px solid var(--glass-border);
+            animation: slideUp 0.4s ease;
+        }
+        .close-modal { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.5rem; }
 
-        .match-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .series-name {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--secondary);
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .match-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
-
-        .score-box {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-
-        .team-score {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-            font-size: 0.95rem;
-        }
-
-        .match-status {
-            font-size: 0.85rem;
-            color: var(--accent);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .match-status::before {
-            content: "";
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-
-        .error-card {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid #ef4444;
-            color: #fca5a5;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            width: 100%;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.9); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.4; }
-            100% { transform: scale(0.9); opacity: 1; }
-        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         @media (max-width: 480px) {
-            header h1 { font-size: 1.6rem; }
-            #match-container { grid-template-columns: 1fr; }
+            header h1 { font-size: 2rem; }
+            .match-card { padding: 18px; }
         }
     </style>
 </head>
 <body>
 
+<div class="container">
     <header>
-        <h1>Cricket Live Scores</h1>
-        <p style="color: var(--text-dim)">Latest match updates and real-time data</p>
+        <h1>Cricket Live Pro</h1>
+        <p style="color: #94a3b8; margin-top: 10px;">Premium Real-time Match Analysis</p>
     </header>
 
     <button class="refresh-btn" onclick="fetchScores()">
-        <span id="btn-icon">🔄</span> Refresh Score
+        <span id="btn-text">🔄 Update Live Scores</span>
     </button>
 
     <div id="loader" class="loader"></div>
-    <div id="match-container"></div>
+    <div id="match-grid"></div>
+</div>
 
-    <script>
-        // Aapki API Key yahan integrated hai
-        const API_KEY = "71a4d725-d2d8-4411-9d5b-fc7c55ccf9e5";
-        const API_URL = `https://api.cricapi.com/v1/cricScore?apikey=${API_KEY}`;
+<div id="scoreModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">×</span>
+        <h2 id="modalTitle" style="margin-bottom: 20px; color: var(--secondary);">Match Details</h2>
+        <div id="modalBody">
+            </div>
+    </div>
+</div>
 
-        async function fetchScores() {
-            const container = document.getElementById('match-container');
-            const loader = document.getElementById('loader');
-            
-            container.innerHTML = '';
-            loader.style.display = 'block';
+<script>
+    const API_KEY = "71a4d725-d2d8-4411-9d5b-fc7c55ccf9e5";
+    const API_URL = `https://api.cricapi.com/v1/cricScore?apikey=${API_KEY}`;
 
-            try {
-                const response = await fetch(API_URL);
-                const result = await response.json();
+    async function fetchScores() {
+        const grid = document.getElementById('match-grid');
+        const loader = document.getElementById('loader');
+        
+        grid.innerHTML = '';
+        loader.style.display = 'block';
 
-                loader.style.display = 'none';
+        try {
+            const response = await fetch(API_URL);
+            const result = await response.json();
+            loader.style.display = 'none';
 
-                if (result.status !== "success") {
-                    throw new Error(result.reason || "API Error occurred");
-                }
+            if (result.status !== "success") throw new Error("API Limit Reached or Error");
 
-                const matches = result.data;
-                
-                if (!matches || matches.length === 0) {
-                    container.innerHTML = `<div class="error-card">Abhi koi live match nahi mila.</div>`;
-                    return;
-                }
-
-                renderMatches(matches);
-
-            } catch (error) {
-                loader.style.display = 'none';
-                container.innerHTML = `
-                    <div class="error-card">
-                        <strong>Error:</strong> ${error.message}<br>
-                        <small style="display:block; margin-top:10px;">Kripya check karein ki aapka internet ya API key sahi hai.</small>
-                    </div>
-                `;
-            }
+            renderMatches(result.data);
+        } catch (error) {
+            loader.style.display = 'none';
+            grid.innerHTML = `<div style="text-align:center; grid-column: 1/-1; padding: 40px;">
+                <h3 style="color: #ef4444;">Unable to load scores</h3>
+                <p style="color: #94a3b8;">${error.message}</p>
+            </div>`;
         }
+    }
 
-        function renderMatches(matches) {
-            const container = document.getElementById('match-container');
-            
-            matches.forEach((match, index) => {
-                const card = document.createElement('div');
-                card.className = 'match-card';
-                card.style.animationDelay = `${index * 0.1}s`;
+    function getLogo(teamName) {
+        return teamName ? teamName.charAt(0).toUpperCase() : '?';
+    }
 
-                // Team Scores Parsing
-                const t1 = match.t1 || "Team 1";
-                const t2 = match.t2 || "Team 2";
-                const t1Score = match.t1s || "N/A";
-                const t2Score = match.t2s || "N/A";
+    function renderMatches(matches) {
+        const grid = document.getElementById('match-grid');
+        
+        matches.forEach((match) => {
+            const card = document.createElement('div');
+            card.className = 'match-card';
+            card.onclick = () => openScorecard(match);
 
-                card.innerHTML = `
-                    <div class="series-name">${match.series || 'International'}</div>
-                    <div class="match-title">${match.matchType.toUpperCase()}: ${t1} vs ${t2}</div>
-                    <div class="score-box">
-                        <div class="team-score">
-                            <span>${t1}</span>
-                            <span><strong>${t1Score}</strong></span>
-                        </div>
-                        <div class="team-score">
-                            <span>${t2}</span>
-                            <span><strong>${t2Score}</strong></span>
-                        </div>
+            card.innerHTML = `
+                <span class="series-tag">${match.series}</span>
+                <div class="team-row">
+                    <div class="team-info">
+                        <div class="team-logo">${getLogo(match.t1)}</div>
+                        <span class="team-name">${match.t1}</span>
                     </div>
-                    <div class="match-status">${match.status || 'Match in progress'}</div>
-                `;
+                    <span class="score">${match.t1s || '0/0'}</span>
+                </div>
+                <div class="team-row">
+                    <div class="team-info">
+                        <div class="team-logo" style="background: linear-gradient(135deg, #4f46e5, #4338ca);">${getLogo(match.t2)}</div>
+                        <span class="team-name">${match.t2}</span>
+                    </div>
+                    <span class="score">${match.t2s || '0/0'}</span>
+                </div>
+                <div class="status-bar">
+                    <div class="live-dot"></div>
+                    ${match.status}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
 
-                container.appendChild(card);
-            });
-        }
+    function openScorecard(match) {
+        const modal = document.getElementById('scoreModal');
+        const modalBody = document.getElementById('modalBody');
+        const modalTitle = document.getElementById('modalTitle');
 
-        // Page load hone par scores fetch karein
-        window.onload = fetchScores;
-    </script>
+        modalTitle.innerText = `${match.t1} vs ${match.t2}`;
+        modalBody.innerHTML = `
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
+                <p style="margin-bottom: 10px;"><strong>Match Type:</strong> ${match.matchType.toUpperCase()}</p>
+                <p style="margin-bottom: 10px;"><strong>Venue:</strong> International Stadium</p>
+                <p style="margin-bottom: 10px; color: var(--accent);"><strong>Current Status:</strong> ${match.status}</p>
+                <hr style="border: 0; border-top: 1px solid #334155; margin: 15px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="color: #fff;">${match.t1}</h3>
+                        <h2 style="font-size: 2rem;">${match.t1s || 'Yet to bat'}</h2>
+                    </div>
+                    <div style="font-weight: 800; color: #475569;">VS</div>
+                    <div style="text-align: right;">
+                        <h3 style="color: #fff;">${match.t2}</h3>
+                        <h2 style="font-size: 2rem;">${match.t2s || 'Yet to bat'}</h2>
+                    </div>
+                </div>
+                <p style="text-align:center; margin-top: 20px; font-size: 0.9rem; color: #94a3b8;">
+                    Detailed player stats are updating via live feed...
+                </p>
+            </div>
+        `;
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('scoreModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('scoreModal');
+        if (event.target == modal) closeModal();
+    }
+
+    // Initial Load
+    fetchScores();
+</script>
+
 </body>
 </html>
-
