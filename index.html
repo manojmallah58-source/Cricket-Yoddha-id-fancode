@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CricPro Live | Complete Edition</title>
+    <title>CricPro Live | Pro Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00a82d; --bg: #f0f3f2; --white: #ffffff; --text-dark: #222; --blue: #1976d2; }
@@ -12,18 +12,38 @@
         header { background: var(--primary); color: white; padding: 15px 15px 0 15px; position: sticky; top: 0; z-index: 100; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .tabs { display: flex; justify-content: space-around; }
-        .tab { padding: 12px 20px; font-weight: 700; cursor: pointer; opacity: 0.6; border-bottom: 4px solid transparent; font-size: 0.9rem; }
+        .tab { padding: 12px 20px; font-weight: 700; cursor: pointer; opacity: 0.6; border-bottom: 4px solid transparent; font-size: 0.9rem; color: white; }
         .tab.active { opacity: 1; border-bottom: 4px solid white; }
         .container { max-width: 600px; margin: auto; padding: 10px; }
+        
+        /* Match Card */
         .match-card { background: var(--white); border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; border-left: 5px solid #ddd; }
         .series-name { font-size: 0.7rem; color: #777; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
         .team-row { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; font-weight: 700; }
         .status { font-size: 0.8rem; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; font-weight: 600; }
         .status.live { color: #d32f2f; }
-        .status.upcoming { color: var(--blue); }
-        .empty-msg { text-align: center; padding: 50px 20px; color: #666; font-weight: 600; }
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
+        .status.fixture { color: var(--blue); }
+
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; }
+        .modal-tabs { display: flex; background: var(--primary); position: sticky; top: 55px; z-index: 99; }
+        .m-tab { flex:1; text-align:center; padding:12px; color:white; font-size:0.8rem; font-weight:700; cursor:pointer; opacity:0.7; border-bottom:3px solid transparent; }
+        .m-tab.active { opacity:1; border-bottom-color:white; }
+
+        /* Squads Design (Exactly like your Screenshot) */
+        .squad-container { display: flex; background: #fff; border-top: 1px solid #eee; }
+        .squad-column { flex: 1; border-right: 1px solid #eee; }
+        .squad-header { background: #e8f5e9; padding: 10px; font-weight: 800; font-size: 0.75rem; text-align: center; color: #333; }
+        .player-item { padding: 10px; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center; gap: 10px; }
+        .player-img { width: 38px; height: 38px; border-radius: 50%; background: #eee; object-fit: cover; }
+        .p-name { font-size: 0.8rem; font-weight: 700; color: #333; line-height: 1.2; }
+        .p-role { font-size: 0.65rem; color: #777; }
+
+        /* Info Center */
+        .info-sec { padding: 40px 20px; text-align: center; color: #666; font-weight: 600; }
+        .countdown { font-size: 2.2rem; font-weight: 800; margin: 15px 0; color: #222; }
+
         .loader { width: 30px; height: 30px; border: 3px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite linear; margin: 50px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -47,9 +67,10 @@
 <div id="modal" class="modal">
     <div class="modal-header">
         <b onclick="closeModal()" style="font-size: 1.5rem; cursor: pointer;">✕</b>
-        <span id="modal-title">Scorecard</span>
+        <span id="modal-title" style="font-weight:700;">Match Details</span>
     </div>
-    <div id="scorecard-content"></div>
+    <div class="modal-tabs" id="modal-tabs-row"></div>
+    <div id="modal-content"></div>
 </div>
 
 <script>
@@ -71,9 +92,9 @@
             if (type === 'live') {
                 const res = await fetch(`${VERCEL_API}/live`);
                 const json = await res.json();
-                // Fix: Live match nahi hone par properly handle karna
+                // FIX: Check if live array exists and has matches
                 if (!json.live || json.live.length === 0) {
-                    container.innerHTML = "<div class='empty-msg'>No live matches at the moment.</div>";
+                    container.innerHTML = "<div class='info-sec'>No live matches at the moment.</div>";
                 } else {
                     renderMatches(json.live, 'live');
                 }
@@ -81,72 +102,122 @@
                 const res = await fetch(`https://api.cricapi.com/v1/cricScore?apikey=${CRIC_API_KEY}`);
                 const json = await res.json();
                 let filtered = json.data.filter(m => m.ms === (type === 'upcoming' ? 'fixture' : 'result'));
-                
-                if(type === 'upcoming') {
-                    filtered.sort((a, b) => new Date(a.dateTimeGMT) - new Date(b.dateTimeGMT));
-                }
-                
+                if(type === 'upcoming') filtered.sort((a, b) => new Date(a.dateTimeGMT) - new Date(b.dateTimeGMT));
                 renderMatches(filtered, type);
             }
         } catch (e) { 
-            // Fix: Network error ya server down ke case mein message
-            if (type === 'live') {
-                container.innerHTML = "<div class='empty-msg'>No live matches at the moment.</div>";
-            } else {
-                container.innerHTML = "<div class='empty-msg'>Unable to load matches. Please try again.</div>";
-            }
+            container.innerHTML = "<div class='info-sec'>No matches available.</div>"; 
         }
     }
 
     function renderMatches(matches, type) {
         const container = document.getElementById('main-list');
-        if (!matches || matches.length === 0) {
-            container.innerHTML = `<div class='empty-msg'>No ${type} matches found.</div>`;
-            return;
-        }
-        
         container.innerHTML = '';
         matches.forEach(m => {
             const card = document.createElement('div');
             card.className = 'match-card';
+            card.onclick = () => openModal(m, type);
             if(type === 'live') card.style.borderLeftColor = "#00a82d";
 
-            if (type === 'live') {
-                card.onclick = () => openLiveScore(m.id, m.title);
-                card.innerHTML = `<div class="series-name">Live Match</div><div class="team-row">${m.title}</div><div class="status live">● LIVE - Ball by Ball</div>`;
-            } else {
-                card.innerHTML = `
-                    <div class="series-name">${m.series || 'Match'}</div>
-                    <div class="team-row"><span>${m.t1}</span><span>${m.t1s || '-'}</span></div>
-                    <div class="team-row"><span>${m.t2}</span><span>${m.t2s || '-'}</span></div>
-                    <div class="status ${type}">${m.status}</div>`;
-            }
+            card.innerHTML = `
+                <div class="series-name">${m.series || (type==='live' ? 'Live Match' : 'Match')}</div>
+                <div class="team-row"><span>${m.t1 || m.title}</span><span>${m.t1s || ''}</span></div>
+                ${m.t2 ? `<div class="team-row"><span>${m.t2}</span><span>${m.t2s || ''}</span></div>` : ''}
+                <div class="status ${type}">${type === 'live' ? '● LIVE - Click for Score' : m.status}</div>
+            `;
             container.appendChild(card);
         });
     }
 
-    async function openLiveScore(id, title) {
+    function openModal(m, type) {
         const modal = document.getElementById('modal');
-        const content = document.getElementById('scorecard-content');
+        const tabsRow = document.getElementById('modal-tabs-row');
         modal.style.display = 'flex';
-        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-title').innerText = m.title || `${m.t1} v ${m.t2}`;
+
+        if (type === 'live') {
+            tabsRow.innerHTML = `<div class="m-tab active">SCORECARD</div>`;
+            fetchLiveScore(m.id);
+        } else {
+            tabsRow.innerHTML = `
+                <div class="m-tab active" onclick="showInfo('${m.dateTimeGMT}', this)">INFO</div>
+                <div class="m-tab" onclick="fetchSquads('${m.id}', this)">SQUADS</div>
+            `;
+            showInfo(m.dateTimeGMT, tabsRow.children[0]);
+        }
+    }
+
+    async function fetchLiveScore(id) {
+        const content = document.getElementById('modal-content');
         content.innerHTML = '<div class="loader"></div>';
         try {
             const res = await fetch(`${VERCEL_API}/score?id=${id}`);
             const data = await res.json();
             content.innerHTML = `
-                <div style="padding:20px; background:white; text-align:center;">
-                    <h2 style="color:var(--primary); font-size:2.2rem;">${data.livescore || '0/0'}</h2>
-                    <p style="font-weight:700; margin-top:5px;">${data.runrate || ''}</p>
-                    <div style="background:#f4f4f4; padding:15px; border-radius:10px; margin-top:20px; text-align:left;">
-                        <p><b>Batter:</b> ${data.batterone || '-'} (${data.batsmanonerun || 0})</p>
-                        <p><b>Bowler:</b> ${data.bowlerone || '-'} (${data.bowleronewickers || 0} Wkts)</p>
-                    </div>
-                    <div style="margin-top:20px; color:red; font-weight:700; border-left:4px solid red; padding:10px; text-align:left; background:#fff5f5;">
-                        Update: ${data.update || 'Updating...'}
+                <div class="info-sec" style="color:#222;">
+                    <h1 style="font-size:3rem; color:var(--primary);">${data.livescore || '0/0'}</h1>
+                    <p><b>${data.runrate || ''}</b></p>
+                    <div style="text-align:left; background:#f9f9f9; padding:20px; border-radius:12px; margin-top:20px;">
+                        <p><b>Batsman:</b> ${data.batterone || '-'}</p>
+                        <p><b>Bowler:</b> ${data.bowlerone || '-'}</p>
+                        <hr style="margin:10px 0; border:0; border-top:1px solid #eee;">
+                        <p style="color:red; font-size:0.85rem;"><b>Update:</b> ${data.update || '-'}</p>
                     </div>
                 </div>`;
-        } catch (e) { content.innerHTML = "<p style='padding:20px; text-align:center;'>Scorecard currently unavailable.</p>"; }
+        } catch (e) { content.innerHTML = "<p class='info-sec'>Score unavailable.</p>"; }
+    }
+
+    function showInfo(time, el) {
+        updateMTabs(el);
+        const content = document.getElementById('modal-content');
+        const target = new Date(time);
+        content.innerHTML = `
+            <div class="info-sec">
+                <p>Starts on ${target.toDateString()}</p>
+                <div class="countdown" id="timer-box">--:--:--</div>
+                <p style="color:var(--blue);">Scheduled: ${target.toLocaleTimeString()}</p>
+            </div>`;
+        
+        const itv = setInterval(() => {
+            const diff = target - new Date();
+            if (diff <= 0) { document.getElementById('timer-box').innerText = "Started"; clearInterval(itv); }
+            else {
+                const h = Math.floor(diff/3600000);
+                const m = Math.floor((diff%3600000)/60000);
+                const s = Math.floor((diff%60000)/1000);
+                document.getElementById('timer-box').innerText = `${h}h ${m}m ${s}s`;
+            }
+        }, 1000);
+    }
+
+    async function fetchSquads(id, el) {
+        updateMTabs(el);
+        const content = document.getElementById('modal-content');
+        content.innerHTML = '<div class="loader"></div>';
+        try {
+            const res = await fetch(`https://api.cricapi.com/v1/match_squad?apikey=${CRIC_API_KEY}&id=${id}`);
+            const json = await res.json();
+            const sq = json.data || [];
+            if (sq.length < 2) { content.innerHTML = "<div class='info-sec'>Squads not announced.</div>"; return; }
+
+            let html = `<div class="squad-container">`;
+            sq.forEach(team => {
+                html += `<div class="squad-column"><div class="squad-header">${team.teamName}</div>`;
+                team.players.forEach(p => {
+                    html += `<div class="player-item">
+                        <img src="${p.playerImg}" class="player-img" onerror="this.src='https://www.cricbuzz.com/a/img/v1/40x40/i1/c170661/default-player.jpg'">
+                        <div><div class="p-name">${p.name}</div><div class="p-role">${p.role || 'Player'}</div></div>
+                    </div>`;
+                });
+                html += `</div>`;
+            });
+            content.innerHTML = html + `</div>`;
+        } catch (e) { content.innerHTML = "<p class='info-sec'>Squad error.</p>"; }
+    }
+
+    function updateMTabs(el) {
+        document.querySelectorAll('.m-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
     }
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
@@ -154,6 +225,7 @@
 </script>
 </body>
 </html>
+
 
 
 
