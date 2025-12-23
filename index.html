@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CricPro Live | Ultimate Scorecard</title>
+    <title>CricPro Live | Final Professional Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00a82d; --bg: #f4f7f6; --white: #ffffff; --text-dark: #222; --blue: #1976d2; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text-dark); }
         header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .ist-clock { font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 20px; }
         .tabs { display: flex; background: var(--primary); }
         .tab { flex: 1; text-align: center; padding: 12px; font-weight: 600; cursor: pointer; opacity: 0.7; border-bottom: 3px solid transparent; }
         .tab.active { opacity: 1; border-bottom: 3px solid white; }
@@ -18,24 +19,17 @@
         .match-card { background: var(--white); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; }
         .team-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
         .team-score { font-weight: 700; font-size: 1.1rem; }
-        
-        /* Modal Scorecard Styling */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f3f2; display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 15px; }
-        .status-header { background: #e3f2fd; color: #1976d2; padding: 10px 15px; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #d1e9ff; }
-        
-        .inning-accordion { background: #fff; margin-bottom: 8px; border-bottom: 1px solid #eee; }
+        .inning-accordion { background: #fff; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .inning-header { padding: 15px; background: #fff; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .inning-header.active-header { background: var(--primary); color: white; }
-        .team-info-box { display: flex; flex-direction: column; }
-        .team-title { font-weight: 800; font-size: 1.05rem; }
+        .team-title { font-weight: 800; font-size: 1rem; }
         .inning-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-top: 3px; color: #777; }
         .active-header .inning-label { color: #fff; opacity: 0.8; }
-        .score-summary { font-weight: 800; font-size: 1.05rem; }
-        
+        .score-summary { font-weight: 800; font-size: 1rem; }
         .inning-content { display: none; background: #fff; }
         .inning-content.active { display: block; }
-        
         .table-pro { width: 100%; border-collapse: collapse; }
         .table-pro th { text-align: left; padding: 10px; font-size: 0.65rem; color: #888; border-bottom: 1px solid #eee; text-transform: uppercase; }
         .table-pro td { padding: 12px 10px; font-size: 0.82rem; border-bottom: 1px solid #f9f9f9; }
@@ -52,7 +46,7 @@
 <header>
     <div class="header-top">
         <h2 style="font-weight: 800;">CricPro Live</h2>
-        <div id="ist-clock" style="font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 20px;">IST: --:--</div>
+        <div id="ist-clock" class="ist-clock">IST: --:--</div>
     </div>
     <div class="tabs">
         <div class="tab active" onclick="switchTab('live', this)">LIVE</div>
@@ -72,7 +66,7 @@
 </div>
 
 <script>
-    const API_KEY = "d49acc4f-d6cb-4466-9cd0-384f2ebd023e"; 
+    const API_KEY = "07a80675-e5e7-414a-9144-cc26f8af3172"; 
     let allMatches = [];
 
     function updateClock() {
@@ -82,12 +76,14 @@
     setInterval(updateClock, 1000);
 
     async function fetchMatches() {
+        const list = document.getElementById('match-list');
+        list.innerHTML = '<div class="loader"></div>';
         try {
             const res = await fetch(`https://api.cricapi.com/v1/cricScore?apikey=${API_KEY}`);
             const json = await res.json();
             allMatches = json.data || [];
             switchTab('live', document.querySelector('.tab.active'));
-        } catch (e) { console.log(e); }
+        } catch (e) { list.innerHTML = "<p style='text-align:center;'>API Error</p>"; }
     }
 
     function switchTab(type, el) {
@@ -95,7 +91,7 @@
         el.classList.add('active');
         const list = document.getElementById('match-list');
         list.innerHTML = '';
-        let filtered = allMatches.filter(m => m.ms === (type === 'live' ? 'live' : type === 'upcoming' ? 'fixture' : 'recent' ? 'result' : 'result'));
+        let filtered = allMatches.filter(m => m.ms === (type === 'live' ? 'live' : type === 'upcoming' ? 'fixture' : 'result'));
         
         filtered.forEach(m => {
             const card = document.createElement('div');
@@ -124,10 +120,10 @@
             const data = json.data;
             if (!data || !data.scorecard) { area.innerHTML = "<p style='padding:40px; text-align:center;'>Scorecard Not Available.</p>"; return; }
 
-            let html = `<div class="status-header">${m.status}</div>`;
+            let html = `<div style="background:#e3f2fd; color:#1976d2; padding:12px 15px; font-weight:600; font-size:0.85rem; border-bottom:1px solid #d1e9ff;">${m.status}</div>`;
             
-            // Fixed Sorting: 1st Inning Always Top
             data.scorecard.forEach((inning, idx) => {
+                const teamName = (idx === 0) ? m.t1 : m.t2;
                 const r = inning.totals?.R || 0;
                 const w = inning.totals?.W || 0;
                 const ov = inning.totals?.OV || 0;
@@ -148,7 +144,7 @@
                 html += `
                     <div class="inning-accordion">
                         <div class="inning-header ${idx === data.scorecard.length - 1 ? 'active-header' : ''}" onclick="toggleInning(${idx})">
-                            <div class="team-info-box"><div class="team-title">${inning.inning}</div><div class="inning-label">${label}</div></div>
+                            <div class="team-info-box"><div class="team-title">${teamName}</div><div class="inning-label">${label}</div></div>
                             <div class="score-summary">${r}-${w} (${ov}) ▾</div>
                         </div>
                         <div id="inning-content-${idx}" class="inning-content ${idx === data.scorecard.length - 1 ? 'active' : ''}">
@@ -175,6 +171,7 @@
 </script>
 </body>
 </html>
+
 
 
 
