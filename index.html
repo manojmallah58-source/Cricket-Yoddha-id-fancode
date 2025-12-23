@@ -12,7 +12,7 @@
         header { background: var(--primary); color: white; padding: 15px 15px 0 15px; position: sticky; top: 0; z-index: 100; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .tabs { display: flex; justify-content: space-around; }
-        .tab { padding: 12px 20px; font-weight: 700; cursor: pointer; opacity: 0.6; border-bottom: 4px solid transparent; font-size: 0.9rem; }
+        .tab { padding: 12px 20px; font-weight: 700; cursor: pointer; opacity: 0.6; border-bottom: 4px solid transparent; font-size: 0.9rem; color: white; }
         .tab.active { opacity: 1; border-bottom: 4px solid white; }
         .container { max-width: 600px; margin: auto; padding: 10px; }
         
@@ -22,7 +22,7 @@
         .team-row { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; font-weight: 700; }
         .status { font-size: 0.8rem; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; font-weight: 600; }
         .status.live { color: #d32f2f; }
-        .status.upcoming { color: var(--blue); }
+        .status.fixture { color: var(--blue); }
 
         /* Professional Modal */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
@@ -31,19 +31,18 @@
         .m-tab { flex:1; text-align:center; padding:12px; color:white; font-size:0.8rem; font-weight:700; cursor:pointer; opacity:0.7; border-bottom:3px solid transparent; }
         .m-tab.active { opacity:1; border-bottom-color:white; }
 
-        /* Squads Design */
+        /* Squads UI (Same as Screenshot) */
         .squad-container { display: flex; background: #fff; border-top: 1px solid #eee; }
         .squad-column { flex: 1; border-right: 1px solid #eee; }
-        .squad-header { background: #e8f5e9; padding: 10px; font-weight: 800; font-size: 0.75rem; text-align: center; }
-        .player-item { padding: 10px; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center; gap: 8px; }
-        .player-img { width: 35px; height: 35px; border-radius: 50%; background: #eee; object-fit: cover; }
-        .player-info { line-height: 1.2; }
-        .p-name { font-size: 0.8rem; font-weight: 700; color: #333; }
-        .p-role { font-size: 0.65rem; color: #888; }
+        .squad-header { background: #e8f5e9; padding: 10px; font-weight: 800; font-size: 0.75rem; text-align: center; color: #333; }
+        .player-item { padding: 10px; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center; gap: 10px; }
+        .player-img { width: 40px; height: 40px; border-radius: 50%; background: #eee; object-fit: cover; }
+        .p-name { font-size: 0.82rem; font-weight: 700; color: #333; }
+        .p-role { font-size: 0.68rem; color: #777; }
 
-        /* Info Section */
-        .info-sec { padding: 20px; text-align: center; }
-        .countdown { font-size: 1.5rem; font-weight: 800; margin: 15px 0; color: #333; }
+        /* Info UI (Countdown) */
+        .info-sec { padding: 25px; text-align: center; }
+        .countdown { font-size: 2rem; font-weight: 800; margin: 20px 0; color: #222; }
 
         .loader { width: 30px; height: 30px; border: 3px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite linear; margin: 50px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -70,8 +69,7 @@
         <b onclick="closeModal()" style="font-size: 1.5rem; cursor: pointer;">✕</b>
         <span id="modal-title" style="font-weight:700;">Match Details</span>
     </div>
-    <div class="modal-tabs" id="modal-tabs-row">
-        </div>
+    <div class="modal-tabs" id="modal-tabs-row"></div>
     <div id="modal-content"></div>
 </div>
 
@@ -94,7 +92,11 @@
             if (type === 'live') {
                 const res = await fetch(`${VERCEL_API}/live`);
                 const json = await res.json();
-                renderMatches(json.live || [], 'live');
+                if(!json.live || json.live.length === 0) {
+                    container.innerHTML = "<div class='info-sec'>No live matches at the moment.</div>";
+                } else {
+                    renderMatches(json.live, 'live');
+                }
             } else {
                 const res = await fetch(`https://api.cricapi.com/v1/cricScore?apikey=${CRIC_API_KEY}`);
                 const json = await res.json();
@@ -102,7 +104,7 @@
                 if(type === 'upcoming') filtered.sort((a, b) => new Date(a.dateTimeGMT) - new Date(b.dateTimeGMT));
                 renderMatches(filtered, type);
             }
-        } catch (e) { container.innerHTML = "<div class='info-sec'>No live matches at the moment.</div>"; }
+        } catch (e) { container.innerHTML = "<div class='info-sec'>No matches available.</div>"; }
     }
 
     function renderMatches(matches, type) {
@@ -115,8 +117,8 @@
             if(type === 'live') card.style.borderLeftColor = "#00a82d";
 
             card.innerHTML = `
-                <div class="series-name">${m.series || (type==='live' ? 'Live Match' : 'International')}</div>
-                <div class="team-row"><span>${m.title || m.t1}</span><span>${m.t1s || ''}</span></div>
+                <div class="series-name">${m.series || (type==='live' ? 'Live Match' : 'Match')}</div>
+                <div class="team-row"><span>${m.t1 || m.title}</span><span>${m.t1s || ''}</span></div>
                 ${m.t2 ? `<div class="team-row"><span>${m.t2}</span><span>${m.t2s || ''}</span></div>` : ''}
                 <div class="status ${type}">${type === 'live' ? '● LIVE - Click for Score' : m.status}</div>
             `;
@@ -133,9 +135,9 @@
         if (type === 'live') {
             tabsRow.innerHTML = `<div class="m-tab active">LIVE SCORE</div>`;
             fetchLiveScore(m.id);
-        } else if (type === 'upcoming') {
+        } else {
             tabsRow.innerHTML = `
-                <div class="m-tab active" onclick="showUpcomingInfo('${m.id}', '${m.dateTimeGMT}', this)">LIVE</div>
+                <div class="m-tab active" onclick="showUpcomingInfo('${m.id}', '${m.dateTimeGMT}', this)">INFO</div>
                 <div class="m-tab" onclick="fetchSquads('${m.id}', this)">SQUADS</div>
             `;
             showUpcomingInfo(m.id, m.dateTimeGMT, tabsRow.children[0]);
@@ -150,11 +152,12 @@
             const data = await res.json();
             content.innerHTML = `
                 <div class="info-sec">
-                    <h1 style="font-size:2.5rem; color:var(--primary);">${data.livescore || '0/0'}</h1>
-                    <p><b>${data.runrate || ''}</b></p>
-                    <div style="text-align:left; background:#f9f9f9; padding:15px; border-radius:10px; margin-top:20px;">
-                        <p><b>Batter:</b> ${data.batterone || '-'}</p>
+                    <h1 style="font-size:2.8rem; color:var(--primary); font-weight:800;">${data.livescore || '0/0'}</h1>
+                    <p style="font-weight:700; color:#444;">${data.runrate || ''}</p>
+                    <div style="text-align:left; background:#f9f9f9; padding:20px; border-radius:12px; margin-top:25px; border-left:4px solid var(--primary);">
+                        <p><b>Batsman:</b> ${data.batterone || '-'}</p>
                         <p><b>Bowler:</b> ${data.bowlerone || '-'}</p>
+                        <p style="margin-top:10px; color:#d32f2f;"><b>Update:</b> ${data.update || '-'}</p>
                     </div>
                 </div>`;
         } catch (e) { content.innerHTML = "<p class='info-sec'>Score unavailable.</p>"; }
@@ -163,28 +166,25 @@
     function showUpcomingInfo(id, time, el) {
         updateModalTabs(el);
         const content = document.getElementById('modal-content');
-        const matchDate = new Date(time);
+        const targetDate = new Date(time);
         content.innerHTML = `
             <div class="info-sec">
-                <p style="color:#666; font-size:0.9rem;">Starts on ${matchDate.toDateString()} • ${matchDate.toLocaleTimeString()}</p>
-                <div class="countdown" id="cd-timer">Calculating...</div>
-                <p style="color:var(--blue); font-weight:700;">Match starts at ${time} GMT</p>
-                <div style="text-align:left; margin-top:30px; border-top:1px solid #eee; padding-top:20px;">
-                    <p><b>Squads:</b> Match squad information will be visible in the Squads tab.</p>
-                </div>
+                <p style="color:#777; font-weight:600;">Starts on ${targetDate.toDateString()}</p>
+                <div class="countdown" id="cd-timer">--:--:--</div>
+                <p style="color:var(--blue); font-weight:700;">Scheduled for ${targetDate.toLocaleTimeString()}</p>
             </div>`;
         
-        // Simple Countdown
-        const timer = setInterval(() => {
-            const now = new Date().getTime();
-            const diff = matchDate - now;
-            if (diff < 0) { document.getElementById('cd-timer').innerHTML = "Started"; clearInterval(timer); }
-            else {
-                const h = Math.floor(diff / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                document.getElementById('cd-timer').innerHTML = `${h}h ${m}m`;
-            }
-        }, 1000);
+        const updateTimer = () => {
+            const now = new Date();
+            const diff = targetDate - now;
+            if (diff <= 0) { document.getElementById('cd-timer').innerText = "Started"; return; }
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            document.getElementById('cd-timer').innerText = `${h}h ${m}m ${s}s`;
+        };
+        updateTimer();
+        const timerInt = setInterval(updateTimer, 1000);
     }
 
     async function fetchSquads(id, el) {
@@ -195,18 +195,16 @@
             const res = await fetch(`https://api.cricapi.com/v1/match_squad?apikey=${CRIC_API_KEY}&id=${id}`);
             const json = await res.json();
             const squads = json.data || [];
-            
-            if (squads.length < 2) { content.innerHTML = "<p class='info-sec'>Squads not announced yet.</p>"; return; }
+            if (squads.length < 2) { content.innerHTML = "<div class='info-sec'>Squads not announced.</div>"; return; }
 
             let html = `<div class="squad-container">`;
             squads.forEach(team => {
-                html += `<div class="squad-column">
-                    <div class="squad-header">${team.teamName}</div>`;
+                html += `<div class="squad-column"><div class="squad-header">${team.teamName}</div>`;
                 team.players.forEach(p => {
                     html += `
                         <div class="player-item">
                             <img src="${p.playerImg}" class="player-img" onerror="this.src='https://www.cricbuzz.com/a/img/v1/40x40/i1/c170661/default-player.jpg'">
-                            <div class="player-info">
+                            <div>
                                 <div class="p-name">${p.name}</div>
                                 <div class="p-role">${p.role || 'Player'}</div>
                             </div>
@@ -214,8 +212,7 @@
                 });
                 html += `</div>`;
             });
-            html += `</div>`;
-            content.innerHTML = html;
+            content.innerHTML = html + `</div>`;
         } catch (e) { content.innerHTML = "<p class='info-sec'>Error loading squads.</p>"; }
     }
 
@@ -229,6 +226,7 @@
 </script>
 </body>
 </html>
+
 
 
 
