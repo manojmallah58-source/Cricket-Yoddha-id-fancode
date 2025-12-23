@@ -21,6 +21,7 @@
         .status { font-size: 0.8rem; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; font-weight: 600; }
         .status.live { color: #d32f2f; }
         .status.upcoming { color: var(--blue); }
+        .empty-msg { text-align: center; padding: 50px 20px; color: #666; font-weight: 600; }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; }
         .loader { width: 30px; height: 30px; border: 3px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite linear; margin: 50px auto; }
@@ -37,7 +38,7 @@
     <div class="tabs">
         <div class="tab active" onclick="loadTab('live', this)">LIVE</div>
         <div class="tab" onclick="loadTab('upcoming', this)">UPCOMING</div>
-        <div class="tab" onclick="switchTabBackup('result', this)">RECENT</div>
+        <div class="tab" onclick="loadTab('recent', this)">RECENT</div>
     </div>
 </header>
 
@@ -70,38 +71,41 @@
             if (type === 'live') {
                 const res = await fetch(`${VERCEL_API}/live`);
                 const json = await res.json();
-                renderMatches(json.live || [], 'live');
-            } else if (type === 'upcoming') {
+                // Fix: Live match nahi hone par properly handle karna
+                if (!json.live || json.live.length === 0) {
+                    container.innerHTML = "<div class='empty-msg'>No live matches at the moment.</div>";
+                } else {
+                    renderMatches(json.live, 'live');
+                }
+            } else {
                 const res = await fetch(`https://api.cricapi.com/v1/cricScore?apikey=${CRIC_API_KEY}`);
                 const json = await res.json();
+                let filtered = json.data.filter(m => m.ms === (type === 'upcoming' ? 'fixture' : 'result'));
                 
-                // Sorting logic: Time ke hisaab se sort karna (Sabse pehle wala match upar)
-                let upcoming = json.data.filter(m => m.ms === 'fixture');
-                upcoming.sort((a, b) => new Date(a.dateTimeGMT) - new Date(b.dateTimeGMT));
+                if(type === 'upcoming') {
+                    filtered.sort((a, b) => new Date(a.dateTimeGMT) - new Date(b.dateTimeGMT));
+                }
                 
-                renderMatches(upcoming, 'upcoming');
+                renderMatches(filtered, type);
             }
-        } catch (e) { container.innerHTML = "<p style='text-align:center; padding:20px;'>Error loading matches.</p>"; }
-    }
-
-    // Recent matches ke liye alag function
-    async function switchTabBackup(type, el) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        el.classList.add('active');
-        const container = document.getElementById('main-list');
-        container.innerHTML = '<div class="loader"></div>';
-        try {
-            const res = await fetch(`https://api.cricapi.com/v1/cricScore?apikey=${CRIC_API_KEY}`);
-            const json = await res.json();
-            const recent = json.data.filter(m => m.ms === 'result');
-            renderMatches(recent, 'recent');
-        } catch (e) { container.innerHTML = "<p>Error.</p>"; }
+        } catch (e) { 
+            // Fix: Network error ya server down ke case mein message
+            if (type === 'live') {
+                container.innerHTML = "<div class='empty-msg'>No live matches at the moment.</div>";
+            } else {
+                container.innerHTML = "<div class='empty-msg'>Unable to load matches. Please try again.</div>";
+            }
+        }
     }
 
     function renderMatches(matches, type) {
         const container = document.getElementById('main-list');
-        container.innerHTML = matches.length ? '' : "<p style='text-align:center; padding:50px;'>No matches found.</p>";
-
+        if (!matches || matches.length === 0) {
+            container.innerHTML = `<div class='empty-msg'>No ${type} matches found.</div>`;
+            return;
+        }
+        
+        container.innerHTML = '';
         matches.forEach(m => {
             const card = document.createElement('div');
             card.className = 'match-card';
@@ -142,7 +146,7 @@
                         Update: ${data.update || 'Updating...'}
                     </div>
                 </div>`;
-        } catch (e) { content.innerHTML = "<p>Scorecard Error.</p>"; }
+        } catch (e) { content.innerHTML = "<p style='padding:20px; text-align:center;'>Scorecard currently unavailable.</p>"; }
     }
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
@@ -150,6 +154,7 @@
 </script>
 </body>
 </html>
+
 
 
 
