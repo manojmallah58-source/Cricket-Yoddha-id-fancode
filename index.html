@@ -24,7 +24,7 @@
         .status.live { color: #d32f2f; }
         .status.fixture { color: var(--blue); }
 
-        /* Modal */
+        /* Professional Modal */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; }
         .modal-tabs { display: flex; background: var(--primary); position: sticky; top: 55px; z-index: 99; }
@@ -40,7 +40,7 @@
         .p-name { font-size: 0.8rem; font-weight: 700; color: #333; line-height: 1.2; }
         .p-role { font-size: 0.65rem; color: #777; }
 
-        /* Info Center */
+        /* Info Section */
         .info-sec { padding: 40px 20px; text-align: center; color: #666; font-weight: 600; }
         .countdown { font-size: 2.2rem; font-weight: 800; margin: 15px 0; color: #222; }
 
@@ -92,7 +92,6 @@
             if (type === 'live') {
                 const res = await fetch(`${VERCEL_API}/live`);
                 const json = await res.json();
-                // FIX: Check if live array exists and has matches
                 if (!json.live || json.live.length === 0) {
                     container.innerHTML = "<div class='info-sec'>No live matches at the moment.</div>";
                 } else {
@@ -180,8 +179,10 @@
         
         const itv = setInterval(() => {
             const diff = target - new Date();
-            if (diff <= 0) { document.getElementById('timer-box').innerText = "Started"; clearInterval(itv); }
-            else {
+            if (diff <= 0) { 
+                document.getElementById('timer-box').innerText = "Started"; 
+                clearInterval(itv); 
+            } else {
                 const h = Math.floor(diff/3600000);
                 const m = Math.floor((diff%3600000)/60000);
                 const s = Math.floor((diff%60000)/1000);
@@ -198,7 +199,10 @@
             const res = await fetch(`https://api.cricapi.com/v1/match_squad?apikey=${CRIC_API_KEY}&id=${id}`);
             const json = await res.json();
             const sq = json.data || [];
-            if (sq.length < 2) { content.innerHTML = "<div class='info-sec'>Squads not announced.</div>"; return; }
+            if (sq.length < 2) { 
+                content.innerHTML = "<div class='info-sec'>Squads not announced.</div>"; 
+                return; 
+            }
 
             let html = `<div class="squad-container">`;
             sq.forEach(team => {
@@ -212,7 +216,9 @@
                 html += `</div>`;
             });
             content.innerHTML = html + `</div>`;
-        } catch (e) { content.innerHTML = "<p class='info-sec'>Squad error.</p>"; }
+        } catch (e) { 
+            content.innerHTML = "<p class='info-sec'>Squad error.</p>"; 
+        }
     }
 
     function updateMTabs(el) {
@@ -225,6 +231,7 @@
 </script>
 </body>
 </html>
+
 
 
 
