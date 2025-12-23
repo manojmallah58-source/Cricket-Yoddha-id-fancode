@@ -3,49 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CricPro Live | Final Fix</title>
+    <title>CricPro Live | Final Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00a82d; --bg: #f0f3f2; --white: #ffffff; --text-dark: #222; --blue: #1976d2; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text-dark); overflow-x: hidden; }
-        header { background: var(--primary); color: white; padding: 15px 15px 0 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        body { background: var(--bg); color: var(--text-dark); }
+        header { background: var(--primary); color: white; padding: 15px 15px 0 15px; position: sticky; top: 0; z-index: 100; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .tabs { display: flex; justify-content: space-around; }
-        .tab { padding: 12px 20px; font-weight: 700; cursor: pointer; opacity: 0.6; border-bottom: 4px solid transparent; font-size: 0.9rem; transition: 0.3s; }
+        .tab { padding: 12px 20px; font-weight: 700; cursor: pointer; opacity: 0.6; border-bottom: 4px solid transparent; font-size: 0.9rem; }
         .tab.active { opacity: 1; border-bottom: 4px solid white; }
-        .container { max-width: 600px; margin: auto; padding: 12px; min-height: 80vh; }
+        .container { max-width: 600px; margin: auto; padding: 12px; min-height: 85vh; }
         
-        .match-card { background: var(--white); border-radius: 12px; padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; border-left: 5px solid #ccc; transition: transform 0.2s; }
-        .match-card:active { transform: scale(0.98); }
-        .series-name { font-size: 0.75rem; color: #666; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .team-row { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; font-weight: 700; font-size: 1rem; }
-        .score { color: var(--primary); font-variant-numeric: tabular-nums; }
-        .status { font-size: 0.85rem; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #eee; font-weight: 600; color: var(--blue); }
-        .status.live { color: #d32f2f; display: flex; align-items: center; gap: 5px; }
-        .status.live::before { content: ''; width: 8px; height: 8px; background: #d32f2f; border-radius: 50%; display: inline-block; animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        /* Match Card Styles */
+        .match-card { background: var(--white); border-radius: 12px; padding: 16px; margin-bottom: 14px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); cursor: pointer; border-left: 6px solid #ccc; transition: 0.2s; }
+        .match-card:hover { transform: translateY(-2px); }
+        .series-name { font-size: 0.7rem; color: #666; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; display: block; }
+        .team-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; font-weight: 700; font-size: 1.05rem; }
+        .score { color: var(--primary); }
+        .status { font-size: 0.8rem; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #eee; font-weight: 700; }
+        .status.live { color: #d32f2f; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
+        /* Modal Styles */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 1000; }
-        .modal-header { background: var(--primary); color: white; padding: 18px; display: flex; align-items: center; gap: 15px; font-size: 1.1rem; }
-        .info-sec { padding: 30px 20px; text-align: center; flex: 1; overflow-y: auto; }
+        .modal-header { background: var(--primary); color: white; padding: 15px; display: flex; align-items: center; gap: 15px; font-weight: 700; }
+        .info-sec { padding: 30px 20px; text-align: center; }
+        
+        /* Error & Loader */
         .loader { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 100px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .retry-btn { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-weight: 700; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,168,45,0.3); }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="header-top">
-        <h2 style="letter-spacing: -0.5px;">CricPro Live</h2>
-        <span id="clock" style="font-size: 0.85rem; font-weight: 600; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px;"></span>
+        <h2 style="letter-spacing: -1px;">CricPro Live</h2>
+        <span id="clock" style="font-size: 0.8rem; font-weight: 600; background: rgba(0,0,0,0.1); padding: 4px 8px; border-radius: 4px;"></span>
     </div>
     <div class="tabs">
-        <div class="tab active" onclick="loadTab('live', this)">LIVE</div>
-        <div class="tab" onclick="loadTab('upcoming', this)">UPCOMING</div>
-        <div class="tab" onclick="loadTab('recent', this)">RECENT</div>
+        <div id="tab-live" class="tab active" onclick="loadTab('live', this)">LIVE</div>
+        <div id="tab-upcoming" class="tab" onclick="loadTab('upcoming', this)">UPCOMING</div>
+        <div id="tab-recent" class="tab" onclick="loadTab('recent', this)">RECENT</div>
     </div>
 </header>
 
@@ -53,60 +55,68 @@
 
 <div id="modal" class="modal">
     <div class="modal-header">
-        <span onclick="closeModal()" style="font-size: 1.8rem; cursor: pointer; line-height: 0;">✕</span>
-        <span id="modal-title" style="font-weight:700;">Match Detail</span>
+        <span onclick="closeModal()" style="font-size: 1.5rem; cursor: pointer;">✕</span>
+        <span id="modal-title">Match Details</span>
     </div>
     <div id="modal-content" class="info-sec"></div>
 </div>
 
 <script>
+    // Apka API link (Sahi wala check kar lein)
     const API_BASE = "https://cricket-yoddha-id-api-key-1.vercel.app";
 
     function updateClock() {
-        const now = new Date();
-        document.getElementById('clock').innerText = "IST: " + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+        document.getElementById('clock').innerText = "IST: " + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
     }
     setInterval(updateClock, 1000);
     updateClock();
 
     async function loadTab(type, el) {
-        // UI Updates
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         el.classList.add('active');
+        
         const container = document.getElementById('main-list');
         container.innerHTML = '<div class="loader"></div>';
 
         try {
-            // Try fetching with a timestamp to avoid cache
+            // STEP 1: Main Endpoint try karein
             const endpoint = type === 'live' ? '/live' : (type === 'upcoming' ? '/upcoming' : '/recent');
-            const res = await fetch(`${API_BASE}${endpoint}?t=${Date.now()}`);
+            const res = await fetch(`${API_BASE}${endpoint}`);
             
-            if (!res.ok) throw new Error("Network issues");
+            if (!res.ok) throw new Error("Server Error");
+            
             const json = await res.json();
-            
-            // Flexible data extraction
             let matches = json.live || json.upcoming || json.recent || json.matches || json.data || [];
 
-            // BACKUP: Agar data khali hai, toh primary /live endpoint check karo
-            if (matches.length === 0 && type !== 'live') {
-                const bRes = await fetch(`${API_BASE}/live`);
-                const bJson = await bRes.json();
-                const all = bJson.live || bJson.matches || [];
+            // STEP 2: Agar matches khali hain, toh backup ke liye sab data fetch karein
+            if (matches.length === 0) {
+                console.log("Empty data, trying backup...");
+                const backupRes = await fetch(`${API_BASE}/live`);
+                const backupJson = await backupRes.json();
+                const allData = backupJson.live || backupJson.matches || backupJson.data || [];
                 
-                if (type === 'upcoming') {
-                    matches = all.filter(m => m.status && (m.status.toLowerCase().includes('start') || m.status.toLowerCase().includes('pm') || m.status.toLowerCase().includes('am')));
-                } else {
-                    matches = all.filter(m => m.status && (m.status.toLowerCase().includes('won') || m.status.toLowerCase().includes('result')));
+                if (type === 'live') {
+                    matches = allData;
+                } else if (type === 'upcoming') {
+                    matches = allData.filter(m => {
+                        const s = (m.status || "").toLowerCase();
+                        return s.includes('start') || s.includes('pm') || s.includes('am') || s.includes('yet');
+                    });
+                } else if (type === 'recent') {
+                    matches = allData.filter(m => {
+                        const s = (m.status || "").toLowerCase();
+                        return s.includes('won') || s.includes('lost') || s.includes('result') || s.includes('draw');
+                    });
                 }
             }
 
             renderMatches(matches, type);
         } catch (e) {
-            console.error(e);
             container.innerHTML = `
                 <div class="info-sec">
-                    <p style="color:#666;">Unable to connect to server.</p>
-                    <button class="retry-btn" onclick="loadTab('${type}', document.querySelector('.tab.active'))">RETRY NOW</button>
+                    <p style="color:red; font-weight:700;">SERVER ERROR</p>
+                    <p style="font-size:0.8rem; color:#666; margin-top:5px;">API is not responding properly.</p>
+                    <button class="btn" onclick="location.reload()">Retry Now</button>
                 </div>`;
         }
     }
@@ -114,7 +124,7 @@
     function renderMatches(matches, type) {
         const container = document.getElementById('main-list');
         if (!matches || matches.length === 0) {
-            container.innerHTML = `<div class="info-sec">No ${type} matches found at the moment.</div>`;
+            container.innerHTML = `<div class="info-sec">No ${type} matches available right now.</div>`;
             return;
         }
 
@@ -124,23 +134,22 @@
             card.className = 'match-card';
             card.onclick = () => openModal(m);
             
-            // Status logic
-            const statusText = m.status || (type === 'live' ? 'Match in progress' : 'Scheduled');
-            const isLive = type === 'live' || statusText.toLowerCase().includes('live') || statusText.toLowerCase().includes('opt to');
+            const statusStr = (m.status || "").toLowerCase();
+            const isLive = type === 'live' || statusStr.includes('live') || statusStr.includes('opt to') || (m.t1s && m.t1s.length > 0);
             
-            if(isLive) card.style.borderLeftColor = "#d32f2f";
+            if (isLive) card.style.borderLeftColor = "#d32f2f";
 
             card.innerHTML = `
-                <span class="series-name">${m.series || m.matchType || 'International Match'}</span>
+                <span class="series-name">${m.series || m.matchType || 'Cricket Match'}</span>
                 <div class="team-row">
-                    <span>${m.t1 || m.title || 'Team A'}</span>
+                    <span>${m.t1 || m.title || 'Team 1'}</span>
                     <span class="score">${m.t1s || ''}</span>
                 </div>
                 <div class="team-row">
-                    <span>${m.t2 || 'Team B'}</span>
+                    <span>${m.t2 || 'Team 2'}</span>
                     <span class="score">${m.t2s || ''}</span>
                 </div>
-                <div class="status ${isLive ? 'live' : ''}">${isLive ? 'LIVE' : statusText}</div>
+                <div class="status ${isLive ? 'live' : ''}">${isLive ? '● LIVE' : (m.status || 'Upcoming')}</div>
             `;
             container.appendChild(card);
         });
@@ -156,35 +165,33 @@
         const content = document.getElementById('modal-content');
         content.innerHTML = '<div class="loader"></div>';
         try {
-            const res = await fetch(`${API_BASE}/score?id=${id}&t=${Date.now()}`);
+            const res = await fetch(`${API_BASE}/score?id=${id}`);
             const data = await res.json();
             
             content.innerHTML = `
-                <div style="animation: fadeIn 0.5s;">
-                    <h1 style="font-size:3rem; color:var(--primary); margin-bottom:10px;">${data.livescore || '0/0'}</h1>
-                    <p style="font-size:1.2rem; font-weight:600; color:#333;">${data.runrate || ''}</p>
-                    
-                    <div style="text-align:left; background:#fff; padding:20px; border-radius:15px; margin-top:30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border:1px solid #eee;">
-                        <p style="margin-bottom:12px; display:flex; justify-content:space-between;"><b>Batter:</b> <span>${data.batterone || 'N/A'}</span></p>
-                        <p style="margin-bottom:12px; display:flex; justify-content:space-between;"><b>Bowler:</b> <span>${data.bowlerone || 'N/A'}</span></p>
-                        <p style="font-size:0.9rem; color:#d32f2f; font-weight:700; border-top:1px solid #eee; padding-top:10px; margin-top:10px;">${data.lastbatsman || 'Updating live...'}</p>
+                <div style="background:var(--white); padding:20px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+                    <h1 style="font-size:3rem; color:var(--primary);">${data.livescore || 'Updating...'}</h1>
+                    <p style="margin:10px 0; font-weight:700;">${data.runrate || ''}</p>
+                    <div style="text-align:left; background:#f9f9f9; padding:15px; border-radius:10px; margin-top:15px; border:1px solid #eee;">
+                        <p><b>Batter:</b> ${data.batterone || '-'}</p>
+                        <p><b>Bowler:</b> ${data.bowlerone || '-'}</p>
+                        <p style="margin-top:10px; font-size:0.85rem; color:#d32f2f; border-top:1px solid #eee; padding-top:10px;">${data.lastbatsman || 'Match updates will appear here'}</p>
                     </div>
-                    
-                    <button class="retry-btn" onclick="fetchScore('${id}')">REFRESH SCORE</button>
-                    <p style="margin-top:15px; font-size:0.7rem; color:#999;">ID: ${id}</p>
+                    <button class="btn" onclick="fetchScore('${id}')">Refresh Score</button>
                 </div>`;
         } catch (e) {
-            content.innerHTML = "<p>Score currently unavailable for this match.</p><button class='retry-btn' onclick='closeModal()'>Close</button>";
+            content.innerHTML = "<p>Detail score not available.</p><button class='btn' onclick='closeModal()'>Go Back</button>";
         }
     }
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
-    
-    // Initial Load
-    window.onload = () => loadTab('live', document.querySelector('.tab'));
+
+    // First time load
+    window.onload = () => loadTab('live', document.getElementById('tab-live'));
 </script>
 </body>
 </html>
+
 
 
 
