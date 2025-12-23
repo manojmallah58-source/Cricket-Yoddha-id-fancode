@@ -3,38 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CricPro Live | Pro Accordion</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>CricPro Live | Professional Scorecard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #00a82d; --bg: #f4f7f6; --white: #ffffff; --text-dark: #222; --text-light: #666; --border: #e0e0e0; --blue: #1976d2; }
+        :root { --primary: #00a82d; --bg: #f4f7f6; --white: #ffffff; --text-dark: #222; --text-light: #666; --border: #e0e0e0; --blue: #1976d2; --light-blue: #e3f2fd; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text-dark); }
         header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .ist-clock { font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 20px; }
         .tabs { display: flex; background: var(--primary); }
         .tab { flex: 1; text-align: center; padding: 12px; font-weight: 600; cursor: pointer; opacity: 0.7; border-bottom: 3px solid transparent; transition: 0.3s; }
         .tab.active { opacity: 1; border-bottom: 3px solid white; }
         .container { max-width: 600px; margin: 10px auto; padding: 10px; }
         
-        /* Match Card */
         .match-card { background: var(--white); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; }
         .team-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
         .team-score { font-weight: 700; font-size: 1.1rem; }
 
-        /* Modal & Accordion */
+        /* Professional Modal & Accordion */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f3f2; display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 15px; }
-        
-        .inning-accordion { background: #00796b; color: white; padding: 12px 15px; margin-bottom: 2px; cursor: pointer; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem; align-items: center; }
-        .inning-content { display: none; background: white; margin-bottom: 10px; }
+        .inning-accordion { background: #fff; margin-bottom: 8px; border-bottom: 1px solid #eee; }
+        .inning-header { padding: 12px 15px; background: #f8f9fa; color: #222; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .inning-header.active { background: #e8f5e9; border-left: 4px solid var(--primary); }
+        .inning-content { display: none; padding: 0; }
         .inning-content.active { display: block; }
-
-        .table-pro { width: 100%; border-collapse: collapse; background: white; }
+        
+        .table-pro { width: 100%; border-collapse: collapse; }
         .table-pro th { text-align: left; padding: 10px; font-size: 0.65rem; color: #777; border-bottom: 1px solid #eee; text-transform: uppercase; }
-        .table-pro td { padding: 10px; font-size: 0.8rem; border-bottom: 1px solid #f1f1f1; }
+        .table-pro td { padding: 12px 10px; font-size: 0.82rem; border-bottom: 1px solid #f9f9f9; }
         .player-name { color: var(--blue); font-weight: 600; }
-        .dismissal { font-size: 0.7rem; color: #777; margin-top: 2px; }
-        .extras-row { padding: 10px 15px; font-size: 0.8rem; border-top: 1px solid #eee; background: #fafafa; }
+        .p-desc { font-size: 0.7rem; color: #888; margin-top: 2px; }
+        .extras-row { padding: 12px 15px; font-size: 0.85rem; border-top: 1px solid #eee; background: #fffdfd; border-bottom: 4px solid #f0f3f2; }
+        .bowling-header { background: #f8f9fa; padding: 8px 15px; font-weight: 700; font-size: 0.75rem; color: #444; }
         .loader { width: 35px; height: 35px; border: 4px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite linear; margin: 50px auto; display: block; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -42,7 +44,10 @@
 <body>
 
 <header>
-    <div class="header-top"><h2 style="font-weight: 800;">CricPro Live</h2></div>
+    <div class="header-top">
+        <h2 style="font-weight: 800;">CricPro Live</h2>
+        <div class="ist-clock" id="ist-clock">IST: --:--</div>
+    </div>
     <div class="tabs">
         <div class="tab active" onclick="switchTab('live', this)">LIVE</div>
         <div class="tab" onclick="switchTab('upcoming', this)">UPCOMING</div>
@@ -50,25 +55,40 @@
     </div>
 </header>
 
-<div class="container"><div id="loader" class="loader"></div><div id="match-list"></div></div>
+<div class="container">
+    <div id="loader" class="loader" style="display:none;"></div>
+    <div id="match-list"></div>
+</div>
 
 <div id="modal" class="modal">
-    <div class="modal-header"><span onclick="closeModal()" style="cursor:pointer; font-size:1.5rem;">←</span><div id="m-title" style="font-weight:700;">Scorecard</div></div>
+    <div class="modal-header">
+        <span onclick="closeModal()" style="cursor:pointer; font-size:1.5rem; padding: 0 10px;">←</span>
+        <div id="m-header-title" style="font-weight:700;">Scorecard</div>
+    </div>
     <div id="scorecard-area"></div>
 </div>
 
 <script>
-    const API_KEY = "43c23d39-d8c8-48a6-9011-53eb1f875e2e"; 
+    // Nayi API Key add ki gayi hai
+    const API_KEY = "5zLEy6EZjfHU7g1V4dsbdJlgZeRNDbemYndo6yXP38jFPSW4jvYNQC7Kh2qC"; 
     let allMatches = [];
 
+    function updateClock() {
+        const ist = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+        document.getElementById('ist-clock').innerText = `IST: ${ist}`;
+    }
+    setInterval(updateClock, 1000);
+
     async function fetchMatches() {
+        const loader = document.getElementById('loader');
+        loader.style.display = 'block';
         try {
             const res = await fetch(`https://api.cricapi.com/v1/cricScore?apikey=${API_KEY}`);
             const json = await res.json();
             allMatches = json.data || [];
-            document.getElementById('loader').style.display = 'none';
             switchTab('live', document.querySelector('.tab.active'));
-        } catch (e) { console.log(e); }
+        } catch (e) { document.getElementById('match-list').innerHTML = "<p style='text-align:center;'>API Error</p>"; }
+        loader.style.display = 'none';
     }
 
     function switchTab(type, el) {
@@ -82,10 +102,12 @@
             const card = document.createElement('div');
             card.className = 'match-card';
             card.onclick = () => openModal(m);
-            card.innerHTML = `<div style="font-size:0.7rem; color:#888;">${m.series}</div>
+            card.innerHTML = `
+                <div style="font-size:0.7rem; color:#888; margin-bottom:5px;">${m.series}</div>
                 <div class="team-row"><span>${m.t1}</span><span class="team-score">${m.t1s || '-'}</span></div>
                 <div class="team-row"><span>${m.t2}</span><span class="team-score">${m.t2s || '-'}</span></div>
-                <div style="color:#d32f2f; font-size:0.8rem; font-weight:600;">${m.status}</div>`;
+                <div style="color:#d32f2f; font-size:0.8rem; font-weight:600; margin-top:5px;">${m.status}</div>
+            `;
             list.appendChild(card);
         });
     }
@@ -94,7 +116,7 @@
         const modal = document.getElementById('modal');
         const area = document.getElementById('scorecard-area');
         modal.style.display = 'flex';
-        document.getElementById('m-title').innerText = `${m.t1} vs ${m.t2}`;
+        document.getElementById('m-header-title').innerText = `${m.t1} v ${m.t2}`;
         area.innerHTML = '<div class="loader"></div>';
 
         try {
@@ -102,50 +124,81 @@
             const json = await res.json();
             const data = json.data;
 
-            if (!data.scorecard) { area.innerHTML = "<p style='padding:40px; text-align:center;'>Scorecard not available.</p>"; return; }
+            if (!data || !data.scorecard) {
+                area.innerHTML = "<p style='padding:40px; text-align:center;'>Scorecard not available.</p>";
+                return;
+            }
 
-            let html = `<div style="background:#e0f2f1; padding:10px; color:#00796b; font-weight:700; font-size:0.85rem; border-bottom:1px solid #b2dfdb;">${m.status}</div>`;
+            let html = `<div style="background:#e3f2fd; color:#1976d2; padding:10px 15px; font-weight:600; font-size:0.85rem;">${m.status}</div>`;
 
             data.scorecard.forEach((inning, idx) => {
-                let batRows = (inning.batting || []).map(p => `
-                    <tr><td><div class="player-name">${p.batsman?.name || 'Batsman'}</div><div class="dismissal">${p['dismissal-text'] || 'not out'}</div></td>
-                    <td style="font-weight:700">${p.r}</td><td>${p.b}</td><td>${p['4s']}</td><td>${p['6s']}</td><td>${p.sr}</td></tr>`).join('');
-
-                let bowlRows = (inning.bowling || []).map(b => `
-                    <tr><td class="player-name" style="color:#222">${b.bowler?.name || 'Bowler'}</td><td>${b.o}</td><td>${b.m}</td><td>${b.r}</td><td style="font-weight:700">${b.w}</td><td>${b.er}</td></tr>`).join('');
-
+                const totalR = inning.totals?.R || 0;
+                const totalW = inning.totals?.W || 0;
+                const totalOV = inning.totals?.OV || 0;
                 const extras = typeof inning.extras === 'object' ? (inning.extras.r || 0) : (inning.extras || 0);
-                const totals = inning.totals || { R: 0, W: 0, OV: 0 };
-                const teamName = inning.inning.split('Inning')[0].trim();
 
+                // Batter Table
+                let batRows = (inning.batting || []).map(p => `
+                    <tr>
+                        <td style="width:50%"><div class="player-name">${p.batsman?.name || 'Batsman'}</div><div class="p-desc">${p['dismissal-text'] || 'not out'}</div></td>
+                        <td style="font-weight:700">${p.r || 0}</td><td>${p.b || 0}</td><td>${p['4s'] || 0}</td><td>${p['6s'] || 0}</td><td>${p.sr || 0}</td>
+                    </tr>
+                `).join('');
+
+                // Bowler Table
+                let bowlRows = (inning.bowling || []).map(b => `
+                    <tr>
+                        <td style="width:50%"><div class="player-name" style="color:#222">${b.bowler?.name || 'Bowler'}</div></td>
+                        <td>${b.o || 0}</td><td>${b.m || 0}</td><td>${b.r || 0}</td><td style="font-weight:700">${b.w || 0}</td><td>${b.er || 0}</td>
+                    </tr>
+                `).join('');
+
+                // Accordion Inning
                 html += `
-                    <div class="inning-accordion" onclick="toggleAccordion(this)">
-                        <span>${teamName}</span>
-                        <span>${totals.R}/${totals.W} (${totals.OV}) ▾</span>
+                    <div class="inning-accordion">
+                        <div id="header-${idx}" class="inning-header ${idx === data.scorecard.length - 1 ? 'active' : ''}" onclick="toggleInning(${idx})">
+                            <span>${inning.inning}</span>
+                            <span>${totalR}-${totalW} (${totalOV}) ▾</span>
+                        </div>
+                        <div id="content-${idx}" class="inning-content ${idx === data.scorecard.length - 1 ? 'active' : ''}">
+                            <table class="table-pro">
+                                <thead><tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead>
+                                <tbody>${batRows}</tbody>
+                            </table>
+                            <div class="extras-row"><strong>Extras:</strong> ${extras} | <strong>Total:</strong> ${totalR}/${totalW} (${totalOV} ov)</div>
+                            <div class="bowling-header">BOWLING</div>
+                            <table class="table-pro">
+                                <thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Eco</th></tr></thead>
+                                <tbody>${bowlRows}</tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="inning-content ${idx === 0 ? 'active' : ''}">
-                        <table class="table-pro"><thead><tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody>${batRows}</tbody></table>
-                        <div class="extras-row"><strong>Extras:</strong> ${extras}</div>
-                        <div style="background:#f5f5f5; padding:8px 15px; font-weight:700; font-size:0.75rem;">BOWLING</div>
-                        <table class="table-pro"><thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Eco</th></tr></thead><tbody>${bowlRows}</tbody></table>
-                    </div>`;
+                `;
             });
+
             area.innerHTML = html;
-        } catch (e) { area.innerHTML = "<p style='padding:20px;'>Error loading details.</p>"; }
+        } catch (e) { area.innerHTML = "<p style='padding:20px;'>Error loading data.</p>"; }
     }
 
-    function toggleAccordion(el) {
-        const content = el.nextElementSibling;
-        const allContent = document.querySelectorAll('.inning-content');
-        allContent.forEach(c => c.classList.remove('active'));
-        content.classList.add('active');
+    function toggleInning(id) {
+        const content = document.getElementById(`content-${id}`);
+        const header = document.getElementById(`header-${id}`);
+        const allHeaders = document.querySelectorAll('.inning-header');
+        const allContents = document.querySelectorAll('.inning-content');
+        
+        allHeaders.forEach(h => h.classList.remove('active'));
+        allContents.forEach(c => { if(c.id !== `content-${id}`) c.classList.remove('active'); });
+        
+        content.classList.toggle('active');
+        if(content.classList.contains('active')) header.classList.add('active');
     }
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
-    window.onload = fetchMatches;
+    window.onload = () => { updateClock(); fetchMatches(); };
 </script>
 </body>
 </html>
+
 
 
 
