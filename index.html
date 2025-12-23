@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CricPro Live | Scorecard Fixed</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>CricPro Live | Pro Scorecard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00a82d; --bg: #f4f7f6; --white: #ffffff; --text-dark: #222; --blue: #1976d2; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -19,22 +19,29 @@
         .team-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
         .team-score { font-weight: 700; font-size: 1.1rem; }
         
-        /* Modal & Scorecard Styling */
+        /* Modal Professional Design */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f3f2; display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 15px; }
-        .inning-accordion { background: #fff; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .status-header { background: #e3f2fd; color: #1976d2; padding: 10px 15px; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #d1e9ff; }
+        
+        /* Inning Accordion */
+        .inning-accordion { background: #fff; margin-bottom: 8px; border-bottom: 1px solid #eee; }
         .inning-header { padding: 15px; background: #fff; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .team-info-box { display: flex; flex-direction: column; }
-        .team-title { font-weight: 800; color: #222; font-size: 1rem; }
-        .inning-label { font-size: 0.7rem; color: #00a82d; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-        .score-summary { font-weight: 800; color: #222; font-size: 1rem; }
+        .team-title { font-weight: 800; color: #222; font-size: 1.05rem; }
+        .inning-label { font-size: 0.75rem; color: #777; font-weight: 600; text-transform: uppercase; margin-top: 3px; }
+        .score-summary { font-weight: 800; color: #222; font-size: 1.05rem; }
         .inning-content { display: none; background: #fff; }
         .inning-content.active { display: block; }
         
+        /* Table Layout */
         .table-pro { width: 100%; border-collapse: collapse; }
         .table-pro th { text-align: left; padding: 10px; font-size: 0.65rem; color: #888; border-bottom: 1px solid #eee; text-transform: uppercase; }
         .table-pro td { padding: 12px 10px; font-size: 0.82rem; border-bottom: 1px solid #f9f9f9; }
-        .bowling-header { background: #f8f9fa; padding: 10px 15px; font-weight: 700; font-size: 0.75rem; border-top: 6px solid #f0f3f2; color: #444; }
+        .player-name { color: var(--blue); font-weight: 600; }
+        .p-desc { font-size: 0.7rem; color: #888; margin-top: 2px; }
+        .extras-row { padding: 12px 15px; font-size: 0.85rem; border-top: 1px solid #eee; background: #fffdfd; }
+        .bowling-header { background: #f8f9fa; padding: 10px 15px; font-weight: 700; font-size: 0.75rem; border-top: 8px solid #f0f3f2; color: #444; }
         .loader { width: 35px; height: 35px; border: 4px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite linear; margin: 50px auto; display: block; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -44,7 +51,7 @@
 <header>
     <div class="header-top">
         <h2 style="font-weight: 800;">CricPro Live</h2>
-        <div id="ist-clock" style="font-size: 0.8rem; opacity: 0.9;">IST: --:--</div>
+        <div id="ist-clock" style="font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 20px;">IST: --:--</div>
     </div>
     <div class="tabs">
         <div class="tab active" onclick="switchTab('live', this)">LIVE</div>
@@ -83,7 +90,7 @@
             const json = await res.json();
             allMatches = json.data || [];
             switchTab('live', document.querySelector('.tab.active'));
-        } catch (e) { list.innerHTML = "<p style='text-align:center;'>API Error</p>"; }
+        } catch (e) { list.innerHTML = "<p style='text-align:center;'>API Key Blocked or Error</p>"; }
     }
 
     function switchTab(type, el) {
@@ -101,7 +108,7 @@
                 <div style="font-size:0.75rem; color:#888; margin-bottom:5px;">${m.series}</div>
                 <div class="team-row"><span>${m.t1}</span><span class="team-score">${m.t1s || '-'}</span></div>
                 <div class="team-row"><span>${m.t2}</span><span class="team-score">${m.t2s || '-'}</span></div>
-                <div style="color:#d32f2f; font-size:0.8rem; font-weight:600; margin-top:5px;">${m.status}</div>
+                <div style="color:#d32f2f; font-size:0.85rem; font-weight:600; margin-top:5px;">${m.status}</div>
             `;
             list.appendChild(card);
         });
@@ -120,54 +127,54 @@
             const data = json.data;
 
             if (!data || !data.scorecard) {
-                area.innerHTML = "<p style='padding:40px; text-align:center;'>Scorecard abhi available nahi hai.</p>";
+                area.innerHTML = "<p style='padding:40px; text-align:center;'>Detailed Scorecard Not Available.</p>";
                 return;
             }
 
-            let html = `<div style="background:#e3f2fd; color:#1976d2; padding:12px 15px; font-weight:600; font-size:0.85rem;">${m.status}</div>`;
+            let html = `<div class="status-header">${m.status}</div>`;
 
             data.scorecard.forEach((inning, idx) => {
-                // Inning Label Logic (1st vs 2nd)
-                const label = (idx === 0) ? '1st Inning' : '2nd Inning';
+                // Label Fix
+                const inningLabel = (idx === 0) ? '1ST INNING' : '2ND INNING';
                 
-                // FIXED: Totals fetching to avoid 0-0
-                const r = inning.totals?.R || 0;
-                const w = inning.totals?.W || 0;
-                const ov = inning.totals?.OV || 0;
+                // Real Score Fix
+                const runs = inning.totals?.R || 0;
+                const wkts = inning.totals?.W || 0;
+                const overs = inning.totals?.OV || 0;
 
                 let batRows = (inning.batting || []).map(p => `
                     <tr>
-                        <td style="width:50%"><div style="color:#1976d2; font-weight:600;">${p.batsman?.name || 'Batsman'}</div>
-                        <div style="font-size:0.65rem; color:#888;">${p['dismissal-text'] || 'not out'}</div></td>
+                        <td style="width:50%"><div class="player-name">${p.batsman?.name || 'Batsman'}</div>
+                        <div class="p-desc">${p['dismissal-text'] || 'not out'}</div></td>
                         <td style="font-weight:700">${p.r || 0}</td><td>${p.b || 0}</td><td>${p['4s'] || 0}</td><td>${p['6s'] || 0}</td><td>${p.sr || 0}</td>
                     </tr>
                 `).join('');
 
                 let bowlRows = (inning.bowling || []).map(b => `
                     <tr>
-                        <td style="width:50%; font-weight:600;">${b.bowler?.name || 'Bowler'}</td>
+                        <td style="width:50%; font-weight:600; color:#222;">${b.bowler?.name || 'Bowler'}</td>
                         <td>${b.o || 0}</td><td>${b.m || 0}</td><td>${b.r || 0}</td><td style="font-weight:700">${b.w || 0}</td><td>${b.er || 0}</td>
                     </tr>
                 `).join('');
+
+                const extras = typeof inning.extras === 'object' ? (inning.extras.r || 0) : (inning.extras || 0);
 
                 html += `
                     <div class="inning-accordion">
                         <div class="inning-header" onclick="toggleInning(${idx})">
                             <div class="team-info-box">
                                 <div class="team-title">${inning.inning}</div>
-                                <div class="inning-label">${label}</div>
+                                <div class="inning-label">${inningLabel}</div>
                             </div>
-                            <div class="score-summary">${r}/${w} (${ov}) ▾</div>
+                            <div class="score-summary">${runs}-${wkts} (${overs}) ▾</div>
                         </div>
                         <div id="inning-content-${idx}" class="inning-content ${idx === data.scorecard.length - 1 ? 'active' : ''}">
                             <table class="table-pro">
                                 <thead><tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead>
                                 <tbody>${batRows}</tbody>
                             </table>
-                            <div style="padding:10px 15px; font-size:0.8rem; border-top:1px solid #eee; background:#fffdfd;">
-                                <strong>Extras:</strong> ${typeof inning.extras === 'object' ? inning.extras.r : inning.extras || 0}
-                            </div>
-                            <div class="bowling-header">BOWLING STATS</div>
+                            <div class="extras-row"><strong>Extras:</strong> ${extras} | <strong>Total:</strong> ${runs}/${wkts} (${overs} ov)</div>
+                            <div class="bowling-header">BOWLING</div>
                             <table class="table-pro">
                                 <thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Eco</th></tr></thead>
                                 <tbody>${bowlRows}</tbody>
@@ -177,7 +184,7 @@
                 `;
             });
             area.innerHTML = html;
-        } catch (e) { area.innerHTML = "<p style='padding:20px; text-align:center;'>Data load karne mein dikkat hui.</p>"; }
+        } catch (e) { area.innerHTML = "<p style='padding:20px; text-align:center;'>Error loading details.</p>"; }
     }
 
     function toggleInning(id) {
@@ -190,6 +197,7 @@
 </script>
 </body>
 </html>
+
 
 
 
