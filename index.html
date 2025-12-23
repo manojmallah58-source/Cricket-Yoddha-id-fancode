@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CricPro Live | Pro Edition</title>
+    <title>CricPro Live | Final Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00a82d; --bg: #f0f3f2; --white: #ffffff; --text-dark: #222; --blue: #1976d2; }
@@ -16,22 +16,22 @@
         .tab.active { opacity: 1; border-bottom: 4px solid white; }
         .container { max-width: 600px; margin: auto; padding: 10px; }
         
-        /* Match Card */
-        .match-card { background: var(--white); border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; border-left: 5px solid #ddd; }
-        .series-name { font-size: 0.7rem; color: #777; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+        .match-card { background: var(--white); border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; border-left: 5px solid #ddd; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .series-name { font-size: 0.7rem; color: #777; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .team-row { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; font-weight: 700; }
-        .status { font-size: 0.8rem; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; font-weight: 600; }
+        .status { font-size: 0.8rem; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; font-weight: 600; color: var(--blue); }
         .status.live { color: #d32f2f; }
 
-        /* Modal */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; }
-        .m-tab { flex:1; text-align:center; padding:12px; color:white; font-size:0.8rem; font-weight:700; cursor:pointer; opacity:0.7; border-bottom:3px solid transparent; }
-        .m-tab.active { opacity:1; border-bottom-color:white; }
-
-        .info-sec { padding: 20px; text-align: center; }
-        .loader { width: 30px; height: 30px; border: 3px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite linear; margin: 50px auto; }
+        
+        .info-sec { padding: 40px 20px; text-align: center; }
+        .loader { width: 35px; height: 35px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s infinite linear; margin: 50px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .refresh-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -52,14 +52,13 @@
 
 <div id="modal" class="modal">
     <div class="modal-header">
-        <b onclick="closeModal()" style="font-size: 1.5rem; cursor: pointer;">✕</b>
-        <span id="modal-title" style="font-weight:700;">Match Details</span>
+        <b onclick="closeModal()" style="font-size: 1.5rem; cursor: pointer; padding: 5px;">✕</b>
+        <span id="modal-title" style="font-weight:700;">Score Details</span>
     </div>
     <div id="modal-content"></div>
 </div>
 
 <script>
-    // Ab saara data isi API se aayega
     const VERCEL_API = "https://cricket-yoddha-id-api-key-1.vercel.app";
 
     function updateClock() {
@@ -74,34 +73,52 @@
         container.innerHTML = '<div class="loader"></div>';
 
         try {
-            // Yahan hum aapke server ke endpoints use kar rahe hain
-            const endpoint = type === 'live' ? '/live' : (type === 'upcoming' ? '/upcoming' : '/recent');
-            const res = await fetch(`${VERCEL_API}${endpoint}`);
-            const json = await res.json();
+            // Hum multiple endpoints try karenge taaki koi na koi data mil jaye
+            let endpoint = type === 'live' ? '/live' : (type === 'upcoming' ? '/upcoming' : '/recent');
+            let res = await fetch(`${VERCEL_API}${endpoint}`);
+            let json = await res.json();
             
-            // Data key mapping check (aapke API structure ke hisaab se)
-            const matches = json.live || json.upcoming || json.recent || json.matches || [];
+            // Sabhi possible keys check kar rahe hain jo aapka server bhej sakta hai
+            let matches = json.live || json.upcoming || json.recent || json.matches || json.data || [];
+
+            // AGAR DATA NAHI MILA: Toh /live se hi saara data filter karne ki koshish karenge (Backup logic)
+            if (matches.length === 0) {
+                const backupRes = await fetch(`${VERCEL_API}/live`);
+                const backupJson = await backupRes.json();
+                const allData = backupJson.live || backupJson.matches || [];
+                
+                if (type === 'live') matches = allData; 
+                else if (type === 'upcoming') matches = allData.filter(m => m.status && m.status.toLowerCase().includes('start'));
+                else if (type === 'recent') matches = allData.filter(m => m.status && m.status.toLowerCase().includes('won'));
+            }
+
             renderMatches(matches, type);
         } catch (e) { 
-            container.innerHTML = `<div class='info-sec'>No ${type} matches found.</div>`; 
+            container.innerHTML = `<div class='info-sec'>Server error or no data. <br><button class="refresh-btn" onclick="location.reload()">Retry</button></div>`; 
         }
     }
 
     function renderMatches(matches, type) {
         const container = document.getElementById('main-list');
-        container.innerHTML = matches.length ? '' : `<div class='info-sec'>No ${type} matches available.</div>`;
-        
+        if (!matches || matches.length === 0) {
+            container.innerHTML = `<div class='info-sec'>No ${type} matches available right now.</div>`;
+            return;
+        }
+
+        container.innerHTML = '';
         matches.forEach(m => {
             const card = document.createElement('div');
             card.className = 'match-card';
             card.onclick = () => openModal(m, type);
-            if(type === 'live') card.style.borderLeftColor = "#00a82d";
+            
+            const isLive = type === 'live' || (m.status && m.status.toLowerCase().includes('live'));
+            if(isLive) card.style.borderLeftColor = "#00a82d";
 
             card.innerHTML = `
-                <div class="series-name">${m.series || 'International'}</div>
+                <div class="series-name">${m.series || m.matchType || 'Match Detail'}</div>
                 <div class="team-row"><span>${m.title || m.t1}</span><span>${m.t1s || ''}</span></div>
-                ${m.t2 ? `<div class="team-row"><span>${m.t2}</span><span>${m.t2s || ''}</span></div>` : ''}
-                <div class="status ${type}">${type === 'live' ? '● LIVE' : (m.status || 'Scheduled')}</div>
+                <div class="team-row"><span>${m.t2 || 'TBC'}</span><span>${m.t2s || ''}</span></div>
+                <div class="status ${isLive ? 'live' : ''}">${isLive ? '● LIVE' : (m.status || 'Upcoming')}</div>
             `;
             container.appendChild(card);
         });
@@ -120,18 +137,21 @@
         try {
             const res = await fetch(`${VERCEL_API}/score?id=${id}`);
             const data = await res.json();
+            
             content.innerHTML = `
                 <div class="info-sec">
-                    <h1 style="font-size:2.5rem; color:var(--primary);">${data.livescore || 'Score Updating...'}</h1>
-                    <p style="margin: 10px 0;"><b>${data.runrate || ''}</b></p>
-                    <div style="text-align:left; background:#f9f9f9; padding:15px; border-radius:10px; margin-top:20px;">
-                        <p><b>Batter:</b> ${data.batterone || '-'}</p>
-                        <p><b>Bowler:</b> ${data.bowlerone || '-'}</p>
-                        <p style="margin-top:10px; color:#666; font-size:0.8rem;">${data.lastbatsman || ''}</p>
+                    <h1 style="font-size:2.8rem; color:var(--primary); margin-bottom:5px;">${data.livescore || '0/0'}</h1>
+                    <p style="font-size:1.1rem; color:#444;"><b>${data.runrate || ''}</b></p>
+                    <div style="text-align:left; background:#f9f9f9; padding:20px; border-radius:12px; margin-top:25px; border:1px solid #eee;">
+                        <p style="margin-bottom:8px;"><b>Batter:</b> ${data.batterone || 'Waiting...'}</p>
+                        <p style="margin-bottom:8px;"><b>Bowler:</b> ${data.bowlerone || 'Waiting...'}</p>
+                        <p style="font-size:0.9rem; color:#666; font-style:italic; border-top:1px solid #eee; padding-top:10px; margin-top:10px;">${data.lastbatsman || 'Live updates in progress'}</p>
                     </div>
-                    <button onclick="fetchLiveScore('${id}')" style="margin-top:20px; padding:10px 20px; background:var(--primary); color:white; border:none; border-radius:5px; font-weight:bold;">REFRESH SCORE</button>
+                    <button class="refresh-btn" onclick="fetchLiveScore('${id}')">REFRESH SCORE</button>
                 </div>`;
-        } catch (e) { content.innerHTML = "<p class='info-sec'>Score detail not available for this match.</p>"; }
+        } catch (e) { 
+            content.innerHTML = "<div class='info-sec'>Score detail not available.<br><button class='refresh-btn' onclick='closeModal()'>Go Back</button></div>"; 
+        }
     }
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
@@ -139,6 +159,7 @@
 </script>
 </body>
 </html>
+
 
 
 
