@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CricPro Live | Pro Scorecard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>CricPro Live | Ultimate Scorecard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00a82d; --bg: #f4f7f6; --white: #ffffff; --text-dark: #222; --blue: #1976d2; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -19,22 +19,23 @@
         .team-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
         .team-score { font-weight: 700; font-size: 1.1rem; }
         
-        /* Modal Professional Design */
+        /* Modal Scorecard Styling */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f3f2; display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 15px; }
         .status-header { background: #e3f2fd; color: #1976d2; padding: 10px 15px; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #d1e9ff; }
         
-        /* Inning Accordion */
         .inning-accordion { background: #fff; margin-bottom: 8px; border-bottom: 1px solid #eee; }
         .inning-header { padding: 15px; background: #fff; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .inning-header.active-header { background: var(--primary); color: white; }
         .team-info-box { display: flex; flex-direction: column; }
-        .team-title { font-weight: 800; color: #222; font-size: 1.05rem; }
-        .inning-label { font-size: 0.75rem; color: #777; font-weight: 600; text-transform: uppercase; margin-top: 3px; }
-        .score-summary { font-weight: 800; color: #222; font-size: 1.05rem; }
+        .team-title { font-weight: 800; font-size: 1.05rem; }
+        .inning-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-top: 3px; color: #777; }
+        .active-header .inning-label { color: #fff; opacity: 0.8; }
+        .score-summary { font-weight: 800; font-size: 1.05rem; }
+        
         .inning-content { display: none; background: #fff; }
         .inning-content.active { display: block; }
         
-        /* Table Layout */
         .table-pro { width: 100%; border-collapse: collapse; }
         .table-pro th { text-align: left; padding: 10px; font-size: 0.65rem; color: #888; border-bottom: 1px solid #eee; text-transform: uppercase; }
         .table-pro td { padding: 12px 10px; font-size: 0.82rem; border-bottom: 1px solid #f9f9f9; }
@@ -60,20 +61,18 @@
     </div>
 </header>
 
-<div class="container">
-    <div id="match-list"></div>
-</div>
+<div class="container"><div id="match-list"></div></div>
 
 <div id="modal" class="modal">
     <div class="modal-header">
-        <span onclick="closeModal()" style="cursor:pointer; font-size:1.5rem;">←</span>
+        <span onclick="closeModal()" style="cursor:pointer; font-size:1.5rem; padding: 0 5px;">←</span>
         <div id="m-header-title" style="font-weight:700;">Scorecard</div>
     </div>
     <div id="scorecard-area"></div>
 </div>
 
 <script>
-    const API_KEY = "07a80675-e5e7-414a-9144-cc26f8af3172"; 
+    const API_KEY = "d49acc4f-d6cb-4466-9cd0-384f2ebd023e"; 
     let allMatches = [];
 
     function updateClock() {
@@ -83,14 +82,12 @@
     setInterval(updateClock, 1000);
 
     async function fetchMatches() {
-        const list = document.getElementById('match-list');
-        list.innerHTML = '<div class="loader"></div>';
         try {
             const res = await fetch(`https://api.cricapi.com/v1/cricScore?apikey=${API_KEY}`);
             const json = await res.json();
             allMatches = json.data || [];
             switchTab('live', document.querySelector('.tab.active'));
-        } catch (e) { list.innerHTML = "<p style='text-align:center;'>API Key Blocked or Error</p>"; }
+        } catch (e) { console.log(e); }
     }
 
     function switchTab(type, el) {
@@ -98,7 +95,7 @@
         el.classList.add('active');
         const list = document.getElementById('match-list');
         list.innerHTML = '';
-        let filtered = allMatches.filter(m => m.ms === (type === 'live' ? 'live' : type === 'upcoming' ? 'fixture' : 'result'));
+        let filtered = allMatches.filter(m => m.ms === (type === 'live' ? 'live' : type === 'upcoming' ? 'fixture' : 'recent' ? 'result' : 'result'));
         
         filtered.forEach(m => {
             const card = document.createElement('div');
@@ -125,71 +122,52 @@
             const res = await fetch(`https://api.cricapi.com/v1/match_scorecard?apikey=${API_KEY}&id=${m.id}`);
             const json = await res.json();
             const data = json.data;
-
-            if (!data || !data.scorecard) {
-                area.innerHTML = "<p style='padding:40px; text-align:center;'>Detailed Scorecard Not Available.</p>";
-                return;
-            }
+            if (!data || !data.scorecard) { area.innerHTML = "<p style='padding:40px; text-align:center;'>Scorecard Not Available.</p>"; return; }
 
             let html = `<div class="status-header">${m.status}</div>`;
-
+            
+            // Fixed Sorting: 1st Inning Always Top
             data.scorecard.forEach((inning, idx) => {
-                // Label Fix
-                const inningLabel = (idx === 0) ? '1ST INNING' : '2ND INNING';
-                
-                // Real Score Fix
-                const runs = inning.totals?.R || 0;
-                const wkts = inning.totals?.W || 0;
-                const overs = inning.totals?.OV || 0;
+                const r = inning.totals?.R || 0;
+                const w = inning.totals?.W || 0;
+                const ov = inning.totals?.OV || 0;
+                const label = (idx === 0) ? '1ST INNING' : '2ND INNING';
 
                 let batRows = (inning.batting || []).map(p => `
                     <tr>
-                        <td style="width:50%"><div class="player-name">${p.batsman?.name || 'Batsman'}</div>
-                        <div class="p-desc">${p['dismissal-text'] || 'not out'}</div></td>
+                        <td style="width:50%"><div class="player-name">${p.batsman?.name || 'Batsman'}</div><div class="p-desc">${p['dismissal-text'] || 'not out'}</div></td>
                         <td style="font-weight:700">${p.r || 0}</td><td>${p.b || 0}</td><td>${p['4s'] || 0}</td><td>${p['6s'] || 0}</td><td>${p.sr || 0}</td>
-                    </tr>
-                `).join('');
+                    </tr>`).join('');
 
                 let bowlRows = (inning.bowling || []).map(b => `
                     <tr>
                         <td style="width:50%; font-weight:600; color:#222;">${b.bowler?.name || 'Bowler'}</td>
                         <td>${b.o || 0}</td><td>${b.m || 0}</td><td>${b.r || 0}</td><td style="font-weight:700">${b.w || 0}</td><td>${b.er || 0}</td>
-                    </tr>
-                `).join('');
-
-                const extras = typeof inning.extras === 'object' ? (inning.extras.r || 0) : (inning.extras || 0);
+                    </tr>`).join('');
 
                 html += `
                     <div class="inning-accordion">
-                        <div class="inning-header" onclick="toggleInning(${idx})">
-                            <div class="team-info-box">
-                                <div class="team-title">${inning.inning}</div>
-                                <div class="inning-label">${inningLabel}</div>
-                            </div>
-                            <div class="score-summary">${runs}-${wkts} (${overs}) ▾</div>
+                        <div class="inning-header ${idx === data.scorecard.length - 1 ? 'active-header' : ''}" onclick="toggleInning(${idx})">
+                            <div class="team-info-box"><div class="team-title">${inning.inning}</div><div class="inning-label">${label}</div></div>
+                            <div class="score-summary">${r}-${w} (${ov}) ▾</div>
                         </div>
                         <div id="inning-content-${idx}" class="inning-content ${idx === data.scorecard.length - 1 ? 'active' : ''}">
-                            <table class="table-pro">
-                                <thead><tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead>
-                                <tbody>${batRows}</tbody>
-                            </table>
-                            <div class="extras-row"><strong>Extras:</strong> ${extras} | <strong>Total:</strong> ${runs}/${wkts} (${overs} ov)</div>
+                            <table class="table-pro"><thead><tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody>${batRows}</tbody></table>
+                            <div class="extras-row"><strong>Extras:</strong> ${typeof inning.extras === 'object' ? (inning.extras.r || 0) : inning.extras}</div>
                             <div class="bowling-header">BOWLING</div>
-                            <table class="table-pro">
-                                <thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Eco</th></tr></thead>
-                                <tbody>${bowlRows}</tbody>
-                            </table>
+                            <table class="table-pro"><thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Eco</th></tr></thead><tbody>${bowlRows}</tbody></table>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
             area.innerHTML = html;
-        } catch (e) { area.innerHTML = "<p style='padding:20px; text-align:center;'>Error loading details.</p>"; }
+        } catch (e) { area.innerHTML = "<p style='text-align:center;'>Error loading details.</p>"; }
     }
 
     function toggleInning(id) {
         const content = document.getElementById(`inning-content-${id}`);
+        const header = content.previousElementSibling;
         content.classList.toggle('active');
+        header.classList.toggle('active-header');
     }
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
@@ -197,6 +175,7 @@
 </script>
 </body>
 </html>
+
 
 
 
