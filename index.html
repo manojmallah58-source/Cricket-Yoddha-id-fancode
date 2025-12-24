@@ -1,210 +1,423 @@
+WEB CODE CHANNEL:
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CricPro Live | Pro Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #00a82d; --bg: #f4f7f6; --white: #ffffff; --text-dark: #222; --blue: #1976d2; --live: #d32f2f; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text-dark); }
-        header { background: var(--primary); color: white; padding: 15px 15px 0 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .ist-clock { font-size: 0.8rem; background: rgba(0,0,0,0.15); padding: 4px 12px; border-radius: 20px; font-weight: 600; }
-        .tabs { display: flex; gap: 20px; }
-        .tab { padding: 12px 5px; font-weight: 700; font-size: 0.9rem; cursor: pointer; opacity: 0.6; border-bottom: 3px solid transparent; transition: 0.3s; }
-        .tab.active { opacity: 1; border-bottom: 3px solid white; }
-        .container { max-width: 600px; margin: 10px auto; padding: 10px; }
-        .match-card { background: var(--white); border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; border: 1px solid #eee; transition: transform 0.1s; }
-        .match-card:active { transform: scale(0.98); }
-        .series-name { font-size: 0.7rem; color: #777; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-        .team-row { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; }
-        .team-score { font-weight: 800; font-size: 1.1rem; color: #111; }
-        .status-bar { color: var(--live); font-size: 0.8rem; font-weight: 700; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
-        
-        /* Modal Styles */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; flex-direction: column; z-index: 1000; overflow-y: auto; }
-        .modal-header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 101; display: flex; align-items: center; gap: 15px; }
-        .inning-accordion { border-bottom: 6px solid #f0f3f2; }
-        .inning-header { padding: 15px; background: #fff; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
-        .active-header { border-left: 5px solid var(--primary); background: #f9fffb; }
-        .score-summary { font-weight: 800; color: var(--primary); }
-        .inning-content { display: none; overflow-x: auto; }
-        .inning-content.active { display: block; }
-        
-        /* Table Styles */
-        .table-pro { width: 100%; border-collapse: collapse; min-width: 350px; }
-        .table-pro th { text-align: left; padding: 10px; font-size: 0.65rem; color: #888; background: #fafafa; }
-        .table-pro td { padding: 12px 10px; font-size: 0.85rem; border-bottom: 1px solid #eee; }
-        .player-name { color: var(--blue); font-weight: 600; }
-        .loader { width: 30px; height: 30px; border: 3px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite linear; margin: 40px auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CRICKET YODDHA</title>
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* NOTE: The existing <style> block is kept, but the new structure below uses inline styles for the main content cards. */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #0a0a0a;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      color: #e0e0e0;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 9999;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    header img {
+      height: 65%;
+      filter: drop-shadow(0 0 8px rgba(29, 185, 84, 0.3));
+      transition: filter 0.3s ease;
+    }
+
+    header:hover img {
+      filter: drop-shadow(0 0 12px rgba(29, 185, 84, 0.5));
+    }
+
+    /* 🔔 Popup Styles */
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10002;
+    }
+
+    .popup-box {
+      width: 320px;
+      background: rgba(20, 20, 30, 0.6);
+      border: 1px solid rgba(173, 216, 230, 0.25);
+      border-radius: 20px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.4), 0 0 80px rgba(173, 216, 230, 0.15);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      animation: fadeIn 0.5s ease forwards;
+      position: relative;
+    }
+
+    @keyframes fadeIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .popup-header {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #00eaff, #bd00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.4rem;
+      text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+    }
+
+    .popup-subtitle {
+      font-size: 1rem;
+      color: #aaa;
+      margin-bottom: 1.2rem;
+    }
+
+    .popup-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .popup-buttons a {
+      text-decoration: none;
+    }
+
+    .popup-btn {
+      padding: 0.8rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .join-btn {
+      background: linear-gradient(135deg, #00eaff, #9c00ff);
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+    }
+
+    .already-btn {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      font-size: 1.3rem;
+      color: #00eaff;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .video-container {
+      width: 100vw;
+      aspect-ratio: 16/9;
+      background: #000;
+      margin-top: 70px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .video-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    
+    .menu-icon {
+      position: absolute; left: 16px; color: #fff; font-size: 30px; cursor: pointer;
+
+}
+    
+    .menu-header {
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      display: none;
+    }
+
+    .overlay.show {
+      display: block;
+    }
+    
+    /* Sidebar Styles */
+    .sidebar {
+      position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(255,255,255,0.2);
+      color: #fff; z-index: 10001; transition: left 0.5s ease;
+      padding-top: 80px; box-shadow: 4px 0 15px rgba(0,0,0,0.4);
+      border-top-right-radius: 12px; border-bottom-right-radius: 12px;
+    }
+    .sidebar.open { left: 0; }
+    .sidebar a {
+      display: block; padding: 15px 24px; color: #fff; text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-weight: 500; font-size: 16px;
+      transition: background 0.3s, padding-left 0.3s;
+    }
+    .counter-box {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 12px;
+      border-radius: 16px;
+      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+      margin-top: 1rem;
+    }
+    
+    .counter-box img {
+      height: 48px;
+    }
+
+  </style>
 </head>
 <body>
-
-<header>
-    <div class="header-top">
-        <h2 style="font-weight: 800; letter-spacing: -1px;">CricPro <span style="color: #99ffb3;">LIVE</span></h2>
-        <div id="ist-clock" class="ist-clock">IST: --:--</div>
+<div class="popup-overlay" id="visitorPopup" style="display:none;">
+  <div class="popup-box">
+    <button class="close-btn" onclick="closeVisitorPopup()">×</button>
+    <div class="popup-header">Total Visitors</div>
+    <div class="popup-subtitle">Users Live On Web</div>
+    <div class="counter-box">
+      <img src="https://visit-counter.vercel.app/counter.png?page=allrounder.com&s=40&c=00ff00&bg=00000000&no=10&ff=digi&tb=&ta=" alt="Visitor Count" />
     </div>
-    <div class="tabs">
-        <div class="tab active" onclick="switchTab('live', this)">LIVE</div>
-        <div class="tab" onclick="switchTab('upcoming', this)">UPCOMING</div>
-        <div class="tab" onclick="switchTab('recent', this)">RECENT</div>
+  </div>
+</div>
+<div class="popup-overlay" id="popup">
+  <div class="popup-box">
+    <button class="close-btn" onclick="closePopup()">×</button>
+    <div class="popup-header">Support Us!</div>
+    <div class="popup-subtitle">Join our Telegram for latest updates.</div>
+    <div class="popup-buttons">
+      <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" class="popup-btn join-btn">Join Now</a>
+      <button class="popup-btn already-btn" onclick="closePopup()">Already Joined</button>
     </div>
-</header>
-
-<div class="container"><div id="match-list"></div></div>
-
-<div id="modal" class="modal">
-    <div class="modal-header">
-        <div onclick="closeModal()" style="cursor:pointer; font-size:1.6rem;">✕</div>
-        <div id="m-header-title" style="font-weight:700; font-size: 1rem;">Scorecard</div>
-    </div>
-    <div id="scorecard-area"></div>
+  </div>
+</div>
+  <header>
+<span class="material-icons menu-icon" onclick="toggleSidebar()">menu</span>
+    <img src="https://i.ibb.co/HLkW7zJV/ei-1765534270242-removebg-preview.png" alt="Logo">
+  </header>
+<div class="video-container">
+  <iframe
+    src="https://zee-seven.vercel.app/"
+    frameborder="0"
+    allowfullscreen
+    allow="autoplay; encrypted-media"
+    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
+  ></iframe>
 </div>
 
-<script>
-    const API_KEY = "e51db6e7-1812-4b19-ab91-741ab3b8af35"; 
-    let allMatches = [];
-    let refreshInterval;
+<div style="background:#000;padding:20px;font-family:'Poppins', sans-serif;color:#fff;">
 
-    function updateClock() {
-        const ist = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
-        document.getElementById('ist-clock').innerText = `IST: ${ist}`;
-    }
-    setInterval(updateClock, 1000);
+    <div style="
+        background:#111;
+        padding:18px 20px;
+        border-radius:18px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:25px;
+    ">
+        <h2 style="margin:0;font-size:24px;font-weight:600;">FANCODE</h2>
 
-    async function fetchMatches() {
-        const list = document.getElementById('match-list');
-        // Only show loader on first load, not on auto-refresh
-        if (list.innerHTML === '') list.innerHTML = '<div class="loader"></div>';
-        
-        try {
-            const res = await fetch(`https://api.cricapi.com/v1/cricScore?apikey=${API_KEY}`);
-            const json = await res.json();
-            allMatches = json.data || [];
-            const activeTabType = document.querySelector('.tab.active').innerText.toLowerCase();
-            renderList(activeTabType);
-        } catch (e) { 
-            list.innerHTML = "<p style='text-align:center; padding:20px;'>Failed to load matches.</p>"; 
-        }
-    }
+        <div style="
+            background:#d1001f;
+            padding:6px 16px;
+            border-radius:20px;
+            font-size:14px;
+            font-weight:700;
+            display:flex;
+            align-items:center;
+        ">
+            🔴 LIVE
+        </div>
+    </div>
 
-    function switchTab(type, el) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        el.classList.add('active');
-        renderList(type);
-    }
+    <div style="
+        background:#1a1a1a;
+        padding:20px;
+        border-radius:20px;
+        margin-bottom:25px;
+    ">
+        <p style="
+            margin:0 0 12px;
+            font-size:16px;
+            font-weight:600;
+            color:#c9c9c9;
+        ">
+            📣 Follow us for more Updates
+        </p>
 
-    function renderList(type) {
-        const list = document.getElementById('match-list');
-        list.innerHTML = '';
-        const statusMap = { 'live': 'live', 'upcoming': 'fixture', 'recent': 'result' };
-        let filtered = allMatches.filter(m => m.ms === statusMap[type]);
-        
-        if (filtered.length === 0) {
-            list.innerHTML = `<p style="text-align:center; margin-top:40px; color:#888;">No ${type} matches found.</p>`;
-            return;
-        }
+<a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" style="
+            display:block;
+            background:linear-gradient(to right, #ff1a1a, #d60000);
+            padding:15px;
+            text-align:center;
+            border-radius:14px;
+            text-decoration:none;
+            color:#fff;
+            font-size:17px;
+            font-weight:700;
+            box-shadow:0 0 12px rgba(255,0,0,0.28);
+        ">
+            🚀  Join Telegram
+        </a>
+    </div>
 
-        filtered.forEach(m => {
-            const card = document.createElement('div');
-            card.className = 'match-card';
-            card.onclick = () => openModal(m);
-            card.innerHTML = `
-                <div class="series-name">${m.series}</div>
-                <div class="team-row"><span>${m.t1}</span><span class="team-score">${m.t1s || 'Yet to bat'}</span></div>
-                <div class="team-row"><span>${m.t2}</span><span class="team-score">${m.t2s || 'Yet to bat'}</span></div>
-                <div class="status-bar">${m.status}</div>
-            `;
-            list.appendChild(card);
-        });
-    }
+    <div style="
+        background:#1a1a1a;
+        padding:20px;
+        border-radius:20px;
+    ">
+        <p style="
+            margin:0 0 12px;
+            font-size:16px;
+            font-weight:600;
+            color:#c9c9c9;
+        ">
+            🔗 Share Stream
+        </p>
 
-    async function openModal(m) {
-        const modal = document.getElementById('modal');
-        const area = document.getElementById('scorecard-area');
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // Prevent scroll
-        document.getElementById('m-header-title').innerText = `${m.t1} vs ${m.t2}`;
-        area.innerHTML = '<div class="loader"></div>';
+        <button onclick="sharePageLink()" style="
+            display:block;
+            width: 100%; /* Important for button to fill width */
+            border: none;
+            cursor: pointer;
+            background:linear-gradient(to right, #ff1a1a, #d60000);
+            padding:15px;
+            text-align:center;
+            border-radius:14px;
+            text-decoration:none;
+            color:#fff;
+            font-size:17px;
+            font-weight:700;
+            box-shadow:0 0 12px rgba(255,0,0,0.28);
+        ">
+            📤  Share This Page Link
+        </button>
+    </div>
+</div>
+<div class="sidebar" id="sidebar">
+  <div class="menu-header">MENU</div>
+  <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank"> Join Our Telegram</a>
+  <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank"> Contact Us</a>
+  <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank">Copyright</a>
+<a href="#" onclick="showVisitorPopup()">Total Visitor</a>
+</div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-        try {
-            const res = await fetch(`https://api.cricapi.com/v1/match_scorecard?apikey=${API_KEY}&id=${m.id}`);
-            const json = await res.json();
-            const data = json.data;
-            
-            if (!data || !data.scorecard || data.scorecard.length === 0) { 
-                area.innerHTML = "<div style='padding:50px; text-align:center;'><p>Full scorecard not yet available.</p><p style='font-size:0.8rem; color:#888; margin-top:10px;'>Status: "+m.status+"</p></div>"; 
-                return; 
-            }
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+  <script>
+    const jsonUrl = 'https://raw.githubusercontent.com/StmpupCricket/Star-Sports-Hindi-json/refs/heads/main/data.json';
+    const telegramLink = 'https://t.me/+rwZKMV0-L8wyOTll';
 
-            let html = `<div style="background:#e3f2fd; color:#1976d2; padding:15px; font-weight:700; font-size:0.85rem; border-bottom:1px solid #d1e9ff;">${m.status}</div>`;
-            
-            data.scorecard.forEach((inning, idx) => {
-                const isLatest = idx === data.scorecard.length - 1;
-                let batRows = (inning.batting || []).map(p => `
-                    <tr>
-                        <td style="width:50%"><div class="player-name">${p.batsman?.name}</div><div style="font-size:0.7rem; color:#999;">${p['dismissal-text'] || 'batting'}</div></td>
-                        <td style="font-weight:700">${p.r}</td><td>${p.b}</td><td>${p['4s']}</td><td>${p['6s']}</td><td>${p.sr}</td>
-                    </tr>`).join('');
+    // Original HLS/Plyr code kept here for functional completeness, 
+    // although the main video display uses the iframe.
+    /*
+    fetch(jsonUrl)
+      .then(res => res.json())
+      .then(data => {
+        // ... HLS/Plyr logic
+      })
+      .catch(err => {
+        console.error('Failed to load stream:', err);
+      });
+    */
 
-                let bowlRows = (inning.bowling || []).map(b => `
-                    <tr>
-                        <td style="width:40%; font-weight:600;">${b.bowler?.name}</td>
-                        <td>${b.o}</td><td>${b.m}</td><td>${b.r}</td><td style="font-weight:700">${b.w}</td><td>${b.er}</td>
-                    </tr>`).join('');
+function toggleSidebar() {
 
-                html += `
-                    <div class="inning-accordion">
-                        <div class="inning-header ${isLatest ? 'active-header' : ''}" onclick="toggleInning(${idx})">
-                            <div><div style="font-weight:800;">${inning.inning}</div></div>
-                            <div class="score-summary">${inning.totals.R}-${inning.totals.W} (${inning.totals.OV}) ▾</div>
-                        </div>
-                        <div id="inning-content-${idx}" class="inning-content ${isLatest ? 'active' : ''}">
-                            <table class="table-pro"><thead><tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody>${batRows}</tbody></table>
-                            <div style="padding:12px; font-size:0.8rem; border-top:1px solid #eee; background:#fffcf5;"><strong>Extras:</strong> ${inning.extras?.r || 0} (w ${inning.extras?.w || 0}, nb ${inning.extras?.nb || 0}, lb ${inning.extras?.lb || 0})</div>
-                            <div style="background:#f8f9fa; padding:10px 15px; font-weight:800; font-size:0.7rem; color:#666;">BOWLING</div>
-                            <table class="table-pro"><thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Eco</th></tr></thead><tbody>${bowlRows}</tbody></table>
-                        </div>
-                    </div>`;
-            });
-            area.innerHTML = html;
-        } catch (e) { area.innerHTML = "<p style='text-align:center; padding:40px;'>Error loading scorecard.</p>"; }
-    }
+document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+  }
+function closePopup() {
+  document.getElementById('popup').style.display = 'none';
+}
+function showVisitorPopup() {
+    const popup = document.getElementById("visitorPopup");
+    popup.style.display = "flex";
+    setTimeout(() => {
+      popup.querySelector('.popup-box').style.opacity = '1';
+    }, 10);
+  }
 
-    function toggleInning(id) {
-        const content = document.getElementById(`inning-content-${id}`);
-        content.classList.toggle('active');
-    }
+  function closeVisitorPopup() {
+    const popup = document.getElementById("visitorPopup");
+    popup.querySelector('.popup-box').style.opacity = '0';
+    setTimeout(() => {
+      popup.style.display = "none";
+    }, 300);
+  }
 
-    function closeModal() { 
-        document.getElementById('modal').style.display = 'none'; 
-        document.body.style.overflow = 'auto';
-    }
-
-    // Auto refresh logic
-    function startAutoRefresh() {
-        refreshInterval = setInterval(() => {
-            const activeTab = document.querySelector('.tab.active').innerText;
-            // Only refresh background list if we are on the LIVE tab and modal is closed
-            if (activeTab === 'LIVE' && document.getElementById('modal').style.display !== 'flex') {
-                fetchMatches();
-            }
-        }, 60000); // 60 seconds
-    }
-
-    window.onload = () => { 
-        updateClock(); 
-        fetchMatches();
-        startAutoRefresh();
+// SHARE FUNCTIONALITY
+async function sharePageLink() {
+    const shareData = {
+        title: 'CRICKET YODDHA - Live Match',
+        // English Translation of the share text
+        text: 'Watch Live Cricket Match here: CRICKET YODDHA! 🏏\n\nJoin our Telegram Channel for updates: ' + telegramLink,
+        url: window.location.href,
     };
-</script>
+
+    try {
+        if (navigator.share) {
+            // Use Web Share API for modern browsers
+            await navigator.share(shareData);
+        } else {
+            // Fallback for older browsers: Copy link to clipboard
+            await navigator.clipboard.writeText(shareData.text + '\n\nLink: ' + shareData.url);
+
+// English Translation of the alert message
+            alert("Link and sharing text copied! You can now share it anywhere.");
+        }
+    } catch (err) {
+        console.error('Share failed:', err);
+        // English Translation of the error alert
+        alert('There was an issue sharing. Please copy the link manually.');
+    }
+}
+  </script>
 </body>
-</html>
+  </html>
 
 
 
