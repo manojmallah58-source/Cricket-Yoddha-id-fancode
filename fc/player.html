@@ -2,704 +2,458 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FanCode Player | Live Streaming</title>
+    <title>Premium Live Stream | FanCode</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#0f172a">
     <link rel="icon" href="https://fancode.com/favicon.ico" type="image/x-icon">
+    <!-- Plyr & Tailwind -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Icons & Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --plyr-color-main: #0ea5e9;
-            --background-dark: #02040a;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --accent-purple: #a855f7;
-        }
-
-        * {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            --primary-color: #38bdf8; /* Sky Blue */
+            --secondary-color: #818cf8; /* Indigo */
+            --accent-color: #f472b6; /* Pink */
+            --bg-dark: #000000;
+            --glass-bg: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         body {
-            height: 100svh; 
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            margin: 0;
+            height: 100svh;
             display: flex;
             flex-direction: column;
-            background: linear-gradient(135deg, #02040a 0%, #0f172a 100%);
-            font-family: 'Inter', sans-serif;
-            color: white;
             overflow: hidden;
-            position: relative;
         }
 
-        body::before {
-            content: '';
-            position: absolute;
+        /* Dynamic Background */
+        .ambient-bg {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.15), transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1), transparent 40%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        body > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .player-header, .player-footer {
-            flex-shrink: 0;
-            padding: 1.25rem;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-        .player-footer {
-            border-bottom: none;
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .player-main {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle at center, #0a0a0a, #000);
-            min-height: 0;
-            padding: 0.5rem;
-        }
-
-        .plyr {
             width: 100%;
             height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(129, 140, 248, 0.08), transparent 25%);
+            animation: bgPulse 10s ease-in-out infinite alternate;
         }
 
-        .share-button {
-            background: linear-gradient(135deg, #f59e0b, #eab308, #fbbf24);
-            color: black;
-            font-weight: bold;
-            box-shadow: 0 4px 20px -3px rgba(234, 179, 8, 0.6);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        @keyframes bgPulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Glassmorphism Header */
+        .glass-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem;
+            z-index: 40;
+            transition: transform 0.3s ease;
+        }
+
+        /* Video Container with Ambient Glow */
+        .player-wrapper {
             position: relative;
+            width: 100%;
+            max-width: 1000px;
+            aspect-ratio: 16/9;
+            box-shadow: 0 0 50px -10px rgba(56, 189, 248, 0.15);
+            border-radius: 12px;
             overflow: hidden;
-        }
-
-        .share-button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .share-button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .share-button:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 6px 30px -2px rgba(234, 179, 8, 0.8);
-        }
-
-        .share-button:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        .telegram-btn {
-            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
-            box-shadow: 0 4px 20px -3px rgba(14, 165, 233, 0.6);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .telegram-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .telegram-btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .telegram-btn:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 6px 30px -2px rgba(14, 165, 233, 0.8);
-            background: linear-gradient(135deg, #38bdf8, #22d3ee);
-        }
-
-        .telegram-btn:active {
-            transform: translateY(0) scale(0.98);
+            background: #000;
         }
         
+        .plyr--video {
+            border-radius: 12px;
+        }
+
+        /* Custom Buttons */
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Telegram Gradient Button */
+        .btn-telegram {
+            background: linear-gradient(135deg, #229ED9 0%, #1c8ec7 100%);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(34, 158, 217, 0.4);
+        }
+        
+        .btn-telegram::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-telegram:hover::after {
+            left: 100%;
+        }
+        
+        .btn-telegram:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(34, 158, 217, 0.6);
+        }
+
+        /* Popup Styling */
         .popup-overlay {
             position: fixed;
             inset: 0;
-            background-color: rgba(0, 0, 0, 0.7);
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(8px);
-            z-index: 50;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: center;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.4s ease, visibility 0s 0.4s;
+            transition: all 0.4s ease;
         }
-        .popup-overlay.show {
+        
+        .popup-overlay.active {
             opacity: 1;
             visibility: visible;
-            transition: opacity 0.4s ease;
         }
+
         .popup-card {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 1.5rem;
-            box-shadow: 0 25px 80px -12px rgba(0, 0, 0, 0.7), 
-                        0 0 40px rgba(14, 165, 233, 0.2);
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
             width: 90%;
-            max-width: 400px;
-            padding: 2rem;
+            max-width: 420px;
             text-align: center;
             transform: scale(0.9) translateY(20px);
-            opacity: 0;
-            transition: transform 0.4s cubic-bezier(0.215, 0.610, 0.355, 1), opacity 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-        .popup-overlay.show .popup-card {
+
+        .popup-overlay.active .popup-card {
             transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-        .popup-join-btn {
-            background: linear-gradient(135deg, #22d3ee, #0ea5e9, #06b6d4);
-            box-shadow: 0 4px 15px -3px rgba(14, 165, 233, 0.5);
-            transition: all 0.3s ease;
         }
 
-        .popup-join-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 25px -3px rgba(14, 165, 233, 0.7);
-        }
-
-        .error-message {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding: 2rem;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        .language-badge {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.25));
-            border: 1px solid rgba(168, 85, 247, 0.4);
-            backdrop-filter: blur(8px);
-            padding: 0.375rem 0.875rem;
-            border-radius: 9999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #e9d5ff;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .language-badge:hover {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.35), rgba(236, 72, 153, 0.35));
-            transform: scale(1.05);
-        }
-
-        .language-badge i {
-            font-size: 0.75rem;
-        }
-
-        #match-title {
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.5);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #0ea5e9, #06b6d4);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #38bdf8, #22d3ee);
-        }
-
-        /* Theater Mode */
-        body.theater-mode .player-header,
-        body.theater-mode .player-footer {
-            display: none;
-        }
-
-        body.theater-mode .player-main {
-            height: 100vh;
-        }
-
-        /* Control Buttons */
-        .control-btn {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .control-btn:hover {
-            background: var(--plyr-color-main);
-            border-color: var(--plyr-color-main);
-            transform: translateY(-2px);
-        }
-
-        .control-btn.active {
-            background: var(--plyr-color-main);
-            border-color: var(--plyr-color-main);
-        }
-
-        /* Keyboard Shortcuts Hint */
-        .shortcuts-hint {
-            position: fixed;
-            bottom: 6rem;
-            right: 2rem;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(14, 165, 233, 0.3);
-            border-radius: 1rem;
-            padding: 1rem;
-            max-width: 250px;
-            opacity: 0;
-            transform: translateX(300px);
-            transition: all 0.4s ease;
-            z-index: 100;
-        }
-
-        .shortcuts-hint.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        .loading-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(14, 165, 233, 0.2);
-            border-top-color: var(--plyr-color-main);
+        /* Loading Spinner */
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #FFF;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            display: inline-block;
+            position: relative;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        .loader::after {
+            content: '';  
+            box-sizing: border-box;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid;
+            border-color: #38bdf8 transparent;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* Theater Mode Utility */
+        body.theater .glass-header, 
+        body.theater .player-footer { display: none; }
+        body.theater .player-wrapper { max-width: 100%; height: 100vh; border-radius: 0; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .popup-card { padding: 1.5rem; }
+            .btn-text-hide { display: none; }
         }
     </style>
 </head>
-<body class="text-slate-200">
+<body>
 
-    <header class="player-header text-center">
-        <div class="flex items-center justify-between mb-3">
-            <a href="fancode.html" class="control-btn text-sm">
-                <i class="fas fa-arrow-left mr-2"></i>Back
+    <!-- Ambient Background -->
+    <div class="ambient-bg"></div>
+
+    <!-- Header -->
+    <header class="glass-header flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <a href="fancode.html" class="btn-glass w-10 h-10 flex items-center justify-center text-white/80 hover:text-white">
+                <i class="fas fa-chevron-left"></i>
             </a>
-            <div class="flex gap-2">
-                <button id="theater-mode-btn" class="control-btn text-sm" title="Theater Mode (T)">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button id="pip-btn" class="control-btn text-sm" title="Picture-in-Picture (P)">
-                    <i class="fas fa-external-link-alt"></i>
-                </button>
-                <button id="shortcuts-btn" class="control-btn text-sm" title="Keyboard Shortcuts">
-                    <i class="fas fa-keyboard"></i>
-                </button>
+            <div>
+                <h1 id="match-title" class="text-lg font-bold text-white tracking-wide truncate max-w-[200px] md:max-w-md">Loading Match...</h1>
+                <div id="language-badge" class="hidden text-xs font-medium text-sky-300 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+                    <span id="match-lang-text">English</span>
+                </div>
             </div>
         </div>
-        <h1 id="match-title" class="text-xl md:text-2xl font-black text-white truncate mb-1">Loading Match...</h1>
-        <div id="language-container" class="hidden">
-            <span class="language-badge">
-                <i class="fas fa-globe"></i>
-                <span id="match-language">Loading...</span>
-            </span>
+
+        <div class="flex items-center gap-2">
+            <button id="btn-theater" class="btn-glass w-10 h-10 text-white/80" title="Theater Mode">
+                <i class="fas fa-expand"></i>
+            </button>
+            <button id="btn-share" class="btn-glass px-4 h-10 flex items-center gap-2 text-sm font-semibold text-amber-400 border-amber-500/30 hover:bg-amber-500/10">
+                <i class="fas fa-share-nodes"></i> <span class="btn-text-hide">Share</span>
+            </button>
         </div>
-        <button id="share-links-btn" class="share-button w-full max-w-sm mx-auto mt-3 py-3 px-6 rounded-lg text-md font-bold">
-            <i class="fas fa-share-alt mr-2"></i> Share With Friends
-        </button>
     </header>
 
-    <main class="player-main">
-        <div class="loading-overlay" id="loading-overlay">
-            <div class="text-center">
-                <div class="spinner mx-auto mb-4"></div>
-                <p class="text-slate-300">Loading stream...</p>
-            </div>
+    <!-- Main Player Area -->
+    <main class="flex-grow flex items-center justify-center p-4 relative">
+        <div id="loading-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/80 backdrop-blur-sm">
+            <span class="loader mb-4"></span>
+            <p class="text-sky-400 font-medium animate-pulse">Initializing Secure Stream...</p>
         </div>
-        <video id="player" playsinline controls></video>
+
+        <div class="player-wrapper">
+            <video id="player" playsinline controls class="w-full h-full"></video>
+        </div>
     </main>
 
-    <!-- Keyboard Shortcuts Hint -->
-    <div class="shortcuts-hint" id="shortcuts-hint">
-        <h4 class="text-white font-bold mb-2 text-sm">Keyboard Shortcuts</h4>
-        <div class="text-xs text-slate-300 space-y-1">
-            <div><kbd class="bg-slate-700 px-1 rounded">Space</kbd> Play/Pause</div>
-            <div><kbd class="bg-slate-700 px-1 rounded">F</kbd> Fullscreen</div>
-            <div><kbd class="bg-slate-700 px-1 rounded">T</kbd> Theater Mode</div>
-            <div><kbd class="bg-slate-700 px-1 rounded">P</kbd> Picture-in-Picture</div>
-            <div><kbd class="bg-slate-700 px-1 rounded">M</kbd> Mute/Unmute</div>
-            <div><kbd class="bg-slate-700 px-1 rounded">↑/↓</kbd> Volume</div>
-            <div><kbd class="bg-slate-700 px-1 rounded">←/→</kbd> Seek</div>
-        </div>
-    </div>
-
-    <footer class="player-footer text-center">
-        <a href="https://t.me/+xdQNNePetGxjYjI1" target="_blank" class="telegram-btn inline-flex items-center justify-center w-full max-w-sm mx-auto px-6 py-3.5 rounded-lg font-bold text-black hover:text-white">
-            <i class="fab fa-telegram-plane mr-3 text-lg"></i> Join Telegram Channel
-        </a>
-    </footer>
-    
-    <div id="telegram-popup" class="popup-overlay">
-        <div class="popup-card">
-            <div class="text-6xl mb-4 text-sky-400"><i class="fab fa-telegram"></i></div>
-            <h3 class="text-2xl font-bold text-white mb-2">Never Miss a Match!</h3>
-            <p class="text-slate-400 mb-6">
-                Join our Telegram channel for live updates and instant stream links.
+    <!-- Footer -->
+    <footer class="player-footer p-4 glass-header border-t border-t-white/10">
+        <div class="max-w-3xl mx-auto">
+            <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" class="btn-telegram w-full py-4 rounded-xl flex items-center justify-center gap-3 text-white font-bold text-lg tracking-wide group">
+                <i class="fab fa-telegram-plane text-2xl group-hover:rotate-12 transition-transform"></i>
+                <span>Join Official Telegram Channel</span>
+            </a>
+            <p class="text-center text-xs text-slate-500 mt-3">
+                Join for HD Links, Highlights & Live Updates. 100% Free.
             </p>
-            <div class="flex flex-col gap-3">
-                <a href="https://t.me/+xdQNNePetGxjYjI1" target="_blank" id="popup-join-btn" class="popup-join-btn w-full text-center px-6 py-3 rounded-lg font-semibold text-white transition-transform transform hover:scale-105">
-                    <i class="fas fa-rocket mr-2"></i>Join Now
+        </div>
+    </footer>
+
+    <!-- Premium Popup -->
+    <div id="telegram-popup" class="popup-overlay">
+        <div class="popup-card relative overflow-hidden">
+            <!-- Decorative Glow -->
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-sky-500"></div>
+            
+            <button id="popup-close" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+
+            <div class="mb-6 mt-2">
+                <div class="w-20 h-20 bg-sky-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                    <i class="fab fa-telegram text-5xl text-sky-400"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Don't Miss the Action!</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Get instant access to backup links, live scores, and exclusive HD streams.
+                </p>
+            </div>
+
+            <div class="space-y-3">
+                <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" id="popup-join-btn" class="block w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold shadow-lg shadow-sky-500/30 hover:shadow-sky-500/50 transition-all transform hover:scale-[1.02]">
+                    <i class="fas fa-paper-plane mr-2"></i> Join Channel Now
                 </a>
-                <button id="popup-close-btn" class="w-full text-center px-6 py-3 rounded-lg font-semibold text-slate-300 bg-slate-700 hover:bg-slate-600 transition-colors">
-                    Maybe Later
+                <button id="popup-dismiss-btn" class="block w-full py-3 rounded-xl border border-white/10 text-slate-400 text-sm hover:bg-white/5 transition-colors">
+                    Continue Watching
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
+        // --- Configuration ---
         const DATA_URL = 'https://raw.githubusercontent.com/Jitendra-unatti/fancode/refs/heads/main/data/fancode.json';
+        const TELEGRAM_LINK = "https://t.me/+rwZKMV0-L8wyOTll";
+
+        // --- UI Elements ---
         const playerElement = document.getElementById('player');
-        const shareLinksBtn = document.getElementById('share-links-btn');
+        const loadingState = document.getElementById('loading-state');
         const matchTitleElem = document.getElementById('match-title');
-
-        // Format language names for better display
-        function formatLanguage(lang) {
-            if (!lang) return '';
-            
-            const languageMap = {
-                'BLOODY_SWEET': '🎯 Multi-Audio',
-                'ENGLISH': '🇬🇧 English',
-                'HINDI': '🇮🇳 Hindi',
-                'TAMIL': '🇮🇳 Tamil',
-                'TELUGU': '🇮🇳 Telugu',
-                'KANNADA': '🇮🇳 Kannada',
-                'BENGALI': '🇮🇳 Bengali',
-                'MALAYALAM': '🇮🇳 Malayalam',
-                'MARATHI': '🇮🇳 Marathi'
-            };
-            
-            return languageMap[lang.toUpperCase()] || `🌐 ${lang.charAt(0) + lang.slice(1).toLowerCase()}`;
-        }
-
-        async function getStreamAndMatchDetails(id, cdnKey) {
-            try {
-                const res = await fetch(DATA_URL);
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                const data = await res.json();
-                
-                const match = data.matches.find(m => String(m.match_id) === String(id));
-                if (!match) throw new Error("Match not found for ID: " + id);
-
-                const streamingCdn = { ...match.STREAMING_CDN };
-                delete streamingCdn.Primary_Playback_URL;
-
-                const sources = {
-                    adfree_stream: match.adfree_stream,
-                    dai_stream: match.dai_stream,
-                    ...streamingCdn
-                };
-
-                const streamUrl = sources[cdnKey];
-                if (streamUrl && streamUrl !== "Unavailable") {
-                    return { streamUrl, match };
-                } else {
-                    throw new Error(`Stream for '${cdnKey}' is unavailable.`);
-                }
-            } catch (err) {
-                console.error("Error fetching stream data:", err);
-                return { streamUrl: null, match: null };
-            }
-        }
-
-        function displayError(message) {
-            document.body.innerHTML = `
-                <div class="error-message">
-                    <h2 class="text-2xl font-bold text-red-500 mb-4">Stream Error</h2>
-                    <p class="text-slate-400">${message}</p>
-                    <a href="index.html" class="mt-6 px-6 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors">
-                        Go Back Home
-                    </a>
-                </div>`;
-        }
+        const langBadge = document.getElementById('language-badge');
+        const langText = document.getElementById('match-lang-text');
         
-        function handlePopup() {
-            const popup = document.getElementById('telegram-popup');
-            const closeBtn = document.getElementById('popup-close-btn');
-            const joinBtn = document.getElementById('popup-join-btn');
-            const POPUP_KEY = 'playerTelegramPopupDismissed';
+        // --- Helper Functions ---
+        const formatLang = (lang) => {
+            const map = { 
+                'HINDI': 'Hindi', 'ENGLISH': 'English', 'TAMIL': 'Tamil', 
+                'TELUGU': 'Telugu', 'KANNADA': 'Kannada', 'BLOODY_SWEET': 'Multi-Audio' 
+            };
+            return map[lang?.toUpperCase()] || lang || 'Unknown';
+        };
 
-            if (localStorage.getItem(POPUP_KEY)) {
-                return;
-            }
-
-            setTimeout(() => {
-                popup.classList.add('show');
-            }, 5000);
-
-            function dismissPopup() {
-                popup.classList.remove('show');
-                localStorage.setItem(POPUP_KEY, 'true');
-            }
-
-            closeBtn.addEventListener('click', dismissPopup);
-            joinBtn.addEventListener('click', () => {
-                setTimeout(dismissPopup, 300);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
+        // --- Stream Logic ---
+        async function initPlayer() {
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get("id");
             const cdn = urlParams.get("cdn");
 
             if (!id || !cdn) {
-                displayError("Missing match ID or CDN information in the URL.");
+                showError("Invalid Match Link");
                 return;
             }
-
-            const { streamUrl, match } = await getStreamAndMatchDetails(id, cdn);
-
-            if (!streamUrl) {
-                displayError(`Sorry, this stream could not be loaded. It might be offline or unavailable.`);
-                return;
-            }
-
-            if (match) {
-                matchTitleElem.textContent = match.title || 'Live Match';
-                document.title = `${match.title || 'Live Match'} | FanCode Player`;
-                
-                // Display language if available
-                const languageContainer = document.getElementById('language-container');
-                const languageElem = document.getElementById('match-language');
-                if (match.language) {
-                    languageElem.textContent = formatLanguage(match.language);
-                    languageContainer.classList.remove('hidden');
-                }
-            }
-
-            shareLinksBtn.addEventListener('click', async () => {
-                const shareData = {
-                    title: `Watch: ${match?.title || 'Live Stream'}`,
-                    text: `Watch "${match?.title || 'Live Stream'}" live!`,
-                    url: window.location.href
-                };
-                try {
-                    if (navigator.share) {
-                        await navigator.share(shareData);
-                    } else {
-                        await navigator.clipboard.writeText(window.location.href);
-                        alert('Link copied to clipboard!');
-                    }
-                } catch (err) {
-                    console.error('Share failed:', err);
-                    alert('Could not share. Please copy the link manually.');
-                }
-            });
 
             try {
-                const loadingOverlay = document.getElementById('loading-overlay');
-                
-                if (streamUrl.includes('.m3u8') && Hls.isSupported()) {
-                    const hls = new Hls();
-                    hls.loadSource(streamUrl);
-                    hls.attachMedia(playerElement);
-                    
-                    hls.on(Hls.Events.MANIFEST_PARSED, function () {
-                        loadingOverlay.classList.add('hidden');
-                        
-                        const availableQualities = hls.levels.map((l) => l.height);
-                        const uniqueQualities = [...new Set(availableQualities)].sort((a, b) => b - a);
+                const response = await fetch(DATA_URL);
+                const data = await response.json();
+                const match = data.matches.find(m => String(m.match_id) === String(id));
 
-                        const player = new Plyr(playerElement, {
-                            autoplay: true,
-                            quality: {
-                                default: uniqueQualities[0] || 720,
-                                options: uniqueQualities,
-                                forced: true,
-                                onChange: (newQuality) => {
-                                    hls.currentLevel = hls.levels.findIndex((level) => level.height === newQuality);
-                                },
-                            },
-                            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'pip', 'airplay', 'fullscreen'],
-                        });
+                if (!match) throw new Error("Match not found");
 
-                        player.play().catch(e => console.warn("Autoplay was blocked.", e));
-                        setupPlayerControls(player);
-                    });
-                } else {
-                    loadingOverlay.classList.add('hidden');
-                    playerElement.src = streamUrl;
-                    const player = new Plyr(playerElement, { 
-                        autoplay: true,
-                        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'pip', 'airplay', 'fullscreen']
-                    });
-                    player.play().catch(e => console.warn("Autoplay was blocked.", e));
-                    setupPlayerControls(player);
+                // Update UI
+                matchTitleElem.textContent = match.title;
+                document.title = match.title + " | Live Stream";
+                if(match.language){
+                    langText.textContent = formatLang(match.language);
+                    langBadge.classList.remove('hidden');
+                    langBadge.classList.add('flex');
                 }
+
+                // Get URL
+                let streamUrl = "";
+                if (cdn === "adfree_stream") streamUrl = match.adfree_stream;
+                else if (cdn === "dai_stream") streamUrl = match.dai_stream;
+                else streamUrl = match.STREAMING_CDN[cdn]; // e.g., akamai, l3
+
+                if (!streamUrl || streamUrl === "Unavailable") throw new Error("Stream Offline");
+
+                loadVideo(streamUrl);
+
             } catch (error) {
-                console.error("Player initialization error:", error);
-                displayError("A player error occurred. Please try another stream.");
+                console.error(error);
+                showError("Stream Unavailable or Offline");
             }
-            
-            handlePopup();
-            setupUIControls();
+        }
+
+        function loadVideo(source) {
+            const defaultOptions = {
+                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'pip', 'airplay', 'fullscreen'],
+                autoplay: true,
+                tooltips: { controls: true, seek: true }
+            };
+
+            if (Hls.isSupported() && source.includes('.m3u8')) {
+                const hls = new Hls();
+                hls.loadSource(source);
+                hls.attachMedia(playerElement);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    const availableQualities = hls.levels.map((l) => l.height);
+                    const uniqueQualities = [...new Set(availableQualities)].sort((a, b) => b - a);
+                    
+                    defaultOptions.quality = {
+                        default: uniqueQualities[0],
+                        options: uniqueQualities,
+                        forced: true,
+                        onChange: (e) => hls.currentLevel = hls.levels.findIndex(l => l.height === e)
+                    };
+                    
+                    const player = new Plyr(playerElement, defaultOptions);
+                    loadingState.style.display = 'none';
+                    player.play().catch(() => player.muted = true); // Autoplay fallback
+                });
+            } else {
+                playerElement.src = source;
+                const player = new Plyr(playerElement, defaultOptions);
+                loadingState.style.display = 'none';
+                player.play();
+            }
+        }
+
+        function showError(msg) {
+            loadingState.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-3"></i>
+                    <h3 class="text-xl font-bold text-white">${msg}</h3>
+                    <a href="index.html" class="mt-4 inline-block px-6 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition">Go Back</a>
+                </div>
+            `;
+        }
+
+        // --- Features: Popup, Theater, Share ---
+        
+        // Popup Logic
+        const popup = document.getElementById('telegram-popup');
+        const POPUP_KEY = 'fc_premium_popup_seen';
+
+        function showPopup() {
+            if(!sessionStorage.getItem(POPUP_KEY)) {
+                setTimeout(() => popup.classList.add('active'), 8000); // Show after 8s
+            }
+        }
+
+        function closePopup(permanent = false) {
+            popup.classList.remove('active');
+            if(permanent) sessionStorage.setItem(POPUP_KEY, 'true');
+        }
+
+        document.getElementById('popup-close').onclick = () => closePopup(true);
+        document.getElementById('popup-dismiss-btn').onclick = () => closePopup(true);
+        document.getElementById('popup-join-btn').onclick = () => {
+            closePopup(true);
+            // Link is already in href
+        };
+
+        // Theater Mode
+        const theaterBtn = document.getElementById('btn-theater');
+        theaterBtn.addEventListener('click', () => {
+            document.body.classList.toggle('theater');
+            const icon = theaterBtn.querySelector('i');
+            icon.classList.toggle('fa-expand');
+            icon.classList.toggle('fa-compress');
         });
 
-        // Setup player controls
-        function setupPlayerControls(player) {
-            // Keyboard shortcuts
-            document.addEventListener('keydown', (e) => {
-                if (e.target.tagName === 'INPUT') return;
-                
-                switch(e.key.toLowerCase()) {
-                    case 't':
-                        toggleTheaterMode();
-                        break;
-                    case 'p':
-                        if (document.pictureInPictureEnabled) {
-                            if (document.pictureInPictureElement) {
-                                document.exitPictureInPicture();
-                            } else {
-                                playerElement.requestPictureInPicture();
-                            }
-                        }
-                        break;
-                }
-            });
-        }
-
-        // Setup UI controls
-        function setupUIControls() {
-            const theaterBtn = document.getElementById('theater-mode-btn');
-            const pipBtn = document.getElementById('pip-btn');
-            const shortcutsBtn = document.getElementById('shortcuts-btn');
-            const shortcutsHint = document.getElementById('shortcuts-hint');
-
-            // Theater mode
-            theaterBtn.addEventListener('click', toggleTheaterMode);
-
-            // Picture-in-Picture
-            pipBtn.addEventListener('click', async () => {
-                try {
-                    if (document.pictureInPictureEnabled) {
-                        if (document.pictureInPictureElement) {
-                            await document.exitPictureInPicture();
-                        } else {
-                            await playerElement.requestPictureInPicture();
-                        }
-                    }
-                } catch (error) {
-                    console.error('PiP error:', error);
-                }
-            });
-
-            // Shortcuts hint toggle
-            let shortcutsVisible = false;
-            shortcutsBtn.addEventListener('click', () => {
-                shortcutsVisible = !shortcutsVisible;
-                shortcutsHint.classList.toggle('show', shortcutsVisible);
-                shortcutsBtn.classList.toggle('active', shortcutsVisible);
-            });
-
-            // Hide shortcuts when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!shortcutsBtn.contains(e.target) && !shortcutsHint.contains(e.target)) {
-                    shortcutsVisible = false;
-                    shortcutsHint.classList.remove('show');
-                    shortcutsBtn.classList.remove('active');
-                }
-            });
-        }
-
-        // Toggle theater mode
-        function toggleTheaterMode() {
-            document.body.classList.toggle('theater-mode');
-            const btn = document.getElementById('theater-mode-btn');
-            const icon = btn.querySelector('i');
-            
-            if (document.body.classList.contains('theater-mode')) {
-                icon.className = 'fas fa-compress';
-                btn.classList.add('active');
-            } else {
-                icon.className = 'fas fa-expand';
-                btn.classList.remove('active');
+        // Share Function
+        document.getElementById('btn-share').addEventListener('click', async () => {
+            const shareData = {
+                title: document.title,
+                text: 'Watch this match live for free!',
+                url: window.location.href
+            };
+            try {
+                await navigator.share(shareData);
+            } catch {
+                navigator.clipboard.writeText(window.location.href);
+                const originalText = document.querySelector('.btn-text-hide').textContent;
+                document.querySelector('.btn-text-hide').textContent = 'Copied!';
+                setTimeout(() => document.querySelector('.btn-text-hide').textContent = originalText, 2000);
             }
-        }
+        });
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            initPlayer();
+            showPopup();
+        });
     </script>
 </body>
 </html>
