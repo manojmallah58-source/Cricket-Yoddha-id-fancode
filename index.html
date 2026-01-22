@@ -2,519 +2,373 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cricket Yoddha | Free Live Streaming</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Cricket Yoddha | Premium Live</title>
     <link rel="icon" href="https://fancode.com/favicon.ico" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Added Russo One for the Logo -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Russo+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --background: #050505;
-            --primary-glow: #eab308; /* Gold */
-            --secondary-glow: #dc2626; /* Red */
-            --accent-blue: #3b82f6;
-            --card-bg: rgba(20, 20, 23, 0.6);
-            --border-color: rgba(255, 215, 0, 0.15); /* Subtle Gold Border */
-        }
-
-        * {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            --bg-dark: #050505;
+            --card-surface: #121212;
+            --brand-red: #ff3b3b;
+            --brand-gold: #fbbf24;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(20, 20, 20, 0.7);
         }
 
         body {
-            background-color: var(--background);
+            background-color: var(--bg-dark);
             font-family: 'Inter', sans-serif;
+            color: #ffffff;
+            /* Subtle Mesh Gradient Background */
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(220, 38, 38, 0.15), transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.1), transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05), transparent 60%);
+                radial-gradient(at 0% 0%, rgba(255, 59, 59, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(251, 191, 36, 0.1) 0px, transparent 50%);
             background-attachment: fixed;
             min-height: 100vh;
-            color: #e2e8f0;
         }
 
-        /* --- Brand Logo Animation --- */
-        .brand-text {
-            font-family: 'Russo One', sans-serif;
+        /* --- Typography --- */
+        .font-sports {
+            font-family: 'Teko', sans-serif;
             text-transform: uppercase;
-            background: linear-gradient(to bottom, #fff 40%, #fbbf24 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(234, 179, 8, 0.4));
-            position: relative;
+            letter-spacing: 0.5px;
         }
 
-        .brand-icon {
-            color: #fbbf24;
-            filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.6));
+        /* --- Header & Nav --- */
+        .glass-nav {
+            background: rgba(5, 5, 5, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
         }
 
-        /* --- Match Card 3D Tilt Effect --- */
+        /* --- Match Cards (Advanced) --- */
         .match-card {
-            background: linear-gradient(145deg, rgba(20, 20, 25, 0.8), rgba(10, 10, 12, 0.9));
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(20px);
-            transform-style: preserve-3d;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: var(--card-surface);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeIn 0.6s ease-out forwards;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
 
         .match-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: rgba(234, 179, 8, 0.5);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 
-                        0 0 25px rgba(234, 179, 8, 0.15);
+            transform: translateY(-4px);
+            border-color: rgba(255, 59, 59, 0.4);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 59, 59, 0.1);
         }
 
-        .match-card::after {
-            content: '';
+        .card-image-wrapper {
+            position: relative;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            overflow: hidden;
+        }
+
+        .card-image-wrapper img {
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.0) 50%);
-            z-index: 1;
-            pointer-events: none;
-            background-size: 200% 200%;
-            transition: background-position 0.5s;
-        }
-        .match-card:hover::after {
-            background-position: 100% 100%;
-        }
-        
-        .match-card img {
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
             transition: transform 0.5s ease;
-            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
         }
 
-        .match-card:hover img {
-            transform: scale(1.1);
+        .match-card:hover .card-image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .live-badge {
+            background: linear-gradient(90deg, #dc2626, #ef4444);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+            animation: pulse-red 2s infinite;
+        }
+
+        /* --- Spotlight Section --- */
+        .hero-spotlight {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            background: #000;
+        }
+
+        .hero-overlay {
+            background: linear-gradient(0deg, #050505 0%, rgba(5,5,5,0.8) 40%, transparent 100%);
         }
 
         /* --- Buttons --- */
-        .watch-btn {
-            background: linear-gradient(90deg, #111, #222);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            position: relative;
-            overflow: hidden;
-            z-index: 10;
+        .btn-play {
+            background: #fff;
+            color: #000;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .btn-play:hover {
+            background: var(--brand-red);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 59, 59, 0.4);
+        }
+
+        .tag {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+
+        /* --- Animations --- */
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #1f1f1f 25%, #2a2a2a 50%, #1f1f1f 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--brand-red); }
+
+        /* --- Telegram Popup --- */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            pointer-events: none;
             transition: all 0.3s ease;
         }
-
-        .watch-btn:hover {
-            border-color: #fbbf24;
-            color: #fbbf24;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .watch-btn.primary-btn {
-            background: linear-gradient(135deg, #fbbf24, #d97706);
-            color: black;
-            font-weight: 800;
-            border: none;
-        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
         
-        .watch-btn.primary-btn:hover {
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
-            transform: translateY(-2px) scale(1.05);
-            color: black;
-        }
-
-        /* --- Spotlight Card --- */
-        .spotlight-card {
-            border: 1px solid rgba(234, 179, 8, 0.3);
-            background: linear-gradient(135deg, rgba(15, 10, 0, 0.9), rgba(20, 20, 20, 0.8));
-            backdrop-filter: blur(30px);
-            box-shadow: 0 0 50px rgba(234, 179, 8, 0.1);
-            position: relative;
-            overflow: hidden;
-            animation: fadeIn 1s ease-out;
-        }
-        
-        .spotlight-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(234, 179, 8, 0.05), transparent 60%);
-            animation: rotateBg 10s linear infinite;
-        }
-
-        @keyframes rotateBg {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* --- Badges --- */
-        .live-pulse {
-            position: relative;
-        }
-        .live-pulse::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: inherit;
-            border-radius: inherit;
-            animation: ripple 1.5s infinite;
-            z-index: -1;
-        }
-        @keyframes ripple {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-
-        /* --- Stats & Search --- */
-        .stats-number {
-            font-family: 'Russo One', sans-serif;
-            font-size: 2.5rem;
-            color: #fbbf24;
-            text-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
-        }
-
-        .search-bar {
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-        }
-        
-        .search-bar:focus-within {
-            border-color: #fbbf24;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
-        }
-
-        .filter-btn.active {
-            background: #fbbf24;
-            color: black;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
-            border: none;
-        }
-
-        /* --- Particles --- */
-        .particle {
-            position: absolute;
-            background: radial-gradient(circle, rgba(251, 191, 36, 0.8), transparent);
-            border-radius: 50%;
-            animation: floatParticle 10s infinite linear;
-        }
-
-        @keyframes floatParticle {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
-        }
-
-        /* --- Popup --- */
-        .popup-card {
-            background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+        .modal-card {
+            background: #1a1a1a;
             border: 1px solid #333;
-            box-shadow: 0 0 50px rgba(0, 168, 255, 0.15);
+            transform: scale(0.95) translateY(10px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        
-        .telegram-btn {
-            background: #2AABEE;
-            background: linear-gradient(90deg, #2AABEE 0%, #229ED9 100%);
-            box-shadow: 0 4px 15px rgba(42, 171, 238, 0.4);
-        }
-        .telegram-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(42, 171, 238, 0.6);
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #fbbf24; }
+        .modal-overlay.active .modal-card { transform: scale(1) translateY(0); }
 
     </style>
 </head>
-<body>
+<body class="antialiased selection:bg-red-500 selection:text-white">
 
-    <!-- Particle Background -->
-    <div id="particles" class="fixed inset-0 pointer-events-none z-0 opacity-30"></div>
-
-    <header class="relative z-10 pt-10 pb-6 text-center overflow-hidden">
-        <!-- Glow effect behind header -->
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-yellow-500/10 blur-[100px] rounded-full -z-10"></div>
-        
-        <div class="container mx-auto px-4">
-            <div class="inline-block mb-4 relative group">
-                <h1 class="brand-text text-5xl md:text-7xl lg:text-8xl tracking-tighter">
-                    <i class="fas fa-shield-alt brand-icon mr-2 md:mr-4"></i>CRICKET<br class="md:hidden"/> <span class="text-white">YODDHA</span>
-                </h1>
-                <div class="h-1 w-full bg-gradient-to-r from-transparent via-yellow-500 to-transparent mt-2"></div>
-            </div>
-            
-            <p class="text-slate-400 text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium tracking-wide">
-                The Ultimate Arena for Free HD Sports Streaming
-            </p>
-            
-            <!-- Live Stats Counter -->
-            <div class="flex items-center justify-center gap-4 mt-8 flex-wrap">
-                <div class="bg-slate-900/50 border border-red-500/30 backdrop-blur-md px-6 py-3 rounded-2xl min-w-[140px]">
-                    <div class="text-red-500 text-xs font-bold uppercase tracking-widest mb-1"><i class="fas fa-circle animate-pulse mr-2"></i>Live Now</div>
-                    <div class="stats-number text-red-500" id="live-count">0</div>
+    <!-- Header -->
+    <header class="glass-nav sticky top-0 z-40 py-3 px-4 md:px-8">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-red-600 to-red-800 rounded-lg flex items-center justify-center shadow-lg shadow-red-500/20">
+                    <i class="fas fa-shield-halved text-white text-xl"></i>
                 </div>
-                <div class="bg-slate-900/50 border border-yellow-500/30 backdrop-blur-md px-6 py-3 rounded-2xl min-w-[140px]">
-                    <div class="text-yellow-500 text-xs font-bold uppercase tracking-widest mb-1">Upcoming</div>
-                    <div class="stats-number" id="upcoming-count">0</div>
+                <div>
+                    <h1 class="font-sports text-2xl md:text-3xl leading-none text-white tracking-wide">
+                        Cricket <span class="text-red-500">Yoddha</span>
+                    </h1>
+                    <p class="text-[10px] text-gray-400 font-medium tracking-wider uppercase hidden sm:block">Official Streaming Partner</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" class="hidden md:flex items-center gap-2 bg-[#229ED9]/10 text-[#229ED9] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#229ED9] hover:text-white transition-all">
+                    <i class="fab fa-telegram-plane"></i> Join Telegram
+                </a>
+                <div class="relative">
+                    <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse absolute top-0 right-0 border-2 border-[#050505]"></div>
+                    <button class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-white transition">
+                        <i class="fas fa-bell"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 pb-12 relative z-10">
+    <main class="max-w-7xl mx-auto px-4 py-6">
         
+        <!-- Search & Filter Bar (Floating) -->
+        <div class="mb-8 sticky top-20 z-30">
+            <div class="bg-[#121212]/90 backdrop-blur-md border border-white/10 rounded-xl p-2 shadow-2xl flex flex-col md:flex-row gap-2">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="text" id="search-input" placeholder="Search matches, series or teams..." 
+                           class="w-full bg-black/20 text-white pl-10 pr-4 py-2.5 rounded-lg border border-transparent focus:border-red-500/50 focus:bg-black/40 outline-none transition-all placeholder-gray-600">
+                </div>
+                <div class="flex gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide px-1">
+                    <button class="filter-btn active px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide bg-white text-black whitespace-nowrap" data-filter="all">All</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide bg-white/5 text-gray-400 hover:text-white whitespace-nowrap" data-filter="live">Live</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide bg-white/5 text-gray-400 hover:text-white whitespace-nowrap" data-filter="upcoming">Upcoming</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Spotlight Section -->
-        <div id="spotlight-container" class="mb-16"></div>
+        <div id="spotlight-container" class="mb-10"></div>
 
-        <!-- Search and Filter Section -->
-        <div class="mb-10 sticky top-4 z-40">
-            <div class="max-w-4xl mx-auto">
-                <div class="search-bar rounded-full p-2 pl-6 flex items-center gap-3 transition-all duration-300 backdrop-blur-xl">
-                    <i class="fas fa-search text-yellow-500 text-lg"></i>
-                    <input 
-                        type="text" 
-                        id="search-input" 
-                        placeholder="Search for matches, teams (e.g., IND vs AUS)..." 
-                        class="flex-1 bg-transparent outline-none text-white placeholder-slate-500 font-medium h-10"
-                    />
-                    <button id="clear-search" class="text-slate-400 hover:text-white px-4 hidden">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <!-- Filter Buttons -->
-                <div class="flex items-center justify-center gap-3 mt-4 flex-wrap">
-                    <button class="filter-btn active px-5 py-2 rounded-full text-xs md:text-sm font-bold tracking-wide uppercase transition-all" data-filter="all">
-                        All
-                    </button>
-                    <button class="filter-btn bg-slate-800 hover:bg-slate-700 px-5 py-2 rounded-full text-xs md:text-sm font-bold tracking-wide uppercase transition-all border border-white/10" data-filter="live">
-                        <i class="fas fa-circle text-[10px] mr-2 text-red-500"></i>Live
-                    </button>
-                    <button class="filter-btn bg-slate-800 hover:bg-slate-700 px-5 py-2 rounded-full text-xs md:text-sm font-bold tracking-wide uppercase transition-all border border-white/10" data-filter="upcoming">
-                        Upcoming
-                    </button>
-                    <button class="filter-btn bg-slate-800 hover:bg-slate-700 px-5 py-2 rounded-full text-xs md:text-sm font-bold tracking-wide uppercase transition-all border border-white/10" data-filter="cricket">
-                        Cricket
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-8 flex items-end justify-between px-2">
+        <!-- Section Title -->
+        <div class="flex items-end justify-between mb-6 border-b border-white/5 pb-2">
             <div>
-                <h2 class="text-2xl md:text-3xl font-bold text-white mb-2 flex items-center">
-                    <span class="bg-yellow-500 w-2 h-8 mr-3 rounded-full block"></span>
-                    Match Center
-                </h2>
+                <h2 class="font-sports text-2xl text-white">Live & Upcoming</h2>
+                <div class="h-1 w-12 bg-red-500 rounded-full mt-1"></div>
             </div>
-            <div class="text-slate-500 text-xs font-mono">
-                Auto-Update: <span class="text-green-400">ON</span>
+            <div class="text-xs text-gray-500 font-mono" id="last-updated">
+                Updating...
             </div>
         </div>
 
-        <div id="matches-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            <!-- Skeletons -->
-            <div class="h-72 bg-slate-800/50 rounded-2xl animate-pulse"></div>
-            <div class="h-72 bg-slate-800/50 rounded-2xl animate-pulse hidden md:block"></div>
-            <div class="h-72 bg-slate-800/50 rounded-2xl animate-pulse hidden lg:block"></div>
+        <!-- Matches Grid -->
+        <div id="matches-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Loading Skeletons -->
+            <div class="aspect-video skeleton rounded-xl"></div>
+            <div class="aspect-video skeleton rounded-xl hidden md:block"></div>
+            <div class="aspect-video skeleton rounded-xl hidden lg:block"></div>
+            <div class="aspect-video skeleton rounded-xl hidden xl:block"></div>
         </div>
 
-        <!-- No Results -->
-        <div id="no-results" class="hidden text-center py-24 bg-slate-900/30 rounded-3xl border border-dashed border-slate-700 mt-8">
-            <div class="text-6xl mb-4 grayscale opacity-50">🏟️</div>
-            <h3 class="text-2xl font-bold text-white mb-2">No Matches Found</h3>
-            <p class="text-slate-500">The arena is empty for this search.</p>
+        <!-- Empty State -->
+        <div id="no-results" class="hidden py-20 text-center">
+            <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-search text-2xl text-gray-600"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-300 mb-2">No Matches Found</h3>
+            <p class="text-gray-500 text-sm">Try adjusting your search filters.</p>
         </div>
+
     </main>
-    
-    <!-- Telegram Popup -->
-    <div id="telegram-popup" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 opacity-0 invisible transition-all duration-500">
-        <div class="popup-card w-full max-w-sm md:max-w-md rounded-3xl overflow-hidden transform scale-90 transition-all duration-500">
-            <div class="relative h-32 bg-gradient-to-r from-sky-600 to-blue-700 flex items-center justify-center overflow-hidden">
-                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
-                <i class="fab fa-telegram-plane text-7xl text-white opacity-20 absolute -right-4 -bottom-4 rotate-12"></i>
-                <div class="text-center z-10">
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
-                        <i class="fab fa-telegram-plane text-3xl text-sky-600 ml-[-2px]"></i>
-                    </div>
-                </div>
+
+    <!-- Professional Footer -->
+    <footer class="border-t border-white/5 bg-[#080808] py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="font-sports text-xl text-white mb-2">Cricket <span class="text-red-600">Yoddha</span></p>
+            <p class="text-gray-600 text-xs">© 2026 Cricket Yoddha. All rights reserved. Streaming content provided by FanCode API.</p>
+        </div>
+    </footer>
+
+    <!-- Telegram Modal -->
+    <div id="telegram-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="modal-card w-full max-w-md rounded-2xl relative overflow-hidden">
+            <!-- Decorative Header -->
+            <div class="h-24 bg-gradient-to-r from-blue-600 to-blue-400 flex items-center justify-center">
+                <i class="fab fa-telegram-plane text-5xl text-white drop-shadow-md transform -rotate-12"></i>
             </div>
-            <div class="p-8 text-center bg-[#151515]">
-                <h3 class="text-2xl font-bold text-white mb-2">Join <span class="text-sky-400">Cricket Yoddha</span></h3>
-                <p class="text-gray-400 text-sm mb-6 leading-relaxed">
-                    Get prediction, instant match links, toss reports, and exclusive updates directly on Telegram.
+            
+            <div class="p-8 text-center bg-[#181818]">
+                <h3 class="font-sports text-3xl text-white mb-2">Don't Miss a Ball!</h3>
+                <p class="text-gray-400 text-sm mb-8 leading-relaxed">
+                    Join the <b>Cricket Yoddha</b> official channel for instant match links, prediction updates, and breaking news.
                 </p>
-                <div class="flex flex-col gap-3">
-                    <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" id="join-btn" class="telegram-btn w-full text-center px-6 py-3.5 rounded-xl font-bold text-white tracking-wide transition-all">
-                        JOIN CHANNEL NOW
-                    </a>
-                    <button id="close-popup-btn" class="w-full text-center px-6 py-3 rounded-xl font-semibold text-slate-500 hover:text-white hover:bg-white/5 transition-colors text-sm">
-                        Maybe Later
-                    </button>
-                </div>
+                
+                <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" id="join-btn" class="block w-full bg-blue-500 hover:bg-blue-400 text-white font-bold py-3.5 rounded-xl transition-all transform hover:scale-[1.02] shadow-lg shadow-blue-500/25 mb-4">
+                    JOIN CHANNEL NOW
+                </a>
+                
+                <button id="close-modal-btn" class="text-gray-500 text-xs hover:text-white transition-colors uppercase tracking-widest font-bold">
+                    Maybe Later
+                </button>
             </div>
         </div>
     </div>
 
-
     <script>
-        const spotlightContainer = document.getElementById('spotlight-container');
-        const gridContainer = document.getElementById('matches-grid');
-        // Kept original data source as requested, logic remains same but rendering updated
+        // --- Configuration ---
         const DATA_URL = 'https://raw.githubusercontent.com/Jitendra-unatti/fancode/refs/heads/main/data/fancode.json';
         const PLAY_BASE = 'fc/player.html';
-
-        // --- Config & Utilities ---
         
-        function formatLanguage(lang) {
-            if (!lang) return '';
-            const map = {
-                'BLOODY_SWEET': '🎧 Multi-Lang',
-                'ENGLISH': '🇬🇧 English',
-                'HINDI': '🇮🇳 Hindi',
-                'TAMIL': 'Tamil',
-                'TELUGU': 'Telugu',
-                'KANNADA': 'Kannada'
-            };
-            return map[lang.toUpperCase()] || lang;
-        }
+        // --- DOM Elements ---
+        const gridContainer = document.getElementById('matches-grid');
+        const spotlightContainer = document.getElementById('spotlight-container');
+        const searchInput = document.getElementById('search-input');
+        const filterBtns = document.querySelectorAll('.filter-btn');
 
-        function getScoreDisplay(match) {
-            if (!match.teams || match.teams.length < 2) return '';
-            const t1 = match.teams[0];
-            const t2 = match.teams[1];
-            
-            const s1 = t1.cricketScore?.[0] ? `${t1.cricketScore[0].runs}/${t1.cricketScore[0].wickets}` : '';
-            const s2 = t2.cricketScore?.[0] ? `${t2.cricketScore[0].runs}/${t2.cricketScore[0].wickets}` : '';
-            
-            if (!s1 && !s2) return '';
-
-            // Using short names
-            return `
-                <div class="mt-3 bg-black/40 rounded-lg p-2 border border-white/5 flex justify-between items-center text-xs font-mono font-bold text-yellow-500">
-                    <div>${t1.shortName} <span class="text-white">${s1 || '0/0'}</span></div>
-                    <div class="text-slate-600">vs</div>
-                    <div>${t2.shortName} <span class="text-white">${s2 || '0/0'}</span></div>
-                </div>
-            `;
-        }
-
-        // --- Visual Effects ---
-
-        function createParticles() {
-            const container = document.getElementById('particles');
-            for(let i=0; i<40; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                const size = Math.random() * 4 + 1;
-                p.style.width = size + 'px';
-                p.style.height = size + 'px';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                p.style.animationDelay = (Math.random() * 5) + 's';
-                p.style.opacity = Math.random() * 0.5;
-                container.appendChild(p);
-            }
-        }
-
-        function updateCountdowns() {
-            document.querySelectorAll('.countdown').forEach(el => {
-                const time = new Date(el.dataset.time);
-                const now = new Date();
-                const diff = time - now;
-                
-                if (diff <= 0) {
-                    el.innerHTML = '<span class="text-red-500 font-bold animate-pulse">Starting Now</span>';
-                    return;
-                }
-                
-                const h = Math.floor(diff / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                el.innerHTML = `<i class="far fa-clock mr-1"></i> ${h}h ${m}m to go`;
-            });
-        }
-
-        // --- Core Logic ---
-
+        // --- State ---
         let allMatches = [];
         let currentFilter = 'all';
 
-        function generateButtons(match, isSpotlight = false) {
-            const streams = { ...match.STREAMING_CDN, adfree: match.adfree_stream, dai: match.dai_stream };
-            const id = encodeURIComponent(String(match.match_id ?? ''));
-            let html = '';
+        // --- Helpers ---
+        const formatTime = (timeStr) => {
+            if(!timeStr) return '';
+            const date = new Date(timeStr);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        };
 
-            // Priority buttons logic
-            const priorityKeys = ['adfree', 'dai', 'hls'];
+        const getStatusColor = (status) => {
+            return status === 'LIVE' ? 'text-red-500' : 'text-blue-400';
+        };
+
+        // --- Core Functions ---
+        async function fetchData() {
+            try {
+                const res = await fetch(DATA_URL);
+                const data = await res.json();
+                let matches = Array.isArray(data.matches) ? data.matches : [];
+                
+                // Sort: LIVE first
+                matches.sort((a, b) => {
+                    const isALive = a.status?.toUpperCase() === 'LIVE';
+                    const isBLive = b.status?.toUpperCase() === 'LIVE';
+                    return isBLive - isALive;
+                });
+
+                allMatches = matches;
+                renderApp();
+                document.getElementById('last-updated').innerText = `Updated: ${new Date().toLocaleTimeString()}`;
+            } catch (e) {
+                console.error("Data Load Error", e);
+            }
+        }
+
+        function renderApp() {
+            // 1. Render Spotlight (First Live Match)
+            const liveMatch = allMatches.find(m => m.status?.toUpperCase() === 'LIVE');
             
-            Object.entries(streams).forEach(([key, val]) => {
-                if(!val || val === 'Unavailable' || key === 'Primary_Playback_URL' || key === 'language') return;
+            if (liveMatch) {
+                renderSpotlight(liveMatch);
+            } else {
+                spotlightContainer.innerHTML = ''; // Hide if no live match
+            }
 
-                let label = key.toUpperCase();
-                let icon = 'fa-play';
-                let btnClass = 'watch-btn text-xs px-3 py-2 rounded font-medium flex-1 min-w-[80px]';
-
-                if(key === 'adfree') { label = 'NO ADS'; icon = 'fa-star'; btnClass += ' primary-btn'; }
-                else if(key.includes('fancode')) { label = 'FANCODE'; icon = 'fa-bolt'; }
-                else if(key === 'dai') { label = 'HD STREAM'; }
-
-                if(isSpotlight) btnClass = key === 'adfree' ? 
-                    'watch-btn primary-btn px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2' : 
-                    'watch-btn px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2';
-
-                html += `<a href="${PLAY_BASE}?id=${id}&cdn=${encodeURIComponent(key)}" class="${btnClass}">
-                    <i class="fas ${icon} ${isSpotlight?'':'mr-1'}"></i> ${label}
-                </a>`;
-            });
-
-            return html || '<span class="text-slate-500 text-sm italic">Links updating...</span>';
+            // 2. Render Grid
+            filterAndRenderGrid();
         }
 
         function renderSpotlight(match) {
-            const img = match.image || 'https://fancode.com/skillup-uploads/cms-media/Cricket_Fallback_Old_match-card.jpg';
+            const imgSrc = match.image || 'https://fancode.com/skillup-uploads/cms-media/Cricket_Fallback_Old_match-card.jpg';
+            const buttons = generateButtons(match, 'bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition shadow-lg shadow-red-600/20');
             
             spotlightContainer.innerHTML = `
-                <div class="spotlight-card rounded-3xl p-6 md:p-10 grid grid-cols-1 lg:grid-cols-5 gap-8 items-center relative z-10">
-                    <div class="lg:col-span-3 relative group">
-                        <div class="absolute -inset-1 bg-gradient-to-r from-yellow-600 to-red-600 rounded-2xl blur opacity-30 group-hover:opacity-75 transition duration-1000"></div>
-                        <div class="relative rounded-2xl overflow-hidden shadow-2xl">
-                            <img src="${img}" class="w-full object-cover transform transition duration-700 hover:scale-105" alt="Spotlight">
-                            <div class="absolute top-4 left-4 flex gap-2">
-                                <span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded shadow-lg animate-pulse">LIVE NOW</span>
-                                <span class="bg-black/80 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded border border-white/20">${match.tournament}</span>
-                            </div>
+                <div class="hero-spotlight aspect-[16/9] md:aspect-[21/9] flex items-end">
+                    <img src="${imgSrc}" class="absolute inset-0 w-full h-full object-cover opacity-80" alt="Spotlight">
+                    <div class="hero-overlay absolute inset-0"></div>
+                    
+                    <div class="relative z-10 p-6 md:p-10 w-full">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-full animate-pulse">LIVE NOW</span>
+                            <span class="text-gold-400 font-sports text-xl text-[#fbbf24]">${match.tournament}</span>
                         </div>
-                    </div>
-                    <div class="lg:col-span-2 flex flex-col justify-center">
-                        <h4 class="text-yellow-500 font-bold tracking-widest text-sm mb-2 uppercase">Featured Match</h4>
-                        <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight mb-4 font-sans">${match.title}</h1>
-                        <div class="flex items-center gap-3 mb-6 text-sm text-slate-300">
-                             ${match.language ? `<span class="bg-white/10 px-2 py-1 rounded">${formatLanguage(match.language)}</span>` : ''}
-                             <span>•</span>
-                             <span>${match.category || 'Cricket'}</span>
+                        <h1 class="font-sports text-4xl md:text-6xl text-white mb-4 leading-none drop-shadow-lg">${match.title}</h1>
+                        <div class="flex flex-wrap gap-4 items-center text-sm text-gray-300 mb-6">
+                            <span><i class="fas fa-language text-gray-500 mr-2"></i>${match.language || 'English'}</span>
+                            <span class="w-1 h-1 bg-gray-500 rounded-full"></span>
+                            <span>${match.matchType || 'T20'}</span>
                         </div>
-                        ${getScoreDisplay(match)}
-                        <div class="flex flex-wrap gap-3 mt-6">
-                            ${generateButtons(match, true)}
+                        <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                            ${buttons}
                         </div>
                     </div>
                 </div>
@@ -523,170 +377,137 @@
 
         function createCard(match) {
             const isLive = match.status?.toUpperCase() === 'LIVE';
-            const img = match.image || 'https://fancode.com/skillup-uploads/cms-media/Cricket_Fallback_Old_match-card.jpg';
-            
-            const div = document.createElement('div');
-            div.className = 'match-card rounded-2xl overflow-hidden flex flex-col group';
-            
-            div.innerHTML = `
-                <div class="relative overflow-hidden aspect-video">
-                    <img src="${img}" class="w-full h-full object-cover" loading="lazy">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
-                    
-                    <div class="absolute top-3 left-3 flex gap-2">
-                        ${isLive ? 
-                            `<div class="live-pulse bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded uppercase">LIVE</div>` : 
-                            `<div class="bg-slate-800 text-slate-300 text-[10px] font-bold px-2 py-1 rounded border border-white/10 uppercase">UPCOMING</div>`
-                        }
+            const imgSrc = match.image || 'https://fancode.com/skillup-uploads/cms-media/Cricket_Fallback_Old_match-card.jpg';
+            const buttons = generateButtons(match, 'btn-play px-3 py-1.5 text-xs flex-1 text-center whitespace-nowrap border border-gray-200');
+
+            // Score Logic
+            let scoreHTML = '';
+            if (isLive && match.teams) {
+                const t1 = match.teams[0];
+                const t2 = match.teams[1];
+                const s1 = t1?.cricketScore?.[0] ? `${t1.cricketScore[0].runs}/${t1.cricketScore[0].wickets}` : '';
+                const s2 = t2?.cricketScore?.[0] ? `${t2.cricketScore[0].runs}/${t2.cricketScore[0].wickets}` : '';
+                if(s1 || s2) {
+                    scoreHTML = `
+                        <div class="bg-black/40 rounded p-2 mb-3 border border-white/5">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-400">${t1?.shortName}</span>
+                                <span class="font-bold">${s1 || '-'}</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-400">${t2?.shortName}</span>
+                                <span class="font-bold">${s2 || '-'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            return `
+                <div class="match-card flex flex-col h-full group">
+                    <div class="card-image-wrapper">
+                        <img src="${imgSrc}" loading="lazy" alt="${match.title}">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent"></div>
+                        ${isLive ? '<div class="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold text-white live-badge">LIVE</div>' : ''}
                     </div>
-                </div>
-                
-                <div class="p-5 flex flex-col flex-1 relative z-10">
-                    <div class="text-[10px] font-bold text-yellow-500 tracking-wider uppercase mb-1 truncate">${match.tournament}</div>
-                    <h3 class="text-lg font-bold text-white leading-snug mb-3 group-hover:text-yellow-400 transition-colors">${match.title}</h3>
                     
-                    <div class="mt-auto">
-                        ${isLive ? getScoreDisplay(match) : ''}
+                    <div class="p-4 flex flex-col flex-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="tag border border-white/10 text-xs">${match.tournament || 'Match'}</span>
+                            ${!isLive ? `<span class="text-[10px] text-gray-400 flex items-center gap-1"><i class="far fa-clock"></i> ${formatTime(match.startTime)}</span>` : ''}
+                        </div>
                         
-                        ${!isLive && match.startTime ? `
-                            <div class="countdown text-xs font-mono text-slate-400 mb-3 bg-white/5 p-2 rounded text-center" data-time="${match.startTime}">
-                                Loading...
-                            </div>` : ''
-                        }
+                        <h3 class="text-sm font-semibold text-gray-100 mb-3 line-clamp-2 leading-snug group-hover:text-red-500 transition-colors">${match.title}</h3>
                         
-                        <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-white/10">
-                            ${generateButtons(match)}
+                        ${scoreHTML}
+                        
+                        <div class="mt-auto pt-3 border-t border-white/5 flex gap-2 overflow-x-auto scrollbar-hide">
+                            ${buttons || '<span class="text-xs text-gray-600 italic py-1">Links available soon</span>'}
                         </div>
                     </div>
                 </div>
             `;
-            return div;
         }
 
-        function filterMatches(term='', filter='all') {
-            const grid = document.getElementById('matches-grid');
-            const noRes = document.getElementById('no-results');
+        function generateButtons(match, cssClass) {
+            const streams = { ...match.STREAMING_CDN, adfree: match.adfree_stream, dai: match.dai_stream };
+            let html = '';
+            const id = encodeURIComponent(String(match.match_id ?? ''));
+
+            for (const [key, value] of Object.entries(streams)) {
+                if (value && value !== "Unavailable" && !['language', 'Primary_Playback_URL'].includes(key)) {
+                    let label = key.replace(/_/g, ' ').replace(/(stream|cdn)/gi, '').trim();
+                    if(key === 'adfree') label = 'Ad-Free';
+                    if(key === 'dai') label = 'HD 1';
+                    
+                    html += `<a href="${PLAY_BASE}?id=${id}&cdn=${encodeURIComponent(key)}" class="${cssClass}">
+                        <i class="fas fa-play text-[8px] mr-1"></i>${label}
+                    </a>`;
+                }
+            }
+            return html;
+        }
+
+        function filterAndRenderGrid() {
+            const term = searchInput.value.toLowerCase();
             
-            const filtered = allMatches.filter(m => {
-                const text = (m.title + m.tournament + m.category).toLowerCase();
-                const matchesSearch = text.includes(term.toLowerCase());
-                
-                if (filter === 'live') return matchesSearch && m.status === 'LIVE';
-                if (filter === 'upcoming') return matchesSearch && m.status !== 'LIVE';
-                if (filter === 'cricket') return matchesSearch && m.category.toLowerCase() === 'cricket';
-                return matchesSearch;
+            const filtered = allMatches.filter(match => {
+                const textMatch = (match.title + match.tournament).toLowerCase().includes(term);
+                if (currentFilter === 'live') return textMatch && match.status === 'LIVE';
+                if (currentFilter === 'upcoming') return textMatch && match.status !== 'LIVE';
+                return textMatch;
             });
 
-            grid.innerHTML = '';
-            
-            if(filtered.length === 0) {
+            const grid = document.getElementById('matches-grid');
+            const noRes = document.getElementById('no-results');
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
                 noRes.classList.remove('hidden');
             } else {
                 noRes.classList.add('hidden');
-                filtered.forEach((m, i) => {
-                    const card = createCard(m);
-                    card.style.animationDelay = (i * 50) + 'ms';
-                    grid.appendChild(card);
-                });
-                updateCountdowns();
+                grid.innerHTML = filtered.map(createCard).join('');
             }
         }
 
-        async function init() {
-            try {
-                const res = await fetch(DATA_URL);
-                const data = await res.json();
-                let matches = data.matches || [];
-
-                // Sort: Live first
-                matches.sort((a,b) => (b.status==='LIVE') - (a.status==='LIVE'));
-                allMatches = matches;
-
-                // Stats
-                const live = matches.filter(m => m.status === 'LIVE');
-                document.getElementById('live-count').innerText = live.length;
-                document.getElementById('upcoming-count').innerText = matches.filter(m => m.status !== 'LIVE').length;
-
-                // Spotlight (First Live Match)
-                if(live.length > 0) {
-                    renderSpotlight(live[0]);
-                    // Remove spotlight match from grid to avoid duplicate? 
-                    // Optional: matches = matches.filter(m => m.match_id !== live[0].match_id);
-                } else {
-                    document.getElementById('spotlight-container').style.display = 'none';
-                }
-
-                filterMatches();
-
-            } catch(e) {
-                console.error(e);
-                gridContainer.innerHTML = '<div class="text-red-500 text-center col-span-full">Server connection failed.</div>';
-            }
-        }
-
-        // --- Interaction ---
-
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            const val = e.target.value;
-            document.getElementById('clear-search').classList.toggle('hidden', !val);
-            filterMatches(val, currentFilter);
-        });
-
-        document.getElementById('clear-search').addEventListener('click', () => {
-            const inp = document.getElementById('search-input');
-            inp.value = '';
-            inp.focus();
-            document.getElementById('clear-search').classList.add('hidden');
-            filterMatches('', currentFilter);
-        });
-
-        document.querySelectorAll('.filter-btn').forEach(btn => {
+        // --- Event Listeners ---
+        searchInput.addEventListener('input', filterAndRenderGrid);
+        
+        filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.filter-btn').forEach(b => {
-                    b.classList.remove('active', 'bg-yellow-500', 'text-black');
-                    b.classList.add('bg-slate-800', 'text-white');
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-white', 'text-black');
+                    b.classList.add('bg-white/5', 'text-gray-400');
                 });
-                btn.classList.remove('bg-slate-800', 'text-white');
-                btn.classList.add('active');
+                btn.classList.remove('bg-white/5', 'text-gray-400');
+                btn.classList.add('bg-white', 'text-black');
                 
                 currentFilter = btn.dataset.filter;
-                filterMatches(document.getElementById('search-input').value, currentFilter);
+                filterAndRenderGrid();
             });
         });
 
-        // Popup Logic
-        function handlePopup() {
-            const popup = document.getElementById('telegram-popup');
-            const box = popup.querySelector('.popup-card');
-            
-            if(localStorage.getItem('cy_joined_telegram')) return;
+        // --- Init ---
+        fetchData();
+        setInterval(fetchData, 60000); // Auto Refresh
 
-            setTimeout(() => {
-                popup.classList.remove('invisible', 'opacity-0');
-                box.classList.remove('scale-90');
-                box.classList.add('scale-100');
-            }, 3500);
-
-            document.getElementById('close-popup-btn').onclick = () => {
-                popup.classList.add('opacity-0', 'invisible');
-                localStorage.setItem('cy_joined_telegram', 'true');
-            };
-            
-            document.getElementById('join-btn').onclick = () => {
-                setTimeout(() => {
-                    popup.classList.add('opacity-0', 'invisible');
-                    localStorage.setItem('cy_joined_telegram', 'true');
-                }, 1000);
-            };
-        }
-
-        // Start
-        createParticles();
-        init();
-        handlePopup();
-        setInterval(init, 60000); // Refresh data every min
-        setInterval(updateCountdowns, 60000); // Update timers
-
+        // --- Telegram Popup Logic ---
+        setTimeout(() => {
+            if (!localStorage.getItem('yoddhaJoined')) {
+                const modal = document.getElementById('telegram-modal');
+                modal.classList.add('active');
+                
+                document.getElementById('close-modal-btn').onclick = () => {
+                    modal.classList.remove('active');
+                    localStorage.setItem('yoddhaJoined', 'true');
+                };
+                
+                document.getElementById('join-btn').onclick = () => {
+                    setTimeout(() => modal.classList.remove('active'), 1000);
+                    localStorage.setItem('yoddhaJoined', 'true');
+                };
+            }
+        }, 3000);
     </script>
 </body>
 </html>
