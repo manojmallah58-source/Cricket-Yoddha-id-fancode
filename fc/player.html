@@ -2,286 +2,217 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Premium Live Stream | FanCode</title>
+    <title>FanCode Player | Live Premium</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="referrer" content="no-referrer" />
     <meta name="theme-color" content="#0f172a">
+    
+    <!-- Favicon -->
     <link rel="icon" href="https://fancode.com/favicon.ico" type="image/x-icon">
-    <!-- Plyr & Tailwind -->
+    
+    <!-- Libraries -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Icons & Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --primary-color: #38bdf8; /* Sky Blue */
-            --secondary-color: #818cf8; /* Indigo */
-            --accent-color: #f472b6; /* Pink */
-            --bg-dark: #000000;
-            --glass-bg: rgba(15, 23, 42, 0.7);
+            --plyr-color-main: #38bdf8; /* Sky Blue */
+            --glass-bg: rgba(15, 23, 42, 0.85);
             --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-dark);
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
             color: #e2e8f0;
-            margin: 0;
-            height: 100svh;
+            height: 100dvh; /* Dynamic Viewport Height for mobile */
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        /* Dynamic Background */
-        .ambient-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: 
-                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(129, 140, 248, 0.08), transparent 25%);
-            animation: bgPulse 10s ease-in-out infinite alternate;
-        }
-
-        @keyframes bgPulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(1.1); opacity: 1; }
-        }
-
-        /* Glassmorphism Header */
-        .glass-header {
+        /* Glassmorphism Headers/Footers */
+        .glass-panel {
             background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--glass-border);
-            padding: 1rem;
             z-index: 40;
-            transition: transform 0.3s ease;
         }
 
-        /* Video Container with Ambient Glow */
-        .player-wrapper {
+        .player-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             position: relative;
-            width: 100%;
-            max-width: 1000px;
-            aspect-ratio: 16/9;
-            box-shadow: 0 0 50px -10px rgba(56, 189, 248, 0.15);
-            border-radius: 12px;
-            overflow: hidden;
             background: #000;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .plyr {
+            height: 100%;
+            width: 100%;
+            border-radius: 0;
         }
         
-        .plyr--video {
-            border-radius: 12px;
+        /* Modern Buttons */
+        .btn-modern {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .btn-modern:active { transform: scale(0.97); }
 
-        /* Custom Buttons */
-        .btn-glass {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            transition: all 0.2s ease;
+        .btn-telegram {
+            background: linear-gradient(135deg, #229ED9 0%, #1c88bd 100%);
+            box-shadow: 0 4px 15px rgba(34, 158, 217, 0.4);
         }
-        .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
+        .btn-telegram:hover {
+            box-shadow: 0 6px 20px rgba(34, 158, 217, 0.6);
             transform: translateY(-1px);
         }
 
-        /* Telegram Gradient Button */
-        .btn-telegram {
-            background: linear-gradient(135deg, #229ED9 0%, #1c8ec7 100%);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 20px rgba(34, 158, 217, 0.4);
-        }
-        
-        .btn-telegram::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        .btn-telegram:hover::after {
-            left: 100%;
-        }
-        
-        .btn-telegram:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(34, 158, 217, 0.6);
-        }
-
-        /* Popup Styling */
-        .popup-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s ease;
-        }
-        
-        .popup-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .popup-card {
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 2.5rem;
-            width: 90%;
-            max-width: 420px;
-            text-align: center;
-            transform: scale(0.9) translateY(20px);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .popup-overlay.active .popup-card {
-            transform: scale(1) translateY(0);
-        }
-
-        /* Loading Spinner */
+        /* Loading Animation */
         .loader {
             width: 48px;
             height: 48px;
-            border: 3px solid #FFF;
+            border: 5px solid #FFF;
+            border-bottom-color: #38bdf8;
             border-radius: 50%;
             display: inline-block;
-            position: relative;
             box-sizing: border-box;
             animation: rotation 1s linear infinite;
         }
-        .loader::after {
-            content: '';  
-            box-sizing: border-box;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 3px solid;
-            border-color: #38bdf8 transparent;
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Popup Styling */
+        .popup-backdrop {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease;
         }
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .popup-content {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(0.95) translateY(10px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .popup-backdrop.active .popup-content {
+            transform: scale(1) translateY(0);
         }
 
-        /* Theater Mode Utility */
-        body.theater .glass-header, 
-        body.theater .player-footer { display: none; }
-        body.theater .player-wrapper { max-width: 100%; height: 100vh; border-radius: 0; }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            .popup-card { padding: 1.5rem; }
-            .btn-text-hide { display: none; }
+        /* Control Bar Tooltips */
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s;
         }
+        .group:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Theater Mode */
+        body.theater-mode .glass-panel { display: none !important; }
+        body.theater-mode .player-container { height: 100vh; }
     </style>
 </head>
 <body>
 
-    <!-- Ambient Background -->
-    <div class="ambient-bg"></div>
-
     <!-- Header -->
-    <header class="glass-header flex items-center justify-between">
+    <header class="glass-panel p-3 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
-            <a href="fancode.html" class="btn-glass w-10 h-10 flex items-center justify-center text-white/80 hover:text-white">
+            <a href="fancode.html" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 transition-colors text-white">
                 <i class="fas fa-chevron-left"></i>
             </a>
             <div>
-                <h1 id="match-title" class="text-lg font-bold text-white tracking-wide truncate max-w-[200px] md:max-w-md">Loading Match...</h1>
-                <div id="language-badge" class="hidden text-xs font-medium text-sky-300 flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
-                    <span id="match-lang-text">English</span>
+                <h1 id="match-title" class="font-bold text-sm md:text-lg leading-tight truncate max-w-[200px] md:max-w-md">Loading Stream...</h1>
+                <div id="match-meta" class="text-xs text-slate-400 flex items-center gap-2 hidden">
+                    <span class="bg-red-500/20 text-red-400 px-1.5 rounded uppercase font-bold tracking-wider text-[10px]">Live</span>
+                    <span id="match-lang"></span>
                 </div>
             </div>
         </div>
 
         <div class="flex items-center gap-2">
-            <button id="btn-theater" class="btn-glass w-10 h-10 text-white/80" title="Theater Mode">
-                <i class="fas fa-expand"></i>
+            <!-- Share -->
+            <button id="share-btn" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-sky-600 text-white transition-all group relative">
+                <i class="fas fa-share-nodes"></i>
+                <span class="tooltip absolute top-full mt-2 right-0 bg-slate-900 text-xs px-2 py-1 rounded border border-slate-700 whitespace-nowrap z-50">Share Match</span>
             </button>
-            <button id="btn-share" class="btn-glass px-4 h-10 flex items-center gap-2 text-sm font-semibold text-amber-400 border-amber-500/30 hover:bg-amber-500/10">
-                <i class="fas fa-share-nodes"></i> <span class="btn-text-hide">Share</span>
+            
+            <!-- Controls -->
+            <button onclick="toggleTheater()" class="hidden md:flex w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all items-center justify-center group relative">
+                <i class="fas fa-expand text-xs"></i>
+                <span class="tooltip absolute top-full mt-2 right-0 bg-slate-900 text-xs px-2 py-1 rounded border border-slate-700 whitespace-nowrap z-50">Theater Mode</span>
             </button>
         </div>
     </header>
 
-    <!-- Main Player Area -->
-    <main class="flex-grow flex items-center justify-center p-4 relative">
-        <div id="loading-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/80 backdrop-blur-sm">
+    <!-- Main Player -->
+    <main class="player-container relative">
+        <!-- Loading Spinner -->
+        <div id="loading-overlay" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/90 transition-opacity duration-500">
             <span class="loader mb-4"></span>
-            <p class="text-sky-400 font-medium animate-pulse">Initializing Secure Stream...</p>
+            <p class="text-slate-400 text-sm animate-pulse">Initializing Secure Stream...</p>
         </div>
 
-        <div class="player-wrapper">
-            <video id="player" playsinline controls class="w-full h-full"></video>
+        <!-- Video Element -->
+        <video id="player" class="w-full h-full" playsinline controls crossorigin></video>
+
+        <!-- Shortcuts Hint (Desktop only) -->
+        <div id="shortcuts-toast" class="absolute bottom-20 right-5 bg-black/80 backdrop-blur border border-white/10 p-4 rounded-xl translate-x-full opacity-0 transition-all duration-500 hidden md:block">
+            <h4 class="text-sky-400 text-xs font-bold uppercase mb-2">Shortcuts</h4>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-slate-300">
+                <span><kbd class="font-mono bg-slate-700 px-1 rounded">Space</kbd> Play/Pause</span>
+                <span><kbd class="font-mono bg-slate-700 px-1 rounded">F</kbd> Fullscreen</span>
+                <span><kbd class="font-mono bg-slate-700 px-1 rounded">M</kbd> Mute</span>
+                <span><kbd class="font-mono bg-slate-700 px-1 rounded">← / →</kbd> Seek 10s</span>
+            </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="player-footer p-4 glass-header border-t border-t-white/10">
-        <div class="max-w-3xl mx-auto">
-            <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" class="btn-telegram w-full py-4 rounded-xl flex items-center justify-center gap-3 text-white font-bold text-lg tracking-wide group">
-                <i class="fab fa-telegram-plane text-2xl group-hover:rotate-12 transition-transform"></i>
+    <footer class="glass-panel p-3 shrink-0">
+        <div class="max-w-2xl mx-auto flex flex-col items-center gap-3">
+            <a href="#" id="footer-telegram" target="_blank" class="btn-modern btn-telegram w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white shadow-lg">
+                <i class="fab fa-telegram-plane text-xl"></i>
                 <span>Join Official Telegram Channel</span>
             </a>
-            <p class="text-center text-xs text-slate-500 mt-3">
-                Join for HD Links, Highlights & Live Updates. 100% Free.
+            <p class="text-[10px] text-slate-500 text-center">
+                Press <span class="text-slate-300">CTRL + /</span> to view shortcuts. Stream issues? Check Telegram.
             </p>
         </div>
     </footer>
 
-    <!-- Premium Popup -->
-    <div id="telegram-popup" class="popup-overlay">
-        <div class="popup-card relative overflow-hidden">
-            <!-- Decorative Glow -->
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-sky-500"></div>
-            
-            <button id="popup-close" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-
-            <div class="mb-6 mt-2">
-                <div class="w-20 h-20 bg-sky-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-                    <i class="fab fa-telegram text-5xl text-sky-400"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-white mb-2">Don't Miss the Action!</h2>
-                <p class="text-slate-300 text-sm leading-relaxed">
-                    Get instant access to backup links, live scores, and exclusive HD streams.
-                </p>
+    <!-- Telegram Popup -->
+    <div id="popup" class="popup-backdrop fixed inset-0 z-[100] flex items-center justify-center opacity-0 invisible">
+        <div class="popup-content w-[90%] max-w-sm rounded-2xl p-6 text-center">
+            <div class="w-16 h-16 bg-sky-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-sky-400 text-3xl">
+                <i class="fab fa-telegram"></i>
             </div>
-
-            <div class="space-y-3">
-                <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" id="popup-join-btn" class="block w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold shadow-lg shadow-sky-500/30 hover:shadow-sky-500/50 transition-all transform hover:scale-[1.02]">
-                    <i class="fas fa-paper-plane mr-2"></i> Join Channel Now
+            <h3 class="text-xl font-bold text-white mb-2">Don't Miss the Action!</h3>
+            <p class="text-slate-400 text-sm mb-6">Join our private channel for backup links, live scores, and ad-free streams.</p>
+            
+            <div class="flex flex-col gap-3">
+                <a href="#" id="popup-join-btn" target="_blank" class="btn-modern btn-telegram py-3 rounded-lg font-bold text-white">
+                    Join Channel Now
                 </a>
-                <button id="popup-dismiss-btn" class="block w-full py-3 rounded-xl border border-white/10 text-slate-400 text-sm hover:bg-white/5 transition-colors">
-                    Continue Watching
+                <button onclick="closePopup()" class="py-2.5 rounded-lg font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-sm">
+                    Maybe Later
                 </button>
             </div>
         </div>
@@ -290,170 +221,226 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    
     <script>
-        // --- Configuration ---
-        const DATA_URL = 'https://raw.githubusercontent.com/Jitendra-unatti/fancode/refs/heads/main/data/fancode.json';
-        const TELEGRAM_LINK = "https://t.me/+rwZKMV0-L8wyOTll";
-
-        // --- UI Elements ---
-        const playerElement = document.getElementById('player');
-        const loadingState = document.getElementById('loading-state');
-        const matchTitleElem = document.getElementById('match-title');
-        const langBadge = document.getElementById('language-badge');
-        const langText = document.getElementById('match-lang-text');
-        
-        // --- Helper Functions ---
-        const formatLang = (lang) => {
-            const map = { 
-                'HINDI': 'Hindi', 'ENGLISH': 'English', 'TAMIL': 'Tamil', 
-                'TELUGU': 'Telugu', 'KANNADA': 'Kannada', 'BLOODY_SWEET': 'Multi-Audio' 
-            };
-            return map[lang?.toUpperCase()] || lang || 'Unknown';
+        // --- ⚙️ CONFIGURATION (Advanced) ---
+        const CONFIG = {
+            TELEGRAM_URL: 'https://t.me/+rwZKMV0-L8wyOTll', // ✅ NEW LINK
+            DATA_URL: 'https://raw.githubusercontent.com/Jitendra-unatti/fancode/refs/heads/main/data/fancode.json',
+            POPUP_DELAY: 6000, // 6 Seconds
+            POPUP_STORAGE_KEY: 'fc_premium_popup_seen_v2'
         };
 
-        // --- Stream Logic ---
-        async function initPlayer() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get("id");
-            const cdn = urlParams.get("cdn");
+        // --- 🚀 INITIALIZATION ---
+        const els = {
+            player: document.getElementById('player'),
+            loading: document.getElementById('loading-overlay'),
+            title: document.getElementById('match-title'),
+            meta: document.getElementById('match-meta'),
+            lang: document.getElementById('match-lang'),
+            popup: document.getElementById('popup'),
+            footerLink: document.getElementById('footer-telegram'),
+            popupLink: document.getElementById('popup-join-btn')
+        };
 
-            if (!id || !cdn) {
-                showError("Invalid Match Link");
+        // Set Links Dynamically
+        els.footerLink.href = CONFIG.TELEGRAM_URL;
+        els.popupLink.href = CONFIG.TELEGRAM_URL;
+
+        // --- 📡 DATA FETCHING ---
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get("id");
+            const cdnKey = params.get("cdn"); // e.g., 'adfree_stream' or 'akamaized'
+
+            if (!id || !cdnKey) {
+                showFatalError("Invalid Link", "Please return to the menu and select a match.");
                 return;
             }
 
             try {
-                const response = await fetch(DATA_URL);
+                const response = await fetch(CONFIG.DATA_URL);
+                if (!response.ok) throw new Error("Network response was not ok");
                 const data = await response.json();
+                
                 const match = data.matches.find(m => String(m.match_id) === String(id));
+                if (!match) throw new Error("Match ID not found.");
 
-                if (!match) throw new Error("Match not found");
+                // Map Source logic
+                let streamUrl = "";
+                const sources = {
+                    ...match.STREAMING_CDN,
+                    adfree_stream: match.adfree_stream,
+                    dai_stream: match.dai_stream
+                };
+                delete sources.Primary_Playback_URL; // Remove if generic
 
-                // Update UI
-                matchTitleElem.textContent = match.title;
-                document.title = match.title + " | Live Stream";
-                if(match.language){
-                    langText.textContent = formatLang(match.language);
-                    langBadge.classList.remove('hidden');
-                    langBadge.classList.add('flex');
+                if (sources[cdnKey] && sources[cdnKey] !== "Unavailable") {
+                    streamUrl = sources[cdnKey];
+                } else {
+                    throw new Error("Selected stream quality is unavailable.");
                 }
 
-                // Get URL
-                let streamUrl = "";
-                if (cdn === "adfree_stream") streamUrl = match.adfree_stream;
-                else if (cdn === "dai_stream") streamUrl = match.dai_stream;
-                else streamUrl = match.STREAMING_CDN[cdn]; // e.g., akamai, l3
-
-                if (!streamUrl || streamUrl === "Unavailable") throw new Error("Stream Offline");
-
-                loadVideo(streamUrl);
+                setupUI(match);
+                loadPlayer(streamUrl);
 
             } catch (error) {
                 console.error(error);
-                showError("Stream Unavailable or Offline");
+                showFatalError("Stream Offline", "This match stream is currently unavailable.");
             }
         }
 
-        function loadVideo(source) {
+        // --- 🎨 UI UPDATES ---
+        function setupUI(match) {
+            els.title.textContent = match.title || "Live Stream";
+            document.title = `▶ ${match.title} | FanCode`;
+            
+            if (match.language) {
+                els.meta.classList.remove('hidden');
+                els.lang.textContent = match.language.replace('_', ' ').toUpperCase();
+            }
+        }
+
+        // --- 📺 PLAYER LOGIC (Advanced HLS) ---
+        function loadPlayer(source) {
             const defaultOptions = {
-                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'pip', 'airplay', 'fullscreen'],
-                autoplay: true,
+                controls: ['play-large', 'play', 'rewind', 'fast-forward', 'progress', 'current-time', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
+                keyboard: { focused: true, global: true },
+                settings: ['quality', 'speed'],
                 tooltips: { controls: true, seek: true }
             };
 
-            if (Hls.isSupported() && source.includes('.m3u8')) {
-                const hls = new Hls();
-                hls.loadSource(source);
-                hls.attachMedia(playerElement);
-                
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    const availableQualities = hls.levels.map((l) => l.height);
-                    const uniqueQualities = [...new Set(availableQualities)].sort((a, b) => b - a);
-                    
-                    defaultOptions.quality = {
-                        default: uniqueQualities[0],
-                        options: uniqueQualities,
-                        forced: true,
-                        onChange: (e) => hls.currentLevel = hls.levels.findIndex(l => l.height === e)
-                    };
-                    
-                    const player = new Plyr(playerElement, defaultOptions);
-                    loadingState.style.display = 'none';
-                    player.play().catch(() => player.muted = true); // Autoplay fallback
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    manifestLoadingTimeOut: 10000,
+                    levelLoadingTimeOut: 10000,
+                    fragLoadingTimeOut: 10000,
+                    enableWorker: true
                 });
-            } else {
-                playerElement.src = source;
-                const player = new Plyr(playerElement, defaultOptions);
-                loadingState.style.display = 'none';
+
+                hls.loadSource(source);
+                hls.attachMedia(els.player);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+                    els.loading.classList.add('opacity-0', 'pointer-events-none'); // Fade out loader
+                    
+                    // Sort Qualities (Highest First)
+                    const availableQualities = hls.levels.map((l) => l.height);
+                    
+                    const player = new Plyr(els.player, {
+                        ...defaultOptions,
+                        quality: {
+                            default: availableQualities[availableQualities.length - 1], // Highest
+                            options: availableQualities,
+                            forced: true,
+                            onChange: (newQuality) => {
+                                hls.levels.forEach((level, levelIndex) => {
+                                    if (level.height === newQuality) hls.currentLevel = levelIndex;
+                                });
+                            },
+                        }
+                    });
+
+                    // Auto Play with Mute fallback
+                    const playPromise = player.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(() => {
+                            player.muted = true;
+                            player.play();
+                            alertify("Autoplay blocked. Playing muted.");
+                        });
+                    }
+                });
+
+                // Pro Error Recovery
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.fatal) {
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                console.log('Network error, recovering...');
+                                hls.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                console.log('Media error, recovering...');
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                hls.destroy();
+                                showFatalError("Playback Error", "Stream cannot be decoded.");
+                                break;
+                        }
+                    }
+                });
+
+            } else if (els.player.canPlayType('application/vnd.apple.mpegurl')) {
+                // Safari / iOS Fallback
+                els.player.src = source;
+                els.loading.classList.add('hidden');
+                const player = new Plyr(els.player, defaultOptions);
                 player.play();
             }
         }
 
-        function showError(msg) {
-            loadingState.innerHTML = `
-                <div class="text-center">
+        // --- 🛠 UTILITIES ---
+        function showFatalError(title, msg) {
+            els.loading.innerHTML = `
+                <div class="text-center p-6 bg-red-900/20 border border-red-500/50 rounded-xl">
                     <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-3"></i>
-                    <h3 class="text-xl font-bold text-white">${msg}</h3>
-                    <a href="index.html" class="mt-4 inline-block px-6 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition">Go Back</a>
+                    <h2 class="text-xl font-bold text-white mb-1">${title}</h2>
+                    <p class="text-red-200 text-sm">${msg}</p>
+                    <a href="fancode.html" class="mt-4 inline-block bg-red-600 px-4 py-2 rounded text-sm font-bold hover:bg-red-500 transition">Go Back</a>
                 </div>
             `;
         }
 
-        // --- Features: Popup, Theater, Share ---
-        
+        function toggleTheater() {
+            document.body.classList.toggle('theater-mode');
+        }
+
         // Popup Logic
-        const popup = document.getElementById('telegram-popup');
-        const POPUP_KEY = 'fc_premium_popup_seen';
-
-        function showPopup() {
-            if(!sessionStorage.getItem(POPUP_KEY)) {
-                setTimeout(() => popup.classList.add('active'), 8000); // Show after 8s
+        setTimeout(() => {
+            if (!localStorage.getItem(CONFIG.POPUP_STORAGE_KEY)) {
+                els.popup.classList.remove('invisible');
+                els.popup.classList.add('active');
             }
+        }, CONFIG.POPUP_DELAY);
+
+        function closePopup() {
+            els.popup.classList.remove('active');
+            setTimeout(() => els.popup.classList.add('invisible'), 300);
+            localStorage.setItem(CONFIG.POPUP_STORAGE_KEY, 'true');
         }
 
-        function closePopup(permanent = false) {
-            popup.classList.remove('active');
-            if(permanent) sessionStorage.setItem(POPUP_KEY, 'true');
-        }
-
-        document.getElementById('popup-close').onclick = () => closePopup(true);
-        document.getElementById('popup-dismiss-btn').onclick = () => closePopup(true);
-        document.getElementById('popup-join-btn').onclick = () => {
-            closePopup(true);
-            // Link is already in href
-        };
-
-        // Theater Mode
-        const theaterBtn = document.getElementById('btn-theater');
-        theaterBtn.addEventListener('click', () => {
-            document.body.classList.toggle('theater');
-            const icon = theaterBtn.querySelector('i');
-            icon.classList.toggle('fa-expand');
-            icon.classList.toggle('fa-compress');
-        });
-
-        // Share Function
-        document.getElementById('btn-share').addEventListener('click', async () => {
-            const shareData = {
-                title: document.title,
-                text: 'Watch this match live for free!',
-                url: window.location.href
-            };
-            try {
-                await navigator.share(shareData);
-            } catch {
+        // Share Button Logic
+        document.getElementById('share-btn').addEventListener('click', async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: document.title,
+                        url: window.location.href
+                    });
+                } catch (err) { console.log('Share canceled'); }
+            } else {
                 navigator.clipboard.writeText(window.location.href);
-                const originalText = document.querySelector('.btn-text-hide').textContent;
-                document.querySelector('.btn-text-hide').textContent = 'Copied!';
-                setTimeout(() => document.querySelector('.btn-text-hide').textContent = originalText, 2000);
+                const btn = document.getElementById('share-btn');
+                const originalIcon = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check text-green-400"></i>';
+                setTimeout(() => btn.innerHTML = originalIcon, 2000);
             }
         });
 
-        // Init
-        document.addEventListener('DOMContentLoaded', () => {
-            initPlayer();
-            showPopup();
+        // Keyboard Shortcut Toggle (Ctrl + /)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === '/') {
+                const toast = document.getElementById('shortcuts-toast');
+                toast.classList.remove('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.classList.add('translate-x-full', 'opacity-0'), 5000);
+            }
         });
+
+        // Start
+        document.addEventListener('DOMContentLoaded', init);
+
     </script>
 </body>
 </html>
