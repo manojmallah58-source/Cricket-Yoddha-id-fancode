@@ -1,513 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Cricket Yoddha | Premium Live</title>
-    <link rel="icon" href="https://fancode.com/favicon.ico" type="image/x-icon">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRICKET YODDHA</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #070b14;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: white;
+      padding: 2rem 1.5rem 4rem;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
     
-    <style>
-        :root {
-            --bg-dark: #050505;
-            --card-surface: #121212;
-            --brand-red: #ff3b3b;
-            --brand-gold: #fbbf24;
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-bg: rgba(20, 20, 20, 0.7);
-        }
+    .sleek-card {
+      background: rgba(12, 20, 35, 0.75);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(59, 130, 246, 0.18);
+      border-radius: 2.8rem;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      box-shadow: 0 25px 40px -18px #000000, 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+      display: flex;
+      flex-direction: column;
+    }
+    .sleek-card:hover {
+      transform: translateY(-10px) scale(1.01);
+      border-color: #3b82f6;
+      box-shadow: 0 35px 55px -18px #2563eb, 0 0 0 1.5px #3b82f6 inset;
+    }
 
-        body {
-            background-color: var(--bg-dark);
-            font-family: 'Inter', sans-serif;
-            color: #ffffff;
-            /* Subtle Mesh Gradient Background */
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(255, 59, 59, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(251, 191, 36, 0.1) 0px, transparent 50%);
-            background-attachment: fixed;
-            min-height: 100vh;
-        }
+    .sleek-image {
+      position: relative;
+      height: 220px;
+      background: #0c1422;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    .sleek-image img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center 15%;
+      transition: transform 0.7s ease, filter 0.5s ease;
+      filter: brightness(0.95) contrast(1.05);
+    }
+    .sleek-card:hover .sleek-image img {
+      transform: scale(1.07); filter: brightness(1.05) contrast(1.1);
+    }
 
-        /* --- Typography --- */
-        .font-sports {
-            font-family: 'Teko', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    .live-glow {
+      position: absolute; top: 18px; left: 18px;
+      background: #dc2626; color: white; font-size: 0.7rem; font-weight: 800;
+      padding: 0.4rem 1.2rem; border-radius: 40px; letter-spacing: 0.7px;
+      box-shadow: 0 0 20px #dc2626, 0 0 40px #dc2626aa;
+      border: 1px solid #ffb3b3; backdrop-filter: blur(4px); z-index: 10;
+      text-transform: uppercase;
+    }
 
-        /* --- Header & Nav --- */
-        .glass-nav {
-            background: rgba(5, 5, 5, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
-        }
+    .flag-strip { display: flex; align-items: center; gap: 0.75rem; margin: 0.8rem 0 0.7rem; flex-wrap: wrap; }
+    .flag-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0.3rem 1rem 0.3rem 0.6rem; border-radius: 40px;
+      backdrop-filter: blur(4px); transition: 0.2s;
+    }
+    .flag-pill:hover { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; }
+    .flag-pill img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1.5px solid #3b82f6; background: #1e2a4a; }
+    .flag-pill span { font-weight: 600; font-size: 0.8rem; color: #e2e8f0; letter-spacing: 0.2px; }
 
-        /* --- Match Cards (Advanced) --- */
-        .match-card {
-            background: var(--card-surface);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-        }
+    .score-sleek {
+      background: linear-gradient(145deg, #1e2d4a, #132036);
+      border-radius: 30px; padding: 0.5rem 1.2rem; font-size: 0.9rem; font-weight: 700;
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid #3b82f6; color: white; margin: 0.5rem 0 0.9rem;
+      box-shadow: 0 6px 12px -6px #0a0f1c;
+    }
 
-        .match-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 59, 59, 0.4);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 59, 59, 0.1);
-        }
+    .watch-sleek {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border: none; border-radius: 24px; padding: 1rem 1.2rem;
+      font-weight: 700; font-size: 1rem; text-align: center;
+      margin-top: auto; cursor: pointer; transition: all 0.25s;
+      box-shadow: 0 15px 20px -12px #1e3a8a; border: 1px solid #60a5fa60;
+      letter-spacing: 0.5px; backdrop-filter: blur(5px); color: white;
+    }
+    .watch-sleek i { margin-right: 8px; }
+    .watch-sleek.not-live {
+      background: #1e293b; box-shadow: none; color: #7789aa;
+      border-color: #334155; cursor: not-allowed; pointer-events: none; opacity: 0.7;
+    }
 
-        .card-image-wrapper {
-            position: relative;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
-            overflow: hidden;
-        }
+    .tourney-sleek { color: #98a9c9; font-weight: 600; font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+    .title-sleek {
+      font-size: 1.4rem; font-weight: 800; line-height: 1.25; margin: 0.2rem 0 0.1rem;
+      letter-spacing: -0.3px; background: linear-gradient(to right, #fff, #d9e6ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .meta-light { display: flex; gap: 1rem; font-size: 0.7rem; color: #6f7d9c; font-weight: 500; margin: 0.3rem 0 1rem; }
 
-        .card-image-wrapper img {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(2, 6, 18, 0.9);
+      backdrop-filter: blur(18px); z-index: 1000; align-items: center; justify-content: center;
+    }
+    .modal-sleek {
+      background: rgba(12, 22, 40, 0.95); border: 1px solid #3b82f6; border-radius: 3rem;
+      padding: 2.2rem 2rem; width: 90%; max-width: 380px; text-align: center;
+      box-shadow: 0 40px 80px -12px #000000, 0 0 0 1px #3b82f6 inset;
+    }
+    .quality-sleek-btn {
+      background: #1a2742; border: 1px solid #314e7c; width: 100%; padding: 1.1rem 1.8rem;
+      margin-bottom: 14px; border-radius: 50px; font-weight: 700; display: flex;
+      justify-content: space-between; align-items: center; color: white; transition: 0.2s; cursor: pointer;
+    }
+    .quality-sleek-btn:hover { background: #253b62; border-color: #3b82f6; transform: scale(1.02); box-shadow: 0 8px 14px -8px #0a1a31; }
+    .close-sleek { color: #fca5a5; font-weight: 700; cursor: pointer; margin-top: 1.2rem; display: inline-block; border-bottom: 2px dotted #f87171; font-size: 0.9rem; }
+    .grid-sleek { gap: 2rem; }
 
-        .match-card:hover .card-image-wrapper img {
-            transform: scale(1.05);
-        }
-
-        .live-badge {
-            background: linear-gradient(90deg, #dc2626, #ef4444);
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
-            animation: pulse-red 2s infinite;
-        }
-
-        /* --- Spotlight Section --- */
-        .hero-spotlight {
-            position: relative;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--glass-border);
-            background: #000;
-        }
-
-        .hero-overlay {
-            background: linear-gradient(0deg, #050505 0%, rgba(5,5,5,0.8) 40%, transparent 100%);
-        }
-
-        /* --- Buttons --- */
-        .btn-play {
-            background: #fff;
-            color: #000;
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-        .btn-play:hover {
-            background: var(--brand-red);
-            color: #fff;
-            box-shadow: 0 0 15px rgba(255, 59, 59, 0.4);
-        }
-
-        .tag {
-            font-size: 10px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #aaa;
-        }
-
-        /* --- Animations --- */
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        .skeleton {
-            background: linear-gradient(90deg, #1f1f1f 25%, #2a2a2a 50%, #1f1f1f 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-
-        /* --- Custom Scrollbar --- */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--brand-red); }
-
-        /* --- Telegram Popup --- */
-        .modal-overlay {
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
-        
-        .modal-card {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            transform: scale(0.95) translateY(10px);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .modal-overlay.active .modal-card { transform: scale(1) translateY(0); }
-
-    </style>
+    .telegram-float {
+      position: fixed;
+      bottom: 30px;
+      right: 20px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: #0088cc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: white;
+      z-index: 99999;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .telegram-float:hover { transform: scale(1.1); }
+  </style>
 </head>
-<body class="antialiased selection:bg-red-500 selection:text-white">
+<body>
 
-    <!-- Header -->
-    <header class="glass-nav sticky top-0 z-40 py-3 px-4 md:px-8">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-red-600 to-red-800 rounded-lg flex items-center justify-center shadow-lg shadow-red-500/20">
-                    <i class="fas fa-shield-halved text-white text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="font-sports text-2xl md:text-3xl leading-none text-white tracking-wide">
-                        Cricket <span class="text-red-500">Yoddha</span>
-                    </h1>
-                    <p class="text-[10px] text-gray-400 font-medium tracking-wider uppercase hidden sm:block">Official Streaming Partner</p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" class="hidden md:flex items-center gap-2 bg-[#229ED9]/10 text-[#229ED9] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#229ED9] hover:text-white transition-all">
-                    <i class="fab fa-telegram-plane"></i> Join Telegram
-                </a>
-                <div class="relative">
-                    <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse absolute top-0 right-0 border-2 border-[#050505]"></div>
-                    <button class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-white transition">
-                        <i class="fas fa-bell"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-6">
-        
-        <!-- Search & Filter Bar (Floating) -->
-        <div class="mb-8 sticky top-20 z-30">
-            <div class="bg-[#121212]/90 backdrop-blur-md border border-white/10 rounded-xl p-2 shadow-2xl flex flex-col md:flex-row gap-2">
-                <div class="relative flex-1">
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                    <input type="text" id="search-input" placeholder="Search matches, series or teams..." 
-                           class="w-full bg-black/20 text-white pl-10 pr-4 py-2.5 rounded-lg border border-transparent focus:border-red-500/50 focus:bg-black/40 outline-none transition-all placeholder-gray-600">
-                </div>
-                <div class="flex gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide px-1">
-                    <button class="filter-btn active px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide bg-white text-black whitespace-nowrap" data-filter="all">All</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide bg-white/5 text-gray-400 hover:text-white whitespace-nowrap" data-filter="live">Live</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide bg-white/5 text-gray-400 hover:text-white whitespace-nowrap" data-filter="upcoming">Upcoming</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Spotlight Section -->
-        <div id="spotlight-container" class="mb-10"></div>
-
-        <!-- Section Title -->
-        <div class="flex items-end justify-between mb-6 border-b border-white/5 pb-2">
-            <div>
-                <h2 class="font-sports text-2xl text-white">Live & Upcoming</h2>
-                <div class="h-1 w-12 bg-red-500 rounded-full mt-1"></div>
-            </div>
-            <div class="text-xs text-gray-500 font-mono" id="last-updated">
-                Updating...
-            </div>
-        </div>
-
-        <!-- Matches Grid -->
-        <div id="matches-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Loading Skeletons -->
-            <div class="aspect-video skeleton rounded-xl"></div>
-            <div class="aspect-video skeleton rounded-xl hidden md:block"></div>
-            <div class="aspect-video skeleton rounded-xl hidden lg:block"></div>
-            <div class="aspect-video skeleton rounded-xl hidden xl:block"></div>
-        </div>
-
-        <!-- Empty State -->
-        <div id="no-results" class="hidden py-20 text-center">
-            <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-search text-2xl text-gray-600"></i>
-            </div>
-            <h3 class="text-xl font-bold text-gray-300 mb-2">No Matches Found</h3>
-            <p class="text-gray-500 text-sm">Try adjusting your search filters.</p>
-        </div>
-
-    </main>
-
-    <!-- Professional Footer -->
-    <footer class="border-t border-white/5 bg-[#080808] py-8 mt-12">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="font-sports text-xl text-white mb-2">Cricket <span class="text-red-600">Yoddha</span></p>
-            <p class="text-gray-600 text-xs">© 2026 Cricket Yoddha. All rights reserved. Streaming content provided by FanCode API.</p>
-        </div>
-    </footer>
-
-    <!-- Telegram Modal -->
-    <div id="telegram-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="modal-card w-full max-w-md rounded-2xl relative overflow-hidden">
-            <!-- Decorative Header -->
-            <div class="h-24 bg-gradient-to-r from-blue-600 to-blue-400 flex items-center justify-center">
-                <i class="fab fa-telegram-plane text-5xl text-white drop-shadow-md transform -rotate-12"></i>
-            </div>
-            
-            <div class="p-8 text-center bg-[#181818]">
-                <h3 class="font-sports text-3xl text-white mb-2">Don't Miss a Ball!</h3>
-                <p class="text-gray-400 text-sm mb-8 leading-relaxed">
-                    Join the <b>Cricket Yoddha</b> official channel for instant match links, prediction updates, and breaking news.
-                </p>
-                
-                <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" id="join-btn" class="block w-full bg-blue-500 hover:bg-blue-400 text-white font-bold py-3.5 rounded-xl transition-all transform hover:scale-[1.02] shadow-lg shadow-blue-500/25 mb-4">
-                    JOIN CHANNEL NOW
-                </a>
-                
-                <button id="close-modal-btn" class="text-gray-500 text-xs hover:text-white transition-colors uppercase tracking-widest font-bold">
-                    Maybe Later
-                </button>
-            </div>
-        </div>
+  <div class="text-center mb-14 mt-2">
+    <div class="inline-flex items-center gap-4 bg-[#0f1a2b] py-4 px-10 rounded-full border border-blue-700/40 shadow-2xl backdrop-blur-xl">
+      <i class="fas fa-bolt text-yellow-400 text-xl"></i>
+      <span class="text-3xl font-black tracking-wider bg-gradient-to-r from-white via-blue-200 to-blue-400 bg-clip-text text-transparent">CRICKET YODDHA</span>
     </div>
+  </div>
 
-    <script>
-        // --- Configuration ---
-        const DATA_URL = 'https://raw.githubusercontent.com/Jitendra-unatti/fancode/refs/heads/main/data/fancode.json';
-        const PLAY_BASE = 'fc/player.html';
-        
-        // --- DOM Elements ---
-        const gridContainer = document.getElementById('matches-grid');
-        const spotlightContainer = document.getElementById('spotlight-container');
-        const searchInput = document.getElementById('search-input');
-        const filterBtns = document.querySelectorAll('.filter-btn');
+  <div id="matches-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 
-        // --- State ---
-        let allMatches = [];
-        let currentFilter = 'all';
+  <div id="quality-modal" class="modal-overlay">
+    <div class="modal-sleek">
+      <h3 class="text-2xl font-bold mb-7 text-white">Select Quality</h3>
+      <div id="quality-list" class="mb-4"></div>
+      <div class="close-sleek" onclick="closeModal()">✕ Close</div>
+    </div>
+  </div>
 
-        // --- Helpers ---
-        const formatTime = (timeStr) => {
-            if(!timeStr) return '';
-            const date = new Date(timeStr);
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        };
+  <script>
+    const DATA_URL = "https://fancod.akcoder777.workers.dev/";
+    const PLAYER_URL = "player.html?url=";
 
-        const getStatusColor = (status) => {
-            return status === 'LIVE' ? 'text-red-500' : 'text-blue-400';
-        };
+    const container = document.getElementById('matches-container');
+    let allMatches = [];
 
-        // --- Core Functions ---
-        async function fetchData() {
-            try {
-                const res = await fetch(DATA_URL);
-                const data = await res.json();
-                let matches = Array.isArray(data.matches) ? data.matches : [];
-                
-                // Sort: LIVE first
-                matches.sort((a, b) => {
-                    const isALive = a.status?.toUpperCase() === 'LIVE';
-                    const isBLive = b.status?.toUpperCase() === 'LIVE';
-                    return isBLive - isALive;
-                });
+    function getUpparImage(match) {
+      if (match.image_cdn) {
+        return match.image_cdn.BG_IMAGE || match.image_cdn.CLOUDFARE || match.image_cdn.TATAPLAY || match.image_cdn.APP || match.image;
+      }
+      return match.image || 'https://via.placeholder.com/800x450/0c1422/3b82f6?text=No+Image';
+    }
 
-                allMatches = matches;
-                renderApp();
-                document.getElementById('last-updated').innerText = `Updated: ${new Date().toLocaleTimeString()}`;
-            } catch (e) {
-                console.error("Data Load Error", e);
-            }
+    function getScore(team) {
+      if (team?.cricketScore?.length) {
+        const s = team.cricketScore[0];
+        if (s.runs !== undefined && s.wickets !== undefined) {
+          return `${s.runs}/${s.wickets} ${s.overs ? '('+s.overs+')' : ''}`;
+        }
+      }
+      return null;
+    }
+
+    function renderMatches(matches) {
+      container.innerHTML = '';
+      matches.forEach((match, idx) => {
+        const isLive = match.status === 'LIVE';
+        const imageSrc = getUpparImage(match);
+        const t1 = match.team?.[0];
+        const t2 = match.team?.[1];
+        const category = match.category || 'Cricket';
+        const lang = match.language ? match.language.charAt(0) + match.language.slice(1).toLowerCase() : '';
+
+        let t1Score = (isLive && category === 'Cricket' && t1) ? getScore(t1) : null;
+        let t2Score = (isLive && category === 'Cricket' && t2) ? getScore(t2) : null;
+
+        let flagHtml = '';
+        if (t1 && t2) {
+          flagHtml = `
+            <div class="flag-strip">
+              <div class="flag-pill">
+                <img src="${t1.flag?.src || ''}" onerror="this.src='https://via.placeholder.com/24/1e2a4a/fff'">
+                <span>${t1.shortName || 'T1'}</span>
+              </div>
+              <div class="flag-pill">
+                <img src="${t2.flag?.src || ''}" onerror="this.src='https://via.placeholder.com/24/1e2a4a/fff'">
+                <span>${t2.shortName || 'T2'}</span>
+              </div>
+              ${lang ? `<span class="ml-auto text-[0.65rem] font-bold bg-blue-900/70 px-4 py-1.5 rounded-full border border-blue-600/60">${lang}</span>` : ''}
+            </div>
+          `;
+        } else {
+          flagHtml = `<div class="h-6"></div>`;
         }
 
-        function renderApp() {
-            // 1. Render Spotlight (First Live Match)
-            const liveMatch = allMatches.find(m => m.status?.toUpperCase() === 'LIVE');
-            
-            if (liveMatch) {
-                renderSpotlight(liveMatch);
-            } else {
-                spotlightContainer.innerHTML = ''; // Hide if no live match
-            }
+        const scoreHtml = (t1Score || t2Score) ? `
+          <div class="score-sleek">
+            <i class="fas fa-bolt text-yellow-400 text-xs"></i>
+            <span>${t1Score || '0/0'} · ${t2Score || '0/0'}</span>
+          </div>
+        ` : '';
 
-            // 2. Render Grid
-            filterAndRenderGrid();
+        const watchAction = isLive ? `openQuality(${idx})` : '';
+        const watchBtnClass = isLive ? 'watch-sleek' : 'watch-sleek not-live';
+        const watchIcon = isLive ? '<i class="fas fa-play-circle"></i> WATCH LIVE' : '<i class="fas fa-hourglass-half"></i> UPCOMING';
+
+        const card = document.createElement('div');
+        card.className = 'sleek-card';
+        card.innerHTML = `
+          <div class="sleek-image">
+            <img src="${imageSrc}" alt="match cover" loading="lazy">
+            ${isLive ? '<span class="live-glow"><i class="fas fa-circle text-[0.5rem] mr-1 align-middle"></i> LIVE</span>' : ''}
+          </div>
+          <div class="p-6 flex flex-col flex-grow">
+            <div class="tourney-sleek">
+              <i class="fas fa-medal text-blue-400"></i> ${match.tournament || 'INTERNATIONAL'}
+            </div>
+            <h3 class="title-sleek">${match.title || 'Match'}</h3>
+            ${flagHtml}
+            ${scoreHtml}
+            <div class="meta-light">
+              <span><i class="far fa-calendar-alt mr-1"></i>${match.startTime || 'TBD'}</span>
+              <span><i class="far fa-clock mr-1"></i>${category}</span>
+            </div>
+            <div onclick="${watchAction}" class="${watchBtnClass}">${watchIcon}</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openQuality(index) {
+      const match = allMatches[index];
+      const streamData = match.auto_streams?.[0]?.auto || '';
+      const list = document.getElementById('quality-list');
+      list.innerHTML = '';
+
+      if (!streamData) {
+        alert('Stream not available');
+        return;
+      }
+
+      const lines = streamData.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes('RESOLUTION=')) {
+          const matchRes = lines[i].match(/RESOLUTION=\d+x(\d+)/);
+          if (!matchRes) continue;
+          const resText = matchRes[1] + 'p';
+          const streamLine = lines[i + 1]?.trim();
+          if (streamLine && (streamLine.startsWith('http') || streamLine.startsWith('/'))) {
+            const btn = document.createElement('div');
+            btn.className = 'quality-sleek-btn';
+            btn.innerHTML = `<span>${resText}</span><i class="fas fa-chevron-right text-blue-400"></i>`;
+            btn.onclick = () => {
+              window.location.href = PLAYER_URL + encodeURIComponent(streamLine);
+            };
+            list.appendChild(btn);
+          }
         }
+      }
 
-        function renderSpotlight(match) {
-            const imgSrc = match.image || 'https://fancode.com/skillup-uploads/cms-media/Cricket_Fallback_Old_match-card.jpg';
-            const buttons = generateButtons(match, 'bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition shadow-lg shadow-red-600/20');
-            
-            spotlightContainer.innerHTML = `
-                <div class="hero-spotlight aspect-[16/9] md:aspect-[21/9] flex items-end">
-                    <img src="${imgSrc}" class="absolute inset-0 w-full h-full object-cover opacity-80" alt="Spotlight">
-                    <div class="hero-overlay absolute inset-0"></div>
-                    
-                    <div class="relative z-10 p-6 md:p-10 w-full">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-full animate-pulse">LIVE NOW</span>
-                            <span class="text-gold-400 font-sports text-xl text-[#fbbf24]">${match.tournament}</span>
-                        </div>
-                        <h1 class="font-sports text-4xl md:text-6xl text-white mb-4 leading-none drop-shadow-lg">${match.title}</h1>
-                        <div class="flex flex-wrap gap-4 items-center text-sm text-gray-300 mb-6">
-                            <span><i class="fas fa-language text-gray-500 mr-2"></i>${match.language || 'English'}</span>
-                            <span class="w-1 h-1 bg-gray-500 rounded-full"></span>
-                            <span>${match.matchType || 'T20'}</span>
-                        </div>
-                        <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                            ${buttons}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+      if (list.children.length === 0) {
+        list.innerHTML = '<div class="text-gray-400 py-5">No alternate qualities available</div>';
+      }
 
-        function createCard(match) {
-            const isLive = match.status?.toUpperCase() === 'LIVE';
-            const imgSrc = match.image || 'https://fancode.com/skillup-uploads/cms-media/Cricket_Fallback_Old_match-card.jpg';
-            const buttons = generateButtons(match, 'btn-play px-3 py-1.5 text-xs flex-1 text-center whitespace-nowrap border border-gray-200');
+      document.getElementById('quality-modal').style.display = 'flex';
+    }
 
-            // Score Logic
-            let scoreHTML = '';
-            if (isLive && match.teams) {
-                const t1 = match.teams[0];
-                const t2 = match.teams[1];
-                const s1 = t1?.cricketScore?.[0] ? `${t1.cricketScore[0].runs}/${t1.cricketScore[0].wickets}` : '';
-                const s2 = t2?.cricketScore?.[0] ? `${t2.cricketScore[0].runs}/${t2.cricketScore[0].wickets}` : '';
-                if(s1 || s2) {
-                    scoreHTML = `
-                        <div class="bg-black/40 rounded p-2 mb-3 border border-white/5">
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-gray-400">${t1?.shortName}</span>
-                                <span class="font-bold">${s1 || '-'}</span>
-                            </div>
-                            <div class="flex justify-between text-xs">
-                                <span class="text-gray-400">${t2?.shortName}</span>
-                                <span class="font-bold">${s2 || '-'}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
+    window.closeModal = function() {
+      document.getElementById('quality-modal').style.display = 'none';
+    };
 
-            return `
-                <div class="match-card flex flex-col h-full group">
-                    <div class="card-image-wrapper">
-                        <img src="${imgSrc}" loading="lazy" alt="${match.title}">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent"></div>
-                        ${isLive ? '<div class="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold text-white live-badge">LIVE</div>' : ''}
-                    </div>
-                    
-                    <div class="p-4 flex flex-col flex-1">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="tag border border-white/10 text-xs">${match.tournament || 'Match'}</span>
-                            ${!isLive ? `<span class="text-[10px] text-gray-400 flex items-center gap-1"><i class="far fa-clock"></i> ${formatTime(match.startTime)}</span>` : ''}
-                        </div>
-                        
-                        <h3 class="text-sm font-semibold text-gray-100 mb-3 line-clamp-2 leading-snug group-hover:text-red-500 transition-colors">${match.title}</h3>
-                        
-                        ${scoreHTML}
-                        
-                        <div class="mt-auto pt-3 border-t border-white/5 flex gap-2 overflow-x-auto scrollbar-hide">
-                            ${buttons || '<span class="text-xs text-gray-600 italic py-1">Links available soon</span>'}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+    fetch(DATA_URL)
+      .then(res => res.json())
+      .then(data => {
+        allMatches = data.matches || data || [];
+        renderMatches(allMatches);
+      })
+      .catch(() => {
+        container.innerHTML = '<div class="col-span-full text-center text-gray-600 text-xl">Failed to load matches</div>';
+      });
 
-        function generateButtons(match, cssClass) {
-            const streams = { ...match.STREAMING_CDN, adfree: match.adfree_stream, dai: match.dai_stream };
-            let html = '';
-            const id = encodeURIComponent(String(match.match_id ?? ''));
+    window.onclick = function(e) {
+      const modal = document.getElementById('quality-modal');
+      if (e.target === modal) closeModal();
+    };
+  </script>
 
-            for (const [key, value] of Object.entries(streams)) {
-                if (value && value !== "Unavailable" && !['language', 'Primary_Playback_URL'].includes(key)) {
-                    let label = key.replace(/_/g, ' ').replace(/(stream|cdn)/gi, '').trim();
-                    if(key === 'adfree') label = 'Ad-Free';
-                    if(key === 'dai') label = 'HD 1';
-                    
-                    html += `<a href="${PLAY_BASE}?id=${id}&cdn=${encodeURIComponent(key)}" class="${cssClass}">
-                        <i class="fas fa-play text-[8px] mr-1"></i>${label}
-                    </a>`;
-                }
-            }
-            return html;
-        }
-
-        function filterAndRenderGrid() {
-            const term = searchInput.value.toLowerCase();
-            
-            const filtered = allMatches.filter(match => {
-                const textMatch = (match.title + match.tournament).toLowerCase().includes(term);
-                if (currentFilter === 'live') return textMatch && match.status === 'LIVE';
-                if (currentFilter === 'upcoming') return textMatch && match.status !== 'LIVE';
-                return textMatch;
-            });
-
-            const grid = document.getElementById('matches-grid');
-            const noRes = document.getElementById('no-results');
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '';
-                noRes.classList.remove('hidden');
-            } else {
-                noRes.classList.add('hidden');
-                grid.innerHTML = filtered.map(createCard).join('');
-            }
-        }
-
-        // --- Event Listeners ---
-        searchInput.addEventListener('input', filterAndRenderGrid);
-        
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => {
-                    b.classList.remove('bg-white', 'text-black');
-                    b.classList.add('bg-white/5', 'text-gray-400');
-                });
-                btn.classList.remove('bg-white/5', 'text-gray-400');
-                btn.classList.add('bg-white', 'text-black');
-                
-                currentFilter = btn.dataset.filter;
-                filterAndRenderGrid();
-            });
-        });
-
-        // --- Init ---
-        fetchData();
-        setInterval(fetchData, 60000); // Auto Refresh
-
-        // --- Telegram Popup Logic ---
-        setTimeout(() => {
-            if (!localStorage.getItem('yoddhaJoined')) {
-                const modal = document.getElementById('telegram-modal');
-                modal.classList.add('active');
-                
-                document.getElementById('close-modal-btn').onclick = () => {
-                    modal.classList.remove('active');
-                    localStorage.setItem('yoddhaJoined', 'true');
-                };
-                
-                document.getElementById('join-btn').onclick = () => {
-                    setTimeout(() => modal.classList.remove('active'), 1000);
-                    localStorage.setItem('yoddhaJoined', 'true');
-                };
-            }
-        }, 3000);
-    </script>
+  <a href="https://t.me/+rwZKMV0-L8wyOTll" 
+     target="_blank"
+     class="telegram-float">
+    <i class="fab fa-telegram-plane"></i>
+  </a>
 </body>
 </html>
