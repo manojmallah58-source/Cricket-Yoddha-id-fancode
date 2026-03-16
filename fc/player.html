@@ -1,446 +1,653 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>FanCode Player | Live Premium</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="referrer" content="no-referrer" />
-    <meta name="theme-color" content="#0f172a">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="https://fancode.com/favicon.ico" type="image/x-icon">
-    
-    <!-- Libraries -->
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+    <title>SHAKA PLAYER</title>
 
-    <style>
-        :root {
-            --plyr-color-main: #38bdf8; /* Sky Blue */
-            --glass-bg: rgba(15, 23, 42, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
+  <meta name="referrer" content="no-referrer">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/shaka-player.ui.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/controls.min.css">
+  
+  <style type="text/css">
+      body {position:absolute;
+        margin: 0;
+        padding: 0px;
+        background-color: #000000;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        height:100%;width:100%
+      }
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: #020617;
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-            color: #e2e8f0;
-            height: 100dvh; /* Dynamic Viewport Height for mobile */
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+      .video-container {
+        position: absolute ;
+        width: 100%;height:100%;
+        aspect-ratio: 16/9;
+        background-color: #000;
+        border-radius: 1px;
+        overflow: hidden;
+        box-shadow: 0 4px 2px rgba(0,0,0,0.5);
+      }
 
-        /* Glassmorphism Headers/Footers */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--glass-border);
-            z-index: 40;
-        }
+      .shaka-video-container {
+        position: absolute ;
+        width: 100%;height:100%;
+      }
 
-        .player-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            background: #000;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
-        }
+      video {
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+      }
 
-        .plyr {
-            height: 100%;
-            width: 100%;
-            border-radius: 0;
+      .video-watermark {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        width: 80px;
+        height: 10px;
+        opacity: 0.7;
+        z-index: 1000;
+        pointer-events: none;
+      }
+
+      @media (max-width: 768px) {
+        body {width:100%;height:100%
+          padding: 1px;
         }
         
-        /* Modern Buttons */
-        .btn-modern {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+        .video-container {
+          max-width: 100%;height:100%
         }
         
-        .btn-modern:active { transform: scale(0.97); }
+        .video-watermark {
+          width: 30px;
+          height: 30px;
+          top: 10px;
+          left: 10px;
+        }
+      }
 
-        .btn-telegram {
-            background: linear-gradient(135deg, #229ED9 0%, #1c88bd 100%);
-            box-shadow: 0 4px 15px rgba(34, 158, 217, 0.4);
+      @media (min-width: 769px) and (max-width: 1024px) {
+        .video-container {
+          max-width: 854px;
         }
-        .btn-telegram:hover {
-            box-shadow: 0 6px 20px rgba(34, 158, 217, 0.6);
-            transform: translateY(-1px);
-        }
+      }
+  
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: #000;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
 
-        /* Loading Animation */
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #FFF;
-            border-bottom-color: #38bdf8;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    /* YouTube Theme CSS */
+    @font-face {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url(https://fonts.gstatic.com/s/roboto/v27/KFOmCnqEu92Fr1Me5Q.ttf) format('truetype');
+    }
+    @font-face {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url(https://fonts.gstatic.com/s/roboto/v27/KFOlCnqEu92Fr1MmEU9vAw.ttf) format('truetype');
+    }
+    .youtube-theme {
+      font-family: 'Roboto', sans-serif;
+    }
+    .youtube-theme .shaka-bottom-controls {
+      width: 100%;
+      padding: 0;
+      padding-bottom: 0;
+      z-index: 1;
+    }
+    .youtube-theme .shaka-bottom-controls {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+    }
+    .youtube-theme .shaka-ad-controls {
+      -webkit-box-ordinal-group: 2;
+          -ms-flex-order: 1;
+              order: 1;
+    }
+    .youtube-theme .shaka-controls-button-panel {
+      -webkit-box-ordinal-group: 3;
+          -ms-flex-order: 2;
+              order: 2;
+      height: 60px;
+      padding: 0 10px;
+    }
+    .youtube-theme .shaka-range-container {
+      margin: 4px 10px 4px 10px;
+      top: 0;
+    }
+    .youtube-theme .shaka-small-play-button {
+      -webkit-box-ordinal-group: -2;
+          -ms-flex-order: -3;
+              order: -3;
+    }
+    .youtube-theme .shaka-mute-button {
+      -webkit-box-ordinal-group: -1;
+          -ms-flex-order: -2;
+              order: -2;
+    }
+    .youtube-theme .shaka-controls-button-panel > * {
+      margin: 0;
+      padding: 3px 8px;
+      color: #EEE;
+      height: 60px;
+    }
+    .youtube-theme .shaka-controls-button-panel > *:focus {
+      outline: none;
+      -webkit-box-shadow: inset 0 0 0 2px rgba(27, 127, 204, 0.8);
+              box-shadow: inset 0 0 0 2px rgba(27, 127, 204, 0.8);
+      color: #FFF;
+    }
+    .youtube-theme .shaka-controls-button-panel > *:hover {
+      color: #FFF;
+    }
+    .youtube-theme .shaka-controls-button-panel .shaka-volume-bar-container {
+      position: relative;
+      z-index: 10;
+      left: -1px;
+      -webkit-box-ordinal-group: 0;
+          -ms-flex-order: -1;
+              order: -1;
+      opacity: 0;
+      width: 0px;
+      -webkit-transition: width 0.2s cubic-bezier(0.4, 0, 1, 1);
+      height: 3px;
+      transition: width 0.2s cubic-bezier(0.4, 0, 1, 1);
+      padding: 0;
+    }
+    .youtube-theme .shaka-controls-button-panel .shaka-volume-bar-container:hover,
+    .youtube-theme .shaka-controls-button-panel .shaka-volume-bar-container:focus {
+      display: block;
+      width: 50px;
+      opacity: 1;
+      padding: 0 6px;
+    }
+    .youtube-theme .shaka-mute-button:hover + div {
+      opacity: 1;
+      width: 50px;
+      padding: 0 6px;
+    }
+    .youtube-theme .shaka-current-time {
+      padding: 0 10px;
+      font-size: 12px;
+    }
+    .youtube-theme .shaka-seek-bar-container {
+      height: 3px;
+      position: relative;
+      top: -1px;
+      border-radius: 0;
+      margin-bottom: 0;
+    }
+    .youtube-theme .shaka-seek-bar-container .shaka-range-element {
+      opacity: 0;
+    }
+    .youtube-theme .shaka-seek-bar-container:hover {
+      height: 5px;
+      top: 0;
+      cursor: pointer;
+    }
+    .youtube-theme .shaka-seek-bar-container:hover .shaka-range-element {
+      opacity: 1;
+      cursor: pointer;
+    }
+    .youtube-theme .shaka-seek-bar-container input[type=range]::-webkit-slider-thumb {
+      background: #FF0000;
+      cursor: pointer;
+    }
+    .youtube-theme .shaka-seek-bar-container input[type=range]::-moz-range-thumb {
+      background: #FF0000;
+      cursor: pointer;
+    }
+    .youtube-theme .shaka-seek-bar-container input[type=range]::-ms-thumb {
+      background: #FF0000;
+      cursor: pointer;
+    }
+    .youtube-theme .shaka-video-container * {
+      font-family: 'Roboto', sans-serif;
+    }
+    .youtube-theme .shaka-video-container .material-icons-round {
+      font-family: 'Material Icons Sharp';
+    }
+    .youtube-theme .shaka-overflow-menu,
+    .youtube-theme .shaka-settings-menu {
+      border-radius: 2px;
+      background: rgba(28, 28, 28, 0.9);
+      text-shadow: 0 0 2px rgb(0 0 0%);
+      -webkit-transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
+      transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -webkit-user-select: none;
+      right: 10px;
+      bottom: 50px;
+      padding: 8px 0;
+      min-width: 200px;
+    }
+    .youtube-theme .shaka-settings-menu {
+      padding: 0 0 8px 0;
+    }
+    .youtube-theme .shaka-settings-menu button {
+      font-size: 12px;
+    }
+    .youtube-theme .shaka-settings-menu button span {
+      margin-left: 33px;
+      font-size: 13px;
+    }
+    .youtube-theme .shaka-settings-menu button[aria-selected="true"] {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+    }
+    .youtube-theme .shaka-settings-menu button[aria-selected="true"] span {
+      -webkit-box-ordinal-group: 3;
+          -ms-flex-order: 2;
+              order: 2;
+      margin-left: 0;
+    }
+    .youtube-theme .shaka-settings-menu button[aria-selected="true"] i {
+      -webkit-box-ordinal-group: 2;
+          -ms-flex-order: 1;
+              order: 1;
+      font-size: 18px;
+      padding-left: 5px;
+    }
+    .youtube-theme .shaka-overflow-menu button {
+      padding: 0;
+    }
+    .youtube-theme .shaka-overflow-menu button i {
+      display: none;
+    }
+    .youtube-theme .shaka-overflow-menu button .shaka-overflow-button-label {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-pack: justify;
+          -ms-flex-pack: justify;
+              justify-content: space-between;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: row;
+              flex-direction: row;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      cursor: default;
+      outline: none;
+      height: 60px;
+      -webkit-box-flex: 0;
+          -ms-flex: 0 0 100%;
+              flex: 0 0 100%;
+    }
+    .youtube-theme .shaka-overflow-menu button .shaka-overflow-button-label span {
+      -ms-flex-negative: initial;
+          flex-shrink: initial;
+      padding-left: 15px;
+      font-size: 13px;
+      font-weight: 500;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+    }
+    .youtube-theme .shaka-overflow-menu span + span {
+      color: #FFF;
+      font-weight: 400 !important;
+      font-size: 12px !important;
+      padding-right: 8px;
+      padding-left: 0 !important;
+    }
+    .youtube-theme .shaka-overflow-menu span + span:after {
+      content: "navigate_next";
+      font-family: 'Material Icons Sharp';
+      font-size: 20px;
+    }
+    .youtube-theme .shaka-overflow-menu .shaka-pip-button span + span {
+      padding-right: 15px !important;
+    }
+    .youtube-theme .shaka-overflow-menu .shaka-pip-button span + span:after {
+      content: "";
+    }
+    .youtube-theme .shaka-back-to-overflow-button {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 12px;
+      color: #eee;
+      height: 60px;
+    }
+    .youtube-theme .shaka-back-to-overflow-button .material-icons-round {
+      font-size: 15px;
+      padding-right: 10px;
+    }
+    .youtube-theme .shaka-back-to-overflow-button span {
+      margin-left: 3px !important;
+    }
+    .youtube-theme .shaka-overflow-menu button:hover,
+    .youtube-theme .shaka-settings-menu button:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+    }
+    .youtube-theme .shaka-overflow-menu button:hover label,
+    .youtube-theme .shaka-settings-menu button:hover label {
+      cursor: pointer;
+    }
+    .youtube-theme .shaka-overflow-menu button:focus,
+    .youtube-theme .shaka-settings-menu button:focus {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: none;
+      outline: none;
+    }
+    .youtube-theme .shaka-overflow-menu button,
+    .youtube-theme .shaka-settings-menu button {
+      color: #EEE;
+    }
+    .youtube-theme .shaka-captions-off {
+      color: #BFBFBF;
+    }
+    .youtube-theme .shaka-overflow-menu-button {
+      font-size: 18px;
+      margin-right: 5px;
+    }
+    .youtube-theme .shaka-fullscreen-button:hover {
+      font-size: 25px;
+      -webkit-transition: font-size 0.1s cubic-bezier(0, 0, 0.2, 1);
+      transition: font-size 0.1s cubic-bezier(0, 0, 0.2, 1);
+    }
 
-        /* Popup Styling */
-        .popup-backdrop {
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px);
-            transition: opacity 0.3s ease;
-        }
-        .popup-content {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transform: scale(0.95) translateY(10px);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .popup-backdrop.active .popup-content {
-            transform: scale(1) translateY(0);
-        }
+    /* Hide center loading spinner */
+    .shaka-spinner-container,
+    .shaka-spinner,
+    .shaka-spinner-svg {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+    }
 
-        /* Control Bar Tooltips */
-        .tooltip {
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        .group:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
+    /* Custom Seek Bar Colors */
+    .youtube-theme .shaka-seek-bar {
+      background: rgba(255,255,255,.2) !important;
+    }
+    
+    .youtube-theme .shaka-buffered-range {
+      background: rgba(255,255,255,.4) !important;
+    }
+    
+    .youtube-theme .shaka-played-range {
+      background: rgb(255,0,0) !important;
+    }
 
-        /* Theater Mode */
-        body.theater-mode .glass-panel { display: none !important; }
-        body.theater-mode .player-container { height: 100vh; }
-    </style>
+    /* Manual play button styles */
+    .manual-play-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px 30px;
+      border-radius: 28px;
+      cursor: pointer;
+      font-size: 18px;
+      z-index: 2000;
+      border: 0px solid #ff0000;
+      display: none;
+      transition: all 0.3s ease;
+    }
+    
+    .manual-play-button:hover {
+      background: rgba(255, 0, 0, 0.8);
+      transform: translate(-50%, -50%) scale(1.05);
+    }#myLogo {width:60px;height:40px;
+  position: absolute;
+  right: 5px;
+  top: 10px;
+             }
+.telegram-popup {
+    position: fixed; 
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 2.5rem 2rem;
+    border-radius: 20px;
+    z-index: 10000;
+    text-align: center;
+    width: 90%; 
+    max-width: 400px;
+    display: none;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popIn {
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.telegram-popup h2 { 
+    color: #1e293b; 
+    font-size: 1.5rem; 
+    margin-bottom: 0.5rem; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.telegram-popup .fa-telegram { 
+    color: #2AABEE; 
+}
+
+.telegram-popup p { 
+    color: #64748b; 
+    font-size: 0.95rem; 
+    margin-bottom: 1.5rem; 
+    line-height: 1.6;
+}
+
+.telegram-popup .popup-button {
+    width: 100%;
+    padding: 1rem;
+    margin-top: 0.75rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.2s;
+    border: none;
+}
+
+.telegram-popup .join-btn {
+    background: #2AABEE;
+    color: white;
+    box-shadow: 0 4px 15px rgba(42, 171, 238, 0.3);
+    border: none;
+}
+
+.telegram-popup .join-btn:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 8px 20px rgba(42, 171, 238, 0.4); 
+}
+
+.telegram-popup .joined-btn {
+    background: transparent;
+    color: #64748b;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.telegram-popup .joined-btn:hover { 
+    background: rgba(0,0,0,0.05); 
+    color: #1e293b; 
+}
+</style>
 </head>
-<body>
 
-    <!-- Header -->
-    <header class="glass-panel p-3 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-3">
-            <a href="fancode.html" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 transition-colors text-white">
-                <i class="fas fa-chevron-left"></i>
-            </a>
-            <div>
-                <h1 id="match-title" class="font-bold text-sm md:text-lg leading-tight truncate max-w-[200px] md:max-w-md">Loading Stream...</h1>
-                <div id="match-meta" class="text-xs text-slate-400 flex items-center gap-2 hidden">
-                    <span class="bg-red-500/20 text-red-400 px-1.5 rounded uppercase font-bold tracking-wider text-[10px]">Live</span>
-                    <span id="match-lang"></span>
-                </div>
-            </div>
-        </div>
+<div class="video-container">
+<div class="shaka-video-container" data-shaka-player>
+  <video id="video" autoplay muted playsinline preload="auto"></video>
+</div></div>
 
-        <div class="flex items-center gap-2">
-            <!-- Share -->
-            <button id="share-btn" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-sky-600 text-white transition-all group relative">
-                <i class="fas fa-share-nodes"></i>
-                <span class="tooltip absolute top-full mt-2 right-0 bg-slate-900 text-xs px-2 py-1 rounded border border-slate-700 whitespace-nowrap z-50">Share Match</span>
-            </button>
-            
-            <!-- Controls -->
-            <button onclick="toggleTheater()" class="hidden md:flex w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all items-center justify-center group relative">
-                <i class="fas fa-expand text-xs"></i>
-                <span class="tooltip absolute top-full mt-2 right-0 bg-slate-900 text-xs px-2 py-1 rounded border border-slate-700 whitespace-nowrap z-50">Theater Mode</span>
-            </button>
-        </div>
-    </header>
+<div id="telegramPopup" class="telegram-popup">
+  <h2>
+    <i class="fab fa-telegram"></i> Join Telegram Channel
+  </h2>
 
-    <!-- Main Player -->
-    <main class="player-container relative">
-        <!-- Loading Spinner -->
-        <div id="loading-overlay" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/90 transition-opacity duration-500">
-            <span class="loader mb-4"></span>
-            <p class="text-slate-400 text-sm animate-pulse">Initializing Secure Stream...</p>
-        </div>
+  <p>
+    Join our Telegram channel to get Live Match Links and Cricket Updates instantly.
+  </p>
 
-        <!-- Video Element -->
-        <video id="player" class="w-full h-full" playsinline controls crossorigin></video>
+  <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" class="popup-button join-btn">
+    Join Channel
+  </a>
 
-        <!-- Shortcuts Hint (Desktop only) -->
-        <div id="shortcuts-toast" class="absolute bottom-20 right-5 bg-black/80 backdrop-blur border border-white/10 p-4 rounded-xl translate-x-full opacity-0 transition-all duration-500 hidden md:block">
-            <h4 class="text-sky-400 text-xs font-bold uppercase mb-2">Shortcuts</h4>
-            <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-slate-300">
-                <span><kbd class="font-mono bg-slate-700 px-1 rounded">Space</kbd> Play/Pause</span>
-                <span><kbd class="font-mono bg-slate-700 px-1 rounded">F</kbd> Fullscreen</span>
-                <span><kbd class="font-mono bg-slate-700 px-1 rounded">M</kbd> Mute</span>
-                <span><kbd class="font-mono bg-slate-700 px-1 rounded">← / →</kbd> Seek 10s</span>
-            </div>
-        </div>
-    </main>
+  <button onclick="closePopup()" class="popup-button joined-btn">
+    Continue Watching
+  </button>
+</div>
 
-    <!-- Footer -->
-    <footer class="glass-panel p-3 shrink-0">
-        <div class="max-w-2xl mx-auto flex flex-col items-center gap-3">
-            <a href="#" id="footer-telegram" target="_blank" class="btn-modern btn-telegram w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white shadow-lg">
-                <i class="fab fa-telegram-plane text-xl"></i>
-                <span>Join Official Telegram Channel</span>
-            </a>
-            <p class="text-[10px] text-slate-500 text-center">
-                Press <span class="text-slate-300">CTRL + /</span> to view shortcuts. Stream issues? Check Telegram.
-            </p>
-        </div>
-    </footer>
+<script>
+  const queryParams = new URLSearchParams(window.location.search);
+  const url = queryParams.get('url');
+  
+    const channelstreamInfo = {  
+      streamUrl: url, 
+      authBearer: "",   
+      streamPoster: ""
+    };
 
-    <!-- Telegram Popup -->
-    <div id="popup" class="popup-backdrop fixed inset-0 z-[100] flex items-center justify-center opacity-0 invisible">
-        <div class="popup-content w-[90%] max-w-sm rounded-2xl p-6 text-center">
-            <div class="w-16 h-16 bg-sky-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-sky-400 text-3xl">
-                <i class="fab fa-telegram"></i>
-            </div>
-            <h3 class="text-xl font-bold text-white mb-2">Don't Miss the Action!</h3>
-            <p class="text-slate-400 text-sm mb-6">Join our private channel for backup links, live scores, and ad-free streams.</p>
-            
-            <div class="flex flex-col gap-3">
-                <a href="#" id="popup-join-btn" target="_blank" class="btn-modern btn-telegram py-3 rounded-lg font-bold text-white">
-                    Join Channel Now
-                </a>
-                <button onclick="closePopup()" class="py-2.5 rounded-lg font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-sm">
-                    Maybe Later
-                </button>
-            </div>
-        </div>
-    </div>
+    let player;
+    const video = document.getElementById('video');
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
-    
-    <script>
-        // --- ⚙️ CONFIGURATION (Advanced) ---
-        const CONFIG = {
-            TELEGRAM_URL: 'https://t.me/+rwZKMV0-L8wyOTll', // ✅ NEW LINK
-            DATA_URL: 'https://raw.githubusercontent.com/Jitendra-unatti/fancode/refs/heads/main/data/fancode.json',
-            POPUP_DELAY: 6000, // 6 Seconds
-            POPUP_STORAGE_KEY: 'fc_premium_popup_seen_v2'
+    async function initializePlayer() {
+      try {
+        player = new shaka.Player();
+        await player.attach(video);
+
+        const container = document.querySelector('.shaka-video-container');
+        const ui = new shaka.ui.Overlay(player, container, video);
+  
+        const config = {
+          'seekBarColors': {
+            base: 'rgba(255,255,255,.2)',
+            buffered: 'rgba(255,255,255,.4)',
+            played: 'rgb(255,0,0)',
+          },
+          'controlPanelElements': [
+            'play_pause',
+            'mute',
+            'time_and_duration',
+            'restart', 
+            'spacer',
+            'quality',
+            'language',
+            'picture_in_picture',
+            'fullscreen',
+            'overflow_menu'
+          ]
         };
+  
+        ui.configure(config);
 
-        // --- 🚀 INITIALIZATION ---
-        const els = {
-            player: document.getElementById('player'),
-            loading: document.getElementById('loading-overlay'),
-            title: document.getElementById('match-title'),
-            meta: document.getElementById('match-meta'),
-            lang: document.getElementById('match-lang'),
-            popup: document.getElementById('popup'),
-            footerLink: document.getElementById('footer-telegram'),
-            popupLink: document.getElementById('popup-join-btn')
-        };
-
-        // Set Links Dynamically
-        els.footerLink.href = CONFIG.TELEGRAM_URL;
-        els.popupLink.href = CONFIG.TELEGRAM_URL;
-
-        // --- 📡 DATA FETCHING ---
-        async function init() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get("id");
-            const cdnKey = params.get("cdn"); // e.g., 'adfree_stream' or 'akamaized'
-
-            if (!id || !cdnKey) {
-                showFatalError("Invalid Link", "Please return to the menu and select a match.");
-                return;
+        player.configure({
+          streaming: {
+            bufferingGoal: 10,
+            rebufferingGoal: 2,
+            bufferBehind: 30
+          },
+          manifest: {
+            retryParameters: {
+              timeout: 30000,
+              maxAttempts: 2,
+              baseDelay: 1000,
+              backoffFactor: 2,
+              fuzzFactor: 0.5
             }
+          }
+        });
 
+        video.autoplay = true;
+        video.controls = false;
+        video.volume = 1;
+        video.muted = false;
+        video.preload = 'auto';
+
+        await player.load(channelstreamInfo.streamUrl);
+
+        const attemptAutoplay = async () => {
+          try {
+            await video.play();
+          } catch (playError) {
+            video.muted = true;
             try {
-                const response = await fetch(CONFIG.DATA_URL);
-                if (!response.ok) throw new Error("Network response was not ok");
-                const data = await response.json();
-                
-                const match = data.matches.find(m => String(m.match_id) === String(id));
-                if (!match) throw new Error("Match ID not found.");
-
-                // Map Source logic
-                let streamUrl = "";
-                const sources = {
-                    ...match.STREAMING_CDN,
-                    adfree_stream: match.adfree_stream,
-                    dai_stream: match.dai_stream
-                };
-                delete sources.Primary_Playback_URL; // Remove if generic
-
-                if (sources[cdnKey] && sources[cdnKey] !== "Unavailable") {
-                    streamUrl = sources[cdnKey];
-                } else {
-                    throw new Error("Selected stream quality is unavailable.");
-                }
-
-                setupUI(match);
-                loadPlayer(streamUrl);
-
-            } catch (error) {
-                console.error(error);
-                showFatalError("Stream Offline", "This match stream is currently unavailable.");
+              await video.play();
+            } catch (mutedError) {
+              console.log('Interaction required');
             }
+          }
+        };
+
+        if (video.readyState >= 2) {
+          await attemptAutoplay();
+        } else {
+          video.addEventListener('canplay', attemptAutoplay, { once: true });
         }
 
-        // --- 🎨 UI UPDATES ---
-        function setupUI(match) {
-            els.title.textContent = match.title || "Live Stream";
-            document.title = `▶ ${match.title} | FanCode`;
-            
-            if (match.language) {
-                els.meta.classList.remove('hidden');
-                els.lang.textContent = match.language.replace('_', ' ').toUpperCase();
-            }
+      } catch (error) {
+        video.src = channelstreamInfo.streamUrl;
+        video.autoplay = true;
+        video.muted = false;
+        try {
+          await video.play();
+        } catch (fallbackError) {
+          video.muted = true;
+          await video.play();
         }
+      }
+    }
 
-        // --- 📺 PLAYER LOGIC (Advanced HLS) ---
-        function loadPlayer(source) {
-            const defaultOptions = {
-                controls: ['play-large', 'play', 'rewind', 'fast-forward', 'progress', 'current-time', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
-                keyboard: { focused: true, global: true },
-                settings: ['quality', 'speed'],
-                tooltips: { controls: true, seek: true }
-            };
+    document.addEventListener('DOMContentLoaded', () => {
+      initializePlayer().catch(error => {
+        console.error('Error initializing player:', error);
+      });
+    });
 
-            if (Hls.isSupported()) {
-                const hls = new Hls({
-                    manifestLoadingTimeOut: 10000,
-                    levelLoadingTimeOut: 10000,
-                    fragLoadingTimeOut: 10000,
-                    enableWorker: true
-                });
+  function showTelegramPopup(){
+    // Check if user already joined to avoid showing it multiple times
+    const alreadyJoined = localStorage.getItem("tgJoined") === "true";
 
-                hls.loadSource(source);
-                hls.attachMedia(els.player);
+    if(!alreadyJoined){
+      setTimeout(()=>{
+        document.getElementById("telegramPopup").style.display="block";
+        const video = document.getElementById("video");
+        if(video) video.pause();
+      }, 5000); // 5 seconds baad popup dikhega
+    }
+  }
 
-                hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-                    els.loading.classList.add('opacity-0', 'pointer-events-none'); // Fade out loader
-                    
-                    // Sort Qualities (Highest First)
-                    const availableQualities = hls.levels.map((l) => l.height);
-                    
-                    const player = new Plyr(els.player, {
-                        ...defaultOptions,
-                        quality: {
-                            default: availableQualities[availableQualities.length - 1], // Highest
-                            options: availableQualities,
-                            forced: true,
-                            onChange: (newQuality) => {
-                                hls.levels.forEach((level, levelIndex) => {
-                                    if (level.height === newQuality) hls.currentLevel = levelIndex;
-                                });
-                            },
-                        }
-                    });
+  function closePopup(){
+    document.getElementById("telegramPopup").style.display="none";
+    localStorage.setItem("tgJoined","true");
+    const video = document.getElementById("video");
+    if(video) video.play();
+  }
 
-                    // Auto Play with Mute fallback
-                    const playPromise = player.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(() => {
-                            player.muted = true;
-                            player.play();
-                            alertify("Autoplay blocked. Playing muted.");
-                        });
-                    }
-                });
-
-                // Pro Error Recovery
-                hls.on(Hls.Events.ERROR, function (event, data) {
-                    if (data.fatal) {
-                        switch (data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                console.log('Network error, recovering...');
-                                hls.startLoad();
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                console.log('Media error, recovering...');
-                                hls.recoverMediaError();
-                                break;
-                            default:
-                                hls.destroy();
-                                showFatalError("Playback Error", "Stream cannot be decoded.");
-                                break;
-                        }
-                    }
-                });
-
-            } else if (els.player.canPlayType('application/vnd.apple.mpegurl')) {
-                // Safari / iOS Fallback
-                els.player.src = source;
-                els.loading.classList.add('hidden');
-                const player = new Plyr(els.player, defaultOptions);
-                player.play();
-            }
-        }
-
-        // --- 🛠 UTILITIES ---
-        function showFatalError(title, msg) {
-            els.loading.innerHTML = `
-                <div class="text-center p-6 bg-red-900/20 border border-red-500/50 rounded-xl">
-                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-3"></i>
-                    <h2 class="text-xl font-bold text-white mb-1">${title}</h2>
-                    <p class="text-red-200 text-sm">${msg}</p>
-                    <a href="fancode.html" class="mt-4 inline-block bg-red-600 px-4 py-2 rounded text-sm font-bold hover:bg-red-500 transition">Go Back</a>
-                </div>
-            `;
-        }
-
-        function toggleTheater() {
-            document.body.classList.toggle('theater-mode');
-        }
-
-        // Popup Logic
-        setTimeout(() => {
-            if (!localStorage.getItem(CONFIG.POPUP_STORAGE_KEY)) {
-                els.popup.classList.remove('invisible');
-                els.popup.classList.add('active');
-            }
-        }, CONFIG.POPUP_DELAY);
-
-        function closePopup() {
-            els.popup.classList.remove('active');
-            setTimeout(() => els.popup.classList.add('invisible'), 300);
-            localStorage.setItem(CONFIG.POPUP_STORAGE_KEY, 'true');
-        }
-
-        // Share Button Logic
-        document.getElementById('share-btn').addEventListener('click', async () => {
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: document.title,
-                        url: window.location.href
-                    });
-                } catch (err) { console.log('Share canceled'); }
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                const btn = document.getElementById('share-btn');
-                const originalIcon = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check text-green-400"></i>';
-                setTimeout(() => btn.innerHTML = originalIcon, 2000);
-            }
-        });
-
-        // Keyboard Shortcut Toggle (Ctrl + /)
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === '/') {
-                const toast = document.getElementById('shortcuts-toast');
-                toast.classList.remove('translate-x-full', 'opacity-0');
-                setTimeout(() => toast.classList.add('translate-x-full', 'opacity-0'), 5000);
-            }
-        });
-
-        // Start
-        document.addEventListener('DOMContentLoaded', init);
-
-    </script>
-</body>
-</html>
+  window.addEventListener("load", showTelegramPopup);
+</script>
